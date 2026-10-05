@@ -1,0 +1,55 @@
+---
+titleFull: Invoice Templates — Free Professional Designs, PDF · Folio
+description: Free professional invoice templates for freelancers, consultants, studios, contractors and small businesses. Choose a layout, fill it in online and download a PDF.
+nav: templates
+bodyClass: page-templates
+hub: templates
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>Invoice templates</h1>
+        <p class="lead page-head__lead muted" data-reveal>{{templates.CountWord}} free templates for trades, studios and small businesses, each set as a proper document. Choose one, fill it in with the invoice generator, and change your mind at any time. Switching templates never touches what you have typed.</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-labelledby="library-title">
+      <div class="wrap">
+        <h2 class="visually-hidden" id="library-title">All templates</h2>
+        <div class="tpl-filter tlib__filter" role="group" aria-label="Filter templates" data-tpl-filter hidden>{{templates.filters}}</div>
+        <ul class="tlib" data-tpl-list data-reveal-group>
+        {{templates.grid}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="how-tpl-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="how-tpl-title" data-reveal>How templates work</h2>
+          <div class="opening__body">
+            <p class="statement" data-reveal>The template is the layout; the invoice is yours. Your details, line items and totals stay the same whichever template you choose.</p>
+            <div class="grid privacy-cols mt-7" data-reveal-group>
+              <div data-reveal><h3 class="h3">Switch at any time</h3><p>Change the template from the editor or the preview. The new layout appears immediately, with nothing to re-enter.</p></div>
+              <div data-reveal><h3 class="h3">Made for the work</h3><p>Trade and professional templates add what those invoices need: hours and rates, labor and materials, phases, deposits and balances.</p></div>
+              <div data-reveal><h3 class="h3">The same PDF you see</h3><p>Every template exports to a typeset PDF that matches the preview exactly, ready to send to a client.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="tpl-guides-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="tpl-guides-title" data-reveal>Guides &amp; tools</h2>
+          <div class="opening__body work-intro">
+            <p class="h2" data-reveal>Before you send it.</p>
+            <a class="go work-intro__all" href="{{root}}invoice-guides/" data-reveal>All guides {{> arrow}}</a>
+          </div>
+        </div>
+        <div class="mt-8">{{library.guidesFew}}</div>
+      </div>
+    </section>
+
+    {{> cta}}

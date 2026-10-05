@@ -1,0 +1,30 @@
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>{{article.title}}</h1>
+        <div class="page-head__lead" data-reveal>
+          <p class="lead muted article__lead">{{article.lead}}</p>
+          <p class="label article__meta">Updated <time datetime="{{article.updatedISO}}">{{article.updated}}</time> · {{article.minutes}} min read</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-label="Guide">
+      <div class="wrap grid article">
+        <nav class="article__toc" aria-labelledby="toc-title">
+          <h2 class="label article__toc-title" id="toc-title">On this page</h2>
+          <ol class="svc-toc__list article__toc-list">{{article.toc}}</ol>
+        </nav>
+        <article class="article__body prose">
+{{article.body}}
+        </article>
+      </div>
+    </section>
+
+    {{article.faqs}}
+
+    {{article.related}}
+
+    {{article.readNext}}
+
+    {{> cta}}

@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Print: only the invoice. The app renders a clean copy into .print-root.
+   ========================================================================== */
+
+.print-root { display: none; }
+
+@media print {
+  html, body, .app-body { background: #fff !important; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .app, .site-header, .site-footer, .mobile-menu, .toast, .skip-link { display: none !important; }
+  .print-root { display: block !important; }
+  .print-root .doc {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+    box-shadow: none;
+  }
+  .print-root .doc__foot { position: static; margin-top: 56px; }
+  .print-root .doc__items thead { display: table-header-group; }
+  .print-root .doc__items tr,
+  .print-root .doc__totals,
+  .print-root .doc__notes > div { break-inside: avoid; }
+  .print-root .is-ph { display: none; }
+}

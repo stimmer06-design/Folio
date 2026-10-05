@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+.display,
+.h1,
+.h2,
+.h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  text-wrap: balance;
+  font-variant-numeric: lining-nums;
+}
+
+.display {
+  font-size: var(--fs-display);
+  line-height: 1.0;
+  letter-spacing: -0.022em;
+}
+.h1 {
+  font-size: var(--fs-h1);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+}
+.h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+}
+.h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+.display em, .h1 em, .h2 em, .h3 em { font-style: italic; letter-spacing: -0.01em; }
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.42;
+  text-wrap: pretty;
+  max-width: 34ch;
+}
+
+.prose {
+  max-width: 62ch;
+  text-wrap: pretty;
+  hyphens: manual;
+}
+.prose p + p { margin-top: 1em; }
+.prose--indent p + p { margin-top: 0; text-indent: 1.5em; }
+
+.small {
+  font-size: var(--fs-small);
+  line-height: 1.45;
+}
+.muted { color: var(--ash); }
+
+/* Sans labels: the "small print" voice of the identity */
+.label {
+  font-family: var(--sans);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.label--ash { color: var(--ash); }
+
+/* True small caps from the full EB Garamond */
+.smcp {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+}
+
+.figure-num {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Wordmark — FOLIO in widely spaced Garamond capitals */
+.wordmark {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  margin-right: -0.38em; /* cancel trailing tracking for optical alignment */
+}
+
+/* Inline text link: hairline underline that firms up on hover */
+.link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color var(--t-fast) var(--ease);
+}
+.link:hover { text-decoration-color: currentColor; }
+
+.drop::first-letter {
+  float: left;
+  font-size: 4.1em;
+  line-height: 0.82;
+  padding: 0.08em 0.08em 0 0;
+  margin-left: -0.04em;
+  font-variant-numeric: lining-nums;
+}

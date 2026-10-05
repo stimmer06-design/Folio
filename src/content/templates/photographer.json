@@ -1,0 +1,39 @@
+{
+  "name": "Photographer",
+  "layout": "photographer",
+  "title": "Free Photography Invoice Template",
+  "description": "A free photography invoice template: session or package, editing, prints and albums, licensing, travel and the booking deposit. Fill it in online, download a PDF.",
+  "summary": "Session, prints, editing and travel in their own sections, with the booking deposit deducted.",
+  "intro": "The session, the prints, the editing and the travel in their own sections, each package described beneath its price, and the booking deposit deducted. Set in an italic serif that suits the work.",
+  "explanation": [
+    "Photography clients book a package, then add to it: another hour, an album, extra retouching, travel to the venue. By the time the invoice arrives, they need a clear record of what they booked, what they added and what they have already paid.",
+    "This template sorts lines into Session, Prints & albums, Editing, Travel and Additional services, and prints each package’s contents beneath its name. The shoot name or date sits in the header, and the deposit taken at booking is subtracted to show the balance.",
+    "It suits wedding, portrait, family, event, product and commercial photographers. For video work, the [videographer template](/invoice-templates/videographer/) adds pre-production, post-production and music licensing."
+  ],
+  "fieldsTitle": "What to put on a photography invoice",
+  "fields": [
+    { "name": "Shoot", "text": "What and when: “Wedding — Saturday, September 12”, or “Product shoot, spring catalog”." },
+    { "name": "Session or package", "text": "The package name and price, with what it includes on the line beneath: hours, number of photographers, gallery." },
+    { "name": "Editing", "text": "Retouching beyond the package, priced per image or per hour." },
+    { "name": "Prints and albums", "text": "Physical products with sizes and quantities: “Fine-art album, 12 × 12 in, 40 pages”." },
+    { "name": "Licensing", "text": "For commercial work, the usage you are licensing (media, territory, duration), as a line or in the notes, so the client knows what they may do with the images." },
+    { "name": "Travel", "text": "Mileage, travel time or accommodation, at the rate you quoted." },
+    { "name": "Deposit", "text": "The booking deposit or retainer, subtracted to show the balance due." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a wedding invoice in the generator. Your saved studio details are kept." },
+    { "title": "Package first", "text": "Enter the couple or client and the shoot, then the package. Press Return in the description to list what it includes." },
+    { "title": "Add-ons and travel", "text": "Add prints, albums, extra editing and travel, choosing the section for each line." },
+    { "title": "Deposit and send", "text": "Enter the deposit; the balance due appears. Download the PDF and send it with the gallery link." }
+  ],
+  "faqs": [
+    { "q": "What should a photography invoice include?", "a": "Your studio details, the client, the shoot name and date, the package and what it includes, any add-ons, travel, the total, the deposit already paid, the balance due, the due date and how to pay." },
+    { "q": "Do photographers charge sales tax?", "a": "It depends on the state and on what you sell. Physical prints and albums are taxable in many states; some states also tax photography services or digital images. Check your state’s rules and enter the rate that applies." },
+    { "q": "When should I send the final invoice?", "a": "Many photographers invoice the balance before the shoot or on delivery of the gallery, as agreed in the contract. Whatever you agreed, print the due date on the invoice." },
+    { "q": "How do I show the image license?", "a": "For commercial work, describe the license in the line or the notes: what media, which territory, for how long. The invoice then records what the client paid for." }
+  ],
+  "relatedTemplates": ["videographer", "designer", "editorial"],
+  "relatedGuides": ["how-to-invoice-a-client", "invoice-vs-receipt", "how-to-send-an-invoice"],
+  "relatedTools": ["sales-tax-calculator"],
+  "updated": "2026-10-01"
+}

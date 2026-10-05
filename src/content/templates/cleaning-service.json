@@ -1,0 +1,49 @@
+{
+  "name": "Cleaning Service",
+  "layout": "services",
+  "title": "Free Cleaning Service Invoice Template",
+  "description": "A free cleaning service invoice template for recurring and one-off cleans: visits, rates, add-ons and the service address. Fill it in online and download a PDF.",
+  "summary": "Visits × rate for recurring cleans, with add-ons and the service address at the top.",
+  "intro": "Count the cleans, add the extras, and print the address you clean at the top. A month of biweekly visits fits on one compact page.",
+  "explanation": [
+    "Cleaning businesses invoice the same clients again and again. The invoice has to be quick to make, quick to read, and clear about what was regular service and what was extra this time.",
+    "This template uses Folio’s home services layout. Work is counted in visits at a rate, so “Standard clean, biweekly — 2 visits at $165” is one line. Add-ons such as an oven or interior windows go on their own lines, and the service address prints beside the client.",
+    "It suits house cleaners, maid services, move-out and end-of-tenancy cleans, and small commercial cleaning contracts. Duplicate last month’s invoice to start this month’s."
+  ],
+  "fieldsTitle": "What to put on a cleaning invoice",
+  "fields": [
+    { "name": "Service address", "text": "The address you clean, which may differ from the billing address for landlords and property managers." },
+    { "name": "Regular cleans", "text": "The service and frequency, with the number of visits in the period: “Standard clean, biweekly — 3 bed / 2 bath”, 2 visits." },
+    { "name": "Add-ons", "text": "Extras with their own price: inside the oven or fridge, interior windows, laundry, a post-party clean." },
+    { "name": "Supplies", "text": "If the client pays for supplies or special products, list them; if they’re included in your rate, say so in the notes." },
+    { "name": "Dates", "text": "The visit dates or the month covered, in the description or the notes, so the client can check them against their calendar." },
+    { "name": "Cancellation fee", "text": "A late-cancellation or lock-out charge, as its own line, only if your service agreement includes one." },
+    { "name": "Next visit", "text": "The next scheduled clean and any access note, in the notes." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a month of biweekly cleans in the generator." },
+    { "title": "Count the visits", "text": "Enter the client and the service address, then each type of clean with the number of visits and your rate." },
+    { "title": "Add the extras", "text": "Add one line per add-on. The total updates as you go." },
+    { "title": "Next month, duplicate", "text": "Download the PDF and send it. Next month, duplicate this invoice from your list and change only the visits." }
+  ],
+  "faqs": [
+    { "q": "How do I invoice recurring cleaning clients?", "a": "Invoice on a fixed rhythm (after each clean, weekly or monthly) and count visits as the quantity. In Folio, duplicate last period’s invoice: the client and items are copied, the dates move to today and the number moves on." },
+    { "q": "Should I charge per visit or per hour?", "a": "Either works on this template. Per visit is simpler for regular cleans and easier for clients to budget; per hour suits deep cleans and one-offs where the time varies. Change the quantity and rate to match." },
+    { "q": "How do I show a tip or a discount?", "a": "Clients add tips when paying, so they don’t belong on the invoice. A discount, for a first clean or a referral, goes in the discount field as a percentage or an amount." },
+    { "q": "When should a cleaning invoice be paid?", "a": "Many cleaners ask for payment on receipt or within a week. Agree it when you take the client on, and print it on every invoice." }
+  ],
+  "sample": {
+    "business": { "name": "Brightside Cleaning Co.", "email": "hello@brightsideclean.com", "phone": "(512) 555-0186", "address": "2401 East Cesar Chavez Street\nAustin, TX 78702", "website": "brightsideclean.com" },
+    "client": { "name": "Dana Whitfield", "email": "dana.whitfield@example.com", "address": "1708 Kenwood Avenue\nAustin, TX 78704" },
+    "project": "1708 Kenwood Avenue, Austin",
+    "number": "BC-0217",
+    "terms": "net7",
+    "items": [["Standard clean, biweekly — 3 bed / 2 bath", "2", "165"], ["Inside oven and refrigerator", "1", "60"], ["Interior windows, ground floor", "1", "75"]],
+    "payment": "Card at brightsideclean.com/pay, Zelle to hello@brightsideclean.com, or check.",
+    "notes": "Next clean: Thursday, October 15. We’ll use the lockbox as usual."
+  },
+  "relatedTemplates": ["landscaper", "small-business", "plumber"],
+  "relatedGuides": ["how-to-invoice-a-client", "how-to-send-an-invoice", "how-to-make-an-invoice"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

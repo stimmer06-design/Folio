@@ -1,0 +1,170 @@
+---
+titleFull: Free Invoice Generator — Create Professional PDF Invoices · Folio
+description: Folio is a free online invoice generator. Create a professional invoice in your browser, watch it update as you type, and download a clean PDF. No account required.
+ogTitle: Folio — Professional invoices, without the paperwork
+bodyClass: page-home
+schema: home
+---
+    <!-- Hero ----------------------------------------------------------------->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap grid hero__grid">
+        <div class="hero__text">
+          <p class="label hero__label" data-reveal>Free online invoice generator</p>
+          <h1 class="display hero__title" id="hero-title" data-reveal>Professional invoices. Without the paperwork.</h1>
+          <p class="hero__lead" data-reveal>Fill in the details, watch the invoice take shape beside them, and download a clean, typeset PDF. Free, private, and no account required.</p>
+          <div class="actions actions--stack-sm hero__actions" data-reveal>
+            <a class="btn" href="{{root}}app/">Create an invoice {{> arrow}}</a>
+            <a class="go" href="#how-it-works">See how it works <svg class="arrow arrow--down" viewBox="0 0 10 14" aria-hidden="true"><path d="M5 0v12.5M1 8.5l4 4 4-4"/></svg></a>
+          </div>
+          <ul class="hero__facts" data-reveal>
+            <li>Free, without limits</li>
+            <li>No account</li>
+            <li>PDF &amp; print</li>
+          </ul>
+        </div>
+        <figure class="hero__visual" data-reveal="fade">
+          <div class="plate plate--stone hero__plate">
+            <div class="plate__surface hero__surface">
+              <div class="hero__doc">{{> sample-doc}}</div>
+              <div class="hero__ui">{{> ui-items}}</div>
+            </div>
+          </div>
+          <figcaption class="plate__caption"><span class="label">Made with Folio</span><p>An invoice and the part of the editor that produced it. Every total is calculated as you type.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- How it works --------------------------------------------------------->
+    <section class="section how" id="how-it-works" aria-labelledby="how-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>How it works</p>
+          <div class="opening__body">
+            <h2 class="h2" id="how-title" data-reveal>Three steps. About three minutes.</h2>
+          </div>
+        </div>
+        <ol class="steps mt-8" data-reveal-group>
+          <li class="step" data-reveal>
+            <p class="step__num">01</p>
+            <h3 class="step__title">Your details, once.</h3>
+            <p class="step__text">Enter your business name, address and logo. Folio remembers them, so every invoice after the first starts already filled in.</p>
+            {{> ui-details}}
+          </li>
+          <li class="step" data-reveal>
+            <p class="step__num">02</p>
+            <h3 class="step__title">The work, line by line.</h3>
+            <p class="step__text">Add services or products with a quantity and price. Tax, discounts and shipping are worked out as you type, and the invoice updates beside you.</p>
+            <div class="ui-frag ui-frag--mini" aria-hidden="true">
+              <div class="item"><span class="fld__input ui-val">Brand identity</span><span class="fld__input ui-val ui-num">1</span><span class="fld__input ui-val ui-num">2,400.00</span><span class="item__amount">$2,400.00</span><span></span></div>
+              <span class="add-item">+ Add item</span>
+            </div>
+          </li>
+          <li class="step" data-reveal>
+            <p class="step__num">03</p>
+            <h3 class="step__title">A PDF, ready to send.</h3>
+            <p class="step__text">Download a typeset PDF or print it directly. No watermark, no sign-up, and nothing is uploaded anywhere.</p>
+            {{> ui-export}}
+          </li>
+        </ol>
+        <div class="how__cta" data-reveal>
+          <a class="btn" href="{{root}}app/">Create your first invoice {{> arrow}}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- The document --------------------------------------------------------->
+    <section class="section section--ivory" aria-labelledby="doc-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>The invoice</p>
+          <div class="opening__body">
+            <h2 class="h2 doc-intro__title" id="doc-title" data-reveal>A document, not a dashboard export.</h2>
+            <p class="lead muted mt-5" data-reveal>Your client opens the PDF and sees a properly typeset invoice: clear hierarchy, aligned figures, and nothing that isn’t needed.</p>
+          </div>
+        </div>
+        <div class="grid anatomy mt-8">
+          <figure class="plate plate--oat anatomy__plate" data-reveal="fade">
+            <div class="plate__surface anatomy__surface">
+              <div class="anatomy__doc">{{> sample-doc}}</div>
+            </div>
+            <figcaption class="plate__caption"><span class="label">Classic</span><p>Set in Garamond with sans-serif labels. A Modern style in Grotesk is one click away.</p></figcaption>
+          </figure>
+          <ol class="anatomy__notes" data-reveal-group>
+            <li data-reveal><h3>Your name, your logo</h3><p>Top left, where a letterhead puts it. Folio never adds its own branding.</p></li>
+            <li data-reveal><h3>Amount due, stated once</h3><p>Set large beside the due date and terms, so nobody has to look for it.</p></li>
+            <li data-reveal><h3>Figures that line up</h3><p>Tabular numerals and hairline rules keep quantities, prices and totals in clean columns.</p></li>
+            <li data-reveal><h3>How to pay you</h3><p>Bank details or a payment link sit at the foot of the page, where clients expect them.</p></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features index ------------------------------------------------------>
+    <section class="section" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>Features</p>
+          <div class="opening__body work-intro">
+            <h2 class="h2" id="features-title" data-reveal>Everything an invoice needs.</h2>
+            <a class="go work-intro__all" href="{{root}}features/" data-reveal>All features {{> arrow}}</a>
+          </div>
+        </div>
+        <ol class="index mt-8" data-reveal-group>
+          <li data-reveal><a class="index__row" href="{{root}}features/#preview"><span class="index__num">i.</span><span class="index__title">Live preview</span><span class="index__desc">The invoice redraws with every keystroke, exactly as it will print.</span><span class="index__go">{{> arrow}}</span></a></li>
+          <li data-reveal><a class="index__row" href="{{root}}features/#calculations"><span class="index__num">ii.</span><span class="index__title">Tax, discounts &amp; shipping</span><span class="index__desc">Percentage or fixed discounts, any tax name and rate, and an extra charge for shipping or materials.</span><span class="index__go">{{> arrow}}</span></a></li>
+          <li data-reveal><a class="index__row" href="{{root}}features/#export"><span class="index__num">iii.</span><span class="index__title">PDF &amp; print</span><span class="index__desc">Vector PDFs with embedded fonts and selectable text, on US Letter or A4.</span><span class="index__go">{{> arrow}}</span></a></li>
+          <li data-reveal><a class="index__row" href="{{root}}features/#library"><span class="index__num">iv.</span><span class="index__title">Saved invoices</span><span class="index__desc">Every invoice is kept as you type. Reopen, duplicate or delete them from one list.</span><span class="index__go">{{> arrow}}</span></a></li>
+          <li data-reveal><a class="index__row" href="{{root}}features/#customise"><span class="index__num">v.</span><span class="index__title">Logo, templates &amp; currency</span><span class="index__desc">Your logo, {{templates.countWord}} invoice templates, sixteen currencies and standard payment terms.</span><span class="index__go">{{> arrow}}</span></a></li>
+          <li data-reveal><a class="index__row" href="{{root}}features/#privacy"><span class="index__num">vi.</span><span class="index__title">Private by design</span><span class="index__desc">No account and no server. Your invoices and your clients’ details stay on your device.</span><span class="index__go">{{> arrow}}</span></a></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Privacy statement --------------------------------------------------->
+    <section class="section section--ivory" aria-labelledby="privacy-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="privacy-title" data-reveal>Private by design</h2>
+          <div class="opening__body">
+            <p class="statement" data-reveal>Your invoices never leave your computer. There is no account to create and no server holding your clients’ names or addresses. Folio runs in your browser; a payment link, if you add one, shares only an invoice’s number and amount.</p>
+            <dl class="facts mt-8" data-reveal-group>
+              <div class="fact" data-reveal><dt class="visually-hidden">Price</dt><dd><span class="fact__num">$0</span><span class="label fact__label">for every invoice you make, with no limit and no watermark</span></dd></div>
+              <div class="fact" data-reveal><dt class="visually-hidden">Accounts</dt><dd><span class="fact__num">None</span><span class="label fact__label">No sign-up, no password, no email address</span></dd></div>
+              <div class="fact" data-reveal><dt class="visually-hidden">Uploads</dt><dd><span class="fact__num">0 bytes</span><span class="label fact__label">of your clients’ details sent to any server</span></dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing teaser ------------------------------------------------------>
+    <section class="section" aria-labelledby="pricing-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>Pricing</p>
+          <div class="opening__body work-intro">
+            <h2 class="h2" id="pricing-title" data-reveal>Free for the invoice you need today.</h2>
+            <a class="go work-intro__all" href="{{root}}pricing/" data-reveal>Compare plans {{> arrow}}</a>
+          </div>
+        </div>
+        <div class="grid plans plans--compact mt-8" data-reveal-group>
+          {{> plan-free}}
+          {{> plan-pro}}
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ excerpt ----------------------------------------------------------->
+    <section class="section section--flush-top" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="faq-title" data-reveal>Questions</h2>
+          <div class="opening__body--narrow" data-reveal>
+            <div class="faq">{{faq.home}}</div>
+            <a class="go mt-6" href="{{root}}faq/">All questions {{> arrow}}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {{> cta}}

@@ -1,0 +1,38 @@
+{
+  "name": "Classic",
+  "layout": "classic",
+  "title": "Free Classic Invoice Template",
+  "description": "A free classic invoice template set in Garamond: your letterhead, billing details and a clear amount due. Fill it in online and download a professional PDF.",
+  "summary": "Garamond letterhead on the left, the invoice number on the right. Folio’s original.",
+  "intro": "Your name set as a letterhead, the invoice number opposite, and the amount due stated once, beside the date it is due. An invoice that reads like correspondence from an established business.",
+  "explanation": [
+    "The classic invoice is laid out like a business letter, because for most of the history of invoicing that is what it was. Clients still read it that way: who it is from at the top left, who it is to beneath, then what it is for, what it costs and how to pay.",
+    "This template sets your name and logo in Garamond as a letterhead, places the invoice number in a quiet serif on the right, and gathers billed-to, issue date, due date and amount due on one line. Totals sit in a narrow column; payment details and notes at the foot.",
+    "It suits almost anyone: consultants, studios, shops, sole traders and professional practices. If your brand uses a sans-serif, the [Modern template](/invoice-templates/modern/) keeps the same arrangement in Grotesk."
+  ],
+  "fieldsTitle": "What’s on the classic invoice",
+  "fields": [
+    { "name": "Letterhead", "text": "Your logo, business name and contact details, top left, as on headed paper." },
+    { "name": "Invoice number", "text": "Set opposite the letterhead, where clients and bookkeepers look for it first." },
+    { "name": "Billed to and dates", "text": "The client, issue date, due date and amount due on one line, so the essentials are read together." },
+    { "name": "Line items", "text": "Description, quantity, unit price and amount, with figures aligned in tabular numerals." },
+    { "name": "Totals", "text": "Subtotal, discount, tax, any shipping or other charge, and the total, in a narrow column on the right." },
+    { "name": "Payment and notes", "text": "How to pay you, and a short note, at the foot of the page." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens the classic example in the generator; Start with a blank one opens it empty." },
+    { "title": "Your details once", "text": "Enter your business details and logo. They are remembered for every invoice after this one." },
+    { "title": "The client and the work", "text": "Add the client and each item. Tax, discount and totals are calculated as you type." },
+    { "title": "Download", "text": "Download a vector PDF with the typefaces embedded, or print it." }
+  ],
+  "faqs": [
+    { "q": "What is a classic invoice layout?", "a": "One arranged like a business letter: sender at the top left, recipient beneath, the invoice number and dates near the top, items in a table, totals on the right and payment details at the bottom. Most accounting software uses a version of it, which is why clients find it easy to read." },
+    { "q": "Can I switch to another template later?", "a": "Yes. Change template from the generator at any time; your details, items and totals stay exactly as they are." },
+    { "q": "Which typeface does it use?", "a": "EB Garamond for names and figures, with small sans-serif labels. The PDF embeds the fonts, so it looks the same on your client’s computer." },
+    { "q": "Is it free to use?", "a": "Yes: no account, no watermark and no limit on how many invoices you make." }
+  ],
+  "relatedTemplates": ["modern", "small-business", "minimal"],
+  "relatedGuides": ["how-to-make-an-invoice", "what-to-put-on-an-invoice", "how-to-create-an-invoice-pdf"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

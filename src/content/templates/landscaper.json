@@ -1,0 +1,38 @@
+{
+  "name": "Landscaper",
+  "layout": "services",
+  "title": "Free Landscaping Invoice Template",
+  "description": "A free landscaping and lawn care invoice template: recurring visits, one-off jobs, materials by the yard, and the property address. Download as a PDF.",
+  "summary": "Recurring lawn care, one-off jobs and materials, with the property address at the top.",
+  "intro": "Weekly mowing counted in visits, the hedge and leaf work on their own lines, and mulch by the cubic yard. One compact page per property, per month.",
+  "explanation": [
+    "Lawn and landscaping clients usually get one invoice a month for regular care, plus extras for the season: a spring clean-up, leaf removal, planting or mulch. The invoice needs to separate the routine from the one-off so nobody is surprised.",
+    "This template uses Folio’s home services layout: one compact column, work counted in visits at a rate, and the property address printed beside the client, which matters when a homeowner or a management company has several properties.",
+    "It works for lawn care, landscape maintenance, garden design and installation, tree and hedge work, and snow removal in winter."
+  ],
+  "fieldsTitle": "What to put on a landscaping invoice",
+  "fields": [
+    { "name": "Property address", "text": "Where the work was done, in the Service address field. Essential for clients with more than one property." },
+    { "name": "Recurring service", "text": "The service and the month, counted in visits: “Weekly lawn care — October”, 4 visits at $85." },
+    { "name": "One-off jobs", "text": "Seasonal work as separate lines: hedge trimming, aeration, leaf removal, storm clean-up." },
+    { "name": "Materials", "text": "Mulch, soil, stone or plants with the unit you sell them in: “Bark mulch, cubic yards”, 3 at $48." },
+    { "name": "Disposal", "text": "Green-waste hauling or dump fees, as their own line if you charge for them." },
+    { "name": "Next visit and access", "text": "The next scheduled visit and any gate code or access note, in the notes. Leave codes out if the invoice might be forwarded." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a month of lawn care in the generator, with your saved business details." },
+    { "title": "One property, one invoice", "text": "Enter the client and the property address, then the visits and any extra jobs for the month." },
+    { "title": "Materials", "text": "Add materials by the unit: cubic yards, bags, plants. Add tax if your state taxes them." },
+    { "title": "Send and repeat", "text": "Download the PDF and send it. Next month, duplicate this invoice and change the visits." }
+  ],
+  "faqs": [
+    { "q": "How do landscapers invoice monthly lawn care?", "a": "One invoice per property per month, with the regular service counted in visits and anything extra on its own line. In Folio, duplicating last month’s invoice copies the client and items and moves the date and number on." },
+    { "q": "Should I charge for materials separately?", "a": "Yes, for anything substantial. Showing mulch or plants by the unit lets the client see that the price follows the quantity, and in many states materials are taxed differently from labor." },
+    { "q": "What if a visit is skipped for weather?", "a": "Bill the visits that happened. If your agreement is a flat monthly fee regardless, say so in the notes so the client isn’t left counting." },
+    { "q": "Can I use this for snow removal in winter?", "a": "Yes. Change the service to “Snow plowing — driveway and walk” and count the visits or pushes in the period." }
+  ],
+  "relatedTemplates": ["cleaning-service", "contractor", "small-business"],
+  "relatedGuides": ["how-to-invoice-a-client", "what-to-put-on-an-invoice", "how-to-send-an-invoice"],
+  "relatedTools": ["sales-tax-calculator"],
+  "updated": "2026-10-01"
+}

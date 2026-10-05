@@ -1,0 +1,88 @@
+/* ==========================================================================
+   "Choose a template" sheet — same materials as the invoices sheet:
+   bone ground with grain, ink hairlines, square corners, sans-caps labels.
+   ========================================================================== */
+
+.tpl-sheet {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--bone);
+  background-image: var(--grain);
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.tpl-sheet::backdrop { background: rgba(22, 21, 19, 0.35); }
+@media (prefers-reduced-motion: no-preference) {
+  .tpl-sheet[open] { animation: sheet-fade 220ms var(--ease); }
+}
+@keyframes sheet-fade { from { opacity: 0; } }
+
+.tpl-sheet__inner { max-width: calc(80rem + 2 * var(--margin)); margin: 0 auto; padding: var(--s-6) var(--margin) var(--s-9); }
+.tpl-sheet__head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-5); padding-bottom: var(--s-5); border-bottom: var(--hair-ink); }
+.tpl-sheet__title { font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem); line-height: 1.1; letter-spacing: -0.012em; }
+.tpl-sheet__note { margin-top: var(--s-2); color: var(--ash); font-size: 1rem; }
+.tpl-sheet__close { margin-right: -0.75rem; }
+
+/* Filter: the site's nav-link voice, underline for the current choice */
+.tpl-filter { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-5); margin-top: var(--s-4); }
+.tpl-filter__btn {
+  position: relative;
+  min-height: 44px; padding: 0;
+  border: 0; background: none; cursor: pointer;
+  font-family: var(--sans); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ash);
+}
+.tpl-filter__btn::after {
+  content: ""; position: absolute; left: 0; right: 0.16em; bottom: 11px; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t-mid) var(--ease);
+}
+.tpl-filter__btn:hover { color: var(--ink); }
+.tpl-filter__btn[aria-pressed="true"] { color: var(--ink); }
+.tpl-filter__btn[aria-pressed="true"]::after, .tpl-filter__btn:hover::after { transform: scaleX(1); }
+
+/* Cards: a plate with the page on it, then the text — no boxes, no radii */
+.tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--s-8) var(--gutter);
+  margin-top: var(--s-6);
+}
+.tpl-card { display: flex; flex-direction: column; min-width: 0; }
+.tpl-card[hidden] { display: none; }
+.tpl-card__frame {
+  position: relative;
+  aspect-ratio: 8.5 / 11;
+  overflow: hidden;
+  background: #fffefb;
+  outline: 1px solid var(--rule);
+  box-shadow: 0 1px 1px rgba(34, 26, 16, 0.06), 0 10px 22px -12px rgba(34, 26, 16, 0.22);
+}
+.tpl-card__frame .doc { position: absolute; top: 0; left: 0; transform-origin: 0 0; pointer-events: none; }
+.tpl-card.is-current .tpl-card__frame { outline: 2px solid var(--ink); outline-offset: 4px; }
+.tpl-card__text { display: flex; flex-direction: column; align-items: flex-start; flex: 1; padding-top: var(--s-4); }
+.tpl-card__cat { font-family: var(--sans); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); }
+.tpl-card__name { margin-top: var(--s-2); font-size: 1.5rem; line-height: 1.15; }
+.tpl-card__desc { margin-top: var(--s-2); font-size: 0.9375rem; line-height: 1.45; color: var(--ash); text-wrap: pretty; }
+.tpl-card__use { margin-top: auto; }
+.tpl-card__desc + .tpl-card__use, .tpl-card__desc + .tpl-card__current { margin-top: var(--s-4); }
+.tpl-card__current { margin-top: var(--s-4); min-height: 2.5rem; display: inline-flex; align-items: center; gap: var(--s-2); font-family: var(--sans); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+.tpl-card__current::before { content: ""; width: 6px; height: 6px; background: var(--ink); }
+
+/* Phones: a row per template, the page beside its description */
+@media (max-width: 34.99rem) {
+  .tpl-grid { grid-template-columns: 1fr; gap: 0; border-top: var(--hair); }
+  .tpl-card { flex-direction: row; gap: var(--s-4); padding: var(--s-5) 0; border-bottom: var(--hair); }
+  .tpl-card__frame { flex: none; width: 42%; }
+  .tpl-card__text { padding-top: 0; }
+  .tpl-card__name { font-size: 1.3125rem; }
+  .tpl-card__use { min-height: 2.75rem; }
+}

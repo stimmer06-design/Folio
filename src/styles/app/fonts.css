@@ -1,0 +1,96 @@
+/* ==========================================================================
+   Invoice font — the "Font" field (section 07) and its picker: a small panel
+   beside the field, a bottom sheet on phones. Bone and ink, hairlines, square
+   corners; each option is set in its own face.
+   ========================================================================== */
+
+.font-field {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  width: 100%; min-height: 2.75rem; padding: 0.35rem 0.75rem;
+  border: 1px solid #c9c1b2; border-radius: 0; background: #fbf9f4; color: var(--ink);
+  text-align: left; cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease);
+}
+.font-field:hover { border-color: #9c9486; }
+.font-field:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.font-field__name { min-width: 0; font-family: var(--sans); font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.font-field__sample { flex: none; font-size: 1.5rem; line-height: 1; }
+
+/* The picker */
+.font-sheet {
+  position: fixed;
+  inset: var(--fp-top, auto) auto auto var(--fp-left, 50%);
+  width: min(24rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: min(34rem, calc(100vh - 2rem));
+  margin: 0;
+  padding: 0;
+  border: var(--hair-ink);
+  background-color: var(--ivory);
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: 0 18px 40px -24px rgba(34, 26, 16, 0.45);
+}
+.font-sheet:not([style*="--fp-left"]) { transform: translateX(-50%); top: 12vh; }
+.font-sheet::backdrop { background: rgba(22, 21, 19, 0.12); }
+.font-sheet[open] { display: flex; flex-direction: column; }
+@media (prefers-reduced-motion: no-preference) {
+  .font-sheet[open] { animation: sheet-fade 160ms var(--ease); }
+}
+.font-sheet__inner { display: flex; flex-direction: column; min-height: 0; max-height: inherit; }
+.font-sheet__head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); padding: var(--s-3) var(--s-2) 0 var(--s-5); }
+.font-sheet__title { font-family: var(--sans); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; }
+.font-sheet__close { margin-right: 0; }
+.font-sheet__note { padding: 0 var(--s-5) var(--s-3); border-bottom: var(--hair); font-size: 0.9375rem; font-style: italic; line-height: 1.4; color: var(--ash); }
+.font-sheet__list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: var(--s-4); }
+.font-sheet__hint { font-size: 0.875rem; font-style: italic; line-height: 1.4; color: var(--ash); }
+
+.font-group { padding: var(--s-3) var(--s-5) 0; }
+.font-group__title { padding: var(--s-2) 0 var(--s-1); font-family: var(--sans); font-size: 0.625rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ash); }
+.font-opt {
+  display: grid; gap: 0.1rem;
+  width: 100%; padding: 0.55rem 0.6rem 0.6rem 0.75rem; margin: 0 -0.75rem;
+  width: calc(100% + 1.35rem);
+  border: 0; border-left: 2px solid transparent; background: none; color: inherit;
+  text-align: left; cursor: pointer;
+}
+.font-opt:hover { background: rgba(22, 21, 19, 0.045); }
+.font-opt:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.font-opt[aria-pressed="true"] { border-left-color: var(--ink); background: rgba(22, 21, 19, 0.06); }
+.font-opt__row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); }
+.font-opt__name { font-size: 1.125rem; line-height: 1.25; }
+.font-opt__meta { flex: none; font-family: var(--sans); font-size: 0.6875rem; letter-spacing: 0.04em; color: var(--ash); }
+.font-opt__sample { font-size: 0.9375rem; line-height: 1.35; color: var(--charcoal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.font-opt__note { font-family: var(--sans); font-size: 0.6875rem; color: var(--ash); }
+.font-opt-wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s-2); }
+.font-opt-wrap .font-opt { margin-right: 0; width: calc(100% + 0.75rem); }
+.font-opt__remove { font-size: 0.75rem; min-height: 2rem; color: var(--ash); }
+
+.font-yours { display: grid; gap: var(--s-2); padding: var(--s-2) 0 0; }
+.font-yours__actions { display: flex; flex-wrap: wrap; gap: 0 var(--s-5); }
+.font-scanned { display: grid; gap: var(--s-2); margin-top: var(--s-2); padding-top: var(--s-3); border-top: var(--hair); }
+.font-scanned__list { display: grid; }
+.font-opt--local { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+.font-opt--local .font-opt__name { font-size: 1.0625rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Phones: a sheet from the bottom edge */
+@media (max-width: 47.99rem) {
+  .font-sheet,
+  .font-sheet:not([style*="--fp-left"]) {
+    inset: auto 0 0 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-height: 82vh;
+    max-height: 82dvh;
+    border: 0;
+    border-top: var(--hair-ink);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .font-sheet::backdrop { background: rgba(22, 21, 19, 0.3); }
+  @media (prefers-reduced-motion: no-preference) {
+    .font-sheet[open] { animation: font-sheet-up 220ms var(--ease); }
+  }
+  .font-opt { min-height: 3rem; }
+}
+@keyframes font-sheet-up { from { transform: translateY(16px); opacity: 0; } }

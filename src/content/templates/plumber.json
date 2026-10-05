@@ -1,0 +1,49 @@
+{
+  "name": "Plumber",
+  "layout": "contractor",
+  "title": "Free Plumber Invoice Template",
+  "description": "A free plumber invoice template with call-out fee, labor hours, parts and materials, and warranty notes. Fill it in online and download a PDF to send.",
+  "summary": "Call-out, labor hours and parts in separate sections, ready for a job or an emergency visit.",
+  "intro": "The call-out, the hours and the parts on separate lines, so the customer can see why a two-hour job cost what it did. Fill it in on site and send the PDF before you leave.",
+  "explanation": [
+    "Plumbing invoices are often read by someone who didn’t see the work: a landlord, a property manager or an insurer. They need to see when you came, what you found, what you did and what you fitted.",
+    "This template uses Folio’s contractor layout. Labor and materials are subtotalled separately, the job address sits in its own box, and a single line for the call-out or emergency fee keeps the after-hours charge visible rather than hidden in your rate.",
+    "Use it for service calls, repairs and installations: a leak, a blocked drain, a water heater or a bathroom rough-in."
+  ],
+  "fieldsTitle": "What to put on a plumber invoice",
+  "fields": [
+    { "name": "Service address", "text": "Where the work was done, which may not be the billing address. Put it in the Project field: “Water heater replacement — 2211 Elm Street”." },
+    { "name": "Call-out fee", "text": "Your trip or emergency charge as its own line under Labor, with when it applied: “Emergency call-out, Saturday”." },
+    { "name": "Labor", "text": "Hours on site at your rate, with a short description of the work. Quarter-hours are fine: 1.25 × $115." },
+    { "name": "Parts and materials", "text": "What you fitted, with make or size where it matters for warranty: “50-gallon gas water heater”, “Expansion tank, valves and fittings”." },
+    { "name": "Disposal", "text": "Removing an old fixture or appliance, as a line or included in the labor description." },
+    { "name": "License number", "text": "Your plumbing license number, in the Tax ID field, if your state or city expects it on paperwork." },
+    { "name": "Warranty", "text": "The manufacturer’s warranty on parts and your own guarantee on labor, in the notes." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a water heater job in the generator. Your saved business details are kept." },
+    { "title": "Describe the visit", "text": "Enter the customer and the service address, then the call-out, your hours and each part, choosing Labor or Materials for every line." },
+    { "title": "Tax and payment", "text": "Add sales tax if you collect it, and your payment options: card, check or a payment link." },
+    { "title": "Send it from site", "text": "On a phone, use the Preview tab to check it, then download the PDF and email it to the customer." }
+  ],
+  "faqs": [
+    { "q": "Should a plumber charge a call-out fee on the invoice?", "a": "If you charge one, show it as its own line. Customers accept a call-out fee they can see far more readily than a higher hourly rate, and it explains the cost of short visits." },
+    { "q": "How do I invoice for parts I bought for the job?", "a": "List each part with its quantity and the price you charge for it under Materials. If you mark parts up, bill the marked-up price; you don’t need to show what you paid." },
+    { "q": "Can I take payment on site?", "a": "Folio doesn’t process payments. Put a payment link, your bank details or “card accepted on site” in the payment section, and record any amount paid there and then as Deposit or amount paid so the invoice shows a zero balance." },
+    { "q": "Do plumbers charge sales tax?", "a": "It depends on the state and on whether the work is a repair, an installation or new construction. Many states tax the parts but not the labor. Check with your state’s tax agency and enter the rate that applies." }
+  ],
+  "sample": {
+    "business": { "name": "Keller Plumbing & Drain", "email": "office@kellerplumbing.com", "phone": "(614) 555-0147", "address": "3390 Indianola Avenue\nColumbus, OH 43214", "website": "kellerplumbing.com" },
+    "client": { "name": "Robert & Ann Liu", "email": "ann.liu@example.com", "address": "2211 Elm Street\nColumbus, OH 43221" },
+    "project": "Water heater replacement — 2211 Elm Street",
+    "number": "KP-2026-0318",
+    "terms": "net7",
+    "items": [["Emergency call-out, Saturday", "1", "125", "Labor"], ["Remove old water heater; install and test new", "4.5", "115", "Labor"], ["50-gallon gas water heater", "1", "1180", "Materials"], ["Expansion tank, valves and fittings", "1", "164.80", "Materials"]],
+    "payment": "Pay by card at kellerplumbing.com/pay, by check, or by ACH.",
+    "notes": "6-year manufacturer’s warranty on the tank; 1 year on our labor."
+  },
+  "relatedTemplates": ["electrician", "contractor", "cleaning-service"],
+  "relatedGuides": ["what-to-put-on-an-invoice", "how-to-send-an-invoice", "how-to-invoice-a-client"],
+  "relatedTools": ["sales-tax-calculator"],
+  "updated": "2026-10-01"
+}

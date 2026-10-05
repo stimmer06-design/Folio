@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Buttons & directional links
+   ========================================================================== */
+
+.arrow {
+  width: 26px;
+  height: 10px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  overflow: visible;
+  transition: transform var(--t-mid) var(--ease);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  min-height: 3.25rem;
+  padding: 0 var(--s-5) 0 1.75rem;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: var(--sans);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color var(--t-mid) var(--ease), color var(--t-mid) var(--ease);
+}
+.btn:hover { background: var(--charcoal); }
+.btn:hover .arrow,
+.go:hover .arrow,
+a:hover > .go .arrow { transform: translateX(4px); }
+
+.btn--light {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--ink);
+}
+.btn--light:hover { background: var(--ivory); }
+
+.btn--outline {
+  background: transparent;
+  color: var(--ink);
+}
+.btn--outline:hover { background: var(--ink); color: var(--bone); }
+
+/* "Go" link: sans caps + arrow + hairline — the secondary action */
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 44px;
+  font-family: var(--sans);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 calc(100% - 10px);
+  background-repeat: no-repeat;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4) var(--s-6);
+}
+
+@media (max-width: 29.99rem) {
+  .actions--stack-sm { flex-direction: column; align-items: stretch; }
+  .actions--stack-sm .btn { width: 100%; }
+  .actions--stack-sm .go { align-self: flex-start; }
+}

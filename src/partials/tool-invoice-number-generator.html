@@ -1,0 +1,56 @@
+<form class="tool grid" data-tool="invoice-number-generator" novalidate>
+          <fieldset class="tool__in" data-reveal>
+            <legend class="label tool__legend">Your numbering format</legend>
+            <div class="tool__fields">
+              <label class="fld">
+                <span class="fld__label">Prefix <span class="fld__opt">optional</span></span>
+                <input class="fld__input" type="text" name="prefix" value="INV" maxlength="12" autocomplete="off" spellcheck="false">
+              </label>
+              <label class="fld">
+                <span class="fld__label">Separator</span>
+                <select class="fld__input" name="separator">
+                  <option value="-" selected>Hyphen  (INV-0001)</option>
+                  <option value="/">Slash  (INV/0001)</option>
+                  <option value=".">Dot  (INV.0001)</option>
+                  <option value="">None  (INV0001)</option>
+                </select>
+              </label>
+              <label class="fld">
+                <span class="fld__label">Date in the number</span>
+                <select class="fld__input" name="datePart">
+                  <option value="none">None</option>
+                  <option value="yyyy" selected>Year  (2026)</option>
+                  <option value="yy">Short year  (26)</option>
+                  <option value="yyyy-mm">Year and month  (2026-10)</option>
+                  <option value="yyyymm">Year and month, joined  (202610)</option>
+                </select>
+              </label>
+              <label class="fld">
+                <span class="fld__label">Next number</span>
+                <input class="fld__input" type="text" name="number" value="1" inputmode="numeric" maxlength="8" autocomplete="off" aria-describedby="num-hint">
+                <span class="fld__hint" id="num-hint">One more than your last invoice.</span>
+              </label>
+              <label class="fld">
+                <span class="fld__label">Digits</span>
+                <select class="fld__input" name="digits">
+                  <option value="1">1  (1, 2 … 10)</option>
+                  <option value="3">3  (001)</option>
+                  <option value="4" selected>4  (0001)</option>
+                  <option value="5">5  (00001)</option>
+                  <option value="6">6  (000001)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+          <div class="tool__out" data-reveal>
+            <p class="label tool__legend" id="num-out-label">Your next invoice number</p>
+            <output class="tool__number" data-out="number" aria-labelledby="num-out-label">INV-2026-0001</output>
+            <p class="tool__then"><span class="label">Then</span> <span data-out="then">INV-2026-0002, INV-2026-0003, INV-2026-0004</span></p>
+            <div class="tool__actions">
+              <a class="btn" href="{{root}}app/" data-out="link">Use this number in your invoice {{> arrow}}</a>
+              <button class="link-btn" type="button" data-copy hidden>Copy number</button>
+            </div>
+            <p class="tool__note" data-out="status" role="status" aria-live="polite"></p>
+            <noscript><p class="tool__note">This tool needs JavaScript. The guide below explains the format, so you can also build the number by hand.</p></noscript>
+          </div>
+        </form>

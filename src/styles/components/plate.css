@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Plate — a toned surface that printed specimens are photographed on.
+   Items are positioned in % of the plate so compositions scale exactly.
+   ========================================================================== */
+
+.plate { position: relative; }
+
+.plate__surface {
+  --tone: var(--stone);
+  --shade: 34, 26, 16;         /* shadow colour, rgb */
+  --shade-a: 1;                /* shadow strength multiplier */
+  position: relative;
+  aspect-ratio: var(--ratio, 4 / 3);
+  overflow: hidden;
+  background-color: var(--tone);
+  background-image:
+    radial-gradient(120% 90% at 22% 12%, rgba(255, 255, 255, 0.16), transparent 60%),
+    radial-gradient(90% 80% at 90% 100%, rgba(0, 0, 0, 0.07), transparent 70%),
+    var(--grain);
+  isolation: isolate;
+}
+
+.plate--stone    .plate__surface { --tone: var(--stone); }
+.plate--oat      .plate__surface { --tone: var(--oat); }
+.plate--charcoal .plate__surface { --tone: var(--charcoal); --shade: 0, 0, 0; --shade-a: 1.6; }
+.plate--moss     .plate__surface { --tone: var(--moss); --shade: 0, 0, 0; --shade-a: 1.5; }
+.plate--ink      .plate__surface { --tone: #1d1c1a; --shade: 0, 0, 0; --shade-a: 1.7; }
+
+.plate__item {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  transform: rotate(var(--r, 0deg));
+  z-index: var(--z, 1);
+  container-type: inline-size;   /* specimens size their own type in cqw of this box */
+}
+
+/* Taller crops on narrow screens: each item may define --xs/--ys/--ws */
+@media (max-width: 29.99rem) {
+  .plate__surface { aspect-ratio: var(--ratio-sm, var(--ratio, 4 / 3)); }
+  .plate__item {
+    left: var(--xs, var(--x));
+    top: var(--ys, var(--y));
+    width: var(--ws, var(--w));
+  }
+  .plate__item--hide-sm { display: none; }
+}
+
+.plate__caption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-4);
+  align-items: baseline;
+  margin-top: var(--s-4);
+  max-width: 60ch;
+}
+.plate__caption .label { color: var(--ash); white-space: nowrap; }
+.plate__caption p {
+  font-size: var(--fs-small);
+  font-style: italic;
+  color: var(--ash);
+  line-height: 1.45;
+}
+@media (max-width: 29.99rem) {
+  .plate__caption { grid-template-columns: 1fr; gap: var(--s-1); }
+}

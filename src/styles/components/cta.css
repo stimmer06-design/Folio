@@ -1,0 +1,43 @@
+/* ==========================================================================
+   Closing call to action — the reversed card
+   ========================================================================== */
+
+.cta {
+  background-color: var(--ink);
+  color: var(--bone);
+  padding-block: var(--section);
+}
+.cta__inner {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: var(--s-6);
+  align-items: end;
+}
+.cta__label { grid-column: 1 / -1; color: #a39b8d; padding-bottom: var(--s-5); border-bottom: 1px solid #3a3733; }
+.cta__title {
+  grid-column: 1 / span 7;
+  margin-top: var(--s-7);
+  font-weight: 400;
+  font-size: clamp(3.25rem, 1.6rem + 6.6vw, 8.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.cta__body { grid-column: 8 / -1; padding-bottom: 0.6em; }
+.cta__body p { color: #cfc8bb; max-width: 40ch; text-wrap: pretty; }
+.cta__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4) var(--s-6); margin-top: var(--s-6); }
+.link--light { color: var(--bone); }
+.cta :focus-visible { outline-color: var(--bone); }
+
+@media (max-width: 63.99rem) {
+  .cta__title { grid-column: 1 / -1; }
+  .cta__body { grid-column: 1 / span 9; }
+}
+@media (max-width: 47.99rem) {
+  .cta__body { grid-column: 1 / -1; }
+}
+@media (max-width: 29.99rem) {
+  .cta__actions { flex-direction: column; align-items: stretch; }
+  .cta__actions .btn { width: 100%; }
+  .cta__actions .link { align-self: flex-start; }
+}

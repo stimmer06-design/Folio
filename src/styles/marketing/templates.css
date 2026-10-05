@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Invoice templates: library and template pages. Built from existing parts:
+   plates, doc-fit pages, labels, go-links and the filter voice of the nav.
+   ========================================================================== */
+
+.tlib__filter { margin: 0 0 var(--s-7); padding: var(--s-2) 0; border-top: var(--hair-ink); border-bottom: var(--hair); }
+.tlib__filter[hidden] { display: none; }
+
+.tlib { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-9) var(--gutter); }
+.tcard { display: flex; flex-direction: column; min-width: 0; }
+.tcard[hidden] { display: none; }
+.tcard__plate {
+  display: block;
+  padding: 9% 11% 0;
+  background-color: var(--stone);
+  background-image: radial-gradient(120% 90% at 22% 12%, rgba(255, 255, 255, 0.16), transparent 60%), var(--grain);
+  aspect-ratio: 4 / 4.4;
+  overflow: hidden;
+}
+.tcard__plate .doc-fit { transition: transform var(--t-slow) var(--ease); }
+.tcard:hover .tcard__plate .doc-fit { transform: translateY(-6px); }
+.tcard__cat { margin-top: var(--s-5); color: var(--ash); }
+.tcard__name { margin-top: var(--s-2); font-size: var(--fs-h3); line-height: 1.15; font-weight: 400; }
+.tcard__name a:hover { font-style: italic; }
+.tcard__desc { margin-top: var(--s-3); color: var(--ash); max-width: 34ch; text-wrap: pretty; }
+.tcard__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); margin-top: auto; padding-top: var(--s-5); }
+
+@media (max-width: 63.99rem) { .tlib { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 34.99rem) {
+  .tlib { grid-template-columns: 1fr; gap: var(--s-8); }
+  .tcard__plate { aspect-ratio: 4 / 3.6; padding: 7% 16% 0; }
+  .tcard__actions .btn { flex: 1 1 auto; justify-content: space-between; }
+}
+
+/* ---- template page ---- */
+.tdetail { row-gap: var(--s-7); align-items: start; }
+.tdetail__plate { grid-column: 1 / span 7; margin: 0; }
+.tdetail__surface { aspect-ratio: auto; padding: clamp(1.5rem, 5%, 3.5rem) clamp(1.5rem, 9%, 5rem); }
+.tdetail__aside { grid-column: 9 / -1; position: sticky; top: calc(var(--header-h) + var(--s-6)); }
+.tdetail__actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+.tdetail__facts { margin-top: var(--s-7); border-top: var(--hair-ink); }
+.tdetail__facts > div { padding: var(--s-3) 0; border-bottom: var(--hair); }
+.tdetail__facts dt { color: var(--ash); }
+.tdetail__facts dd { margin-top: var(--s-1); font-size: var(--fs-small); line-height: 1.45; }
+
+.tdetail__about { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: var(--s-6); }
+.tdetail__audience { font-size: var(--fs-lead); line-height: 1.42; text-wrap: pretty; max-width: 32ch; }
+.tdetail__sub { color: var(--ash); margin-bottom: var(--s-3); }
+.tdetail__sub + .feature__list { margin-top: 0; }
+.tdetail__lists .tdetail__sub:not(:first-child) { margin-top: var(--s-7); }
+.tdetail__example { max-width: 44ch; text-wrap: pretty; }
+
+@media (max-width: 63.99rem) {
+  .tdetail__plate { grid-column: 1 / -1; }
+  .tdetail__aside { grid-column: 1 / -1; position: static; }
+  .tdetail__actions { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--s-4) var(--s-6); }
+}
+@media (max-width: 47.99rem) {
+  .tdetail__about { grid-template-columns: 1fr; }
+}
+@media (max-width: 29.99rem) {
+  .tdetail__actions { flex-direction: column; align-items: stretch; }
+  .tdetail__actions .go { align-self: flex-start; }
+}

@@ -1,0 +1,46 @@
+<footer class="site-footer">
+    <div class="wrap">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <a href="{{root}}" aria-label="Folio — home">{{> wordmark}}</a>
+          <p class="site-footer__line">Professional invoices, without the paperwork. Your invoices stay in your browser.</p>
+        </div>
+        <nav class="site-footer__col" aria-label="Product">
+          <h2 class="label">Product</h2>
+          <ul class="site-footer__nav">
+            <li><a class="link" href="{{root}}app/">Create an invoice</a></li>
+            <li><a class="link" href="{{root}}features/">Features</a></li>
+            <li><a class="link" href="{{root}}pricing/">Pricing</a></li>
+            <li><a class="link" href="{{root}}faq/">FAQ</a></li>
+          </ul>
+        </nav>
+        <nav class="site-footer__col" aria-label="Resources">
+          <h2 class="label">Resources</h2>
+          <ul class="site-footer__nav">
+            <li><a class="link" href="{{root}}invoice-generator/">Invoice generator</a></li>
+            <li><a class="link" href="{{root}}invoice-templates/">Invoice templates</a></li>
+            <li><a class="link" href="{{root}}invoice-guides/">Invoice guides</a></li>
+            <li><a class="link" href="{{root}}tools/">Free tools</a></li>
+          </ul>
+        </nav>
+        <nav class="site-footer__col" aria-label="Company">
+          <h2 class="label">Company</h2>
+          <ul class="site-footer__nav">
+            <li><a class="link" href="{{root}}about/">About</a></li>
+            <li><a class="link" href="{{root}}contact/">Contact</a></li>
+            <li><a class="link" href="{{root}}privacy/">Privacy</a></li>
+            <li><a class="link" href="{{root}}terms/">Terms</a></li>
+          </ul>
+        </nav>
+        <div class="site-footer__col">
+          <h2 class="label">Support</h2>
+          <p><a class="link" href="mailto:{{site.supportEmail}}">{{site.supportEmail}}</a></p>
+          <p class="site-footer__muted">Replies within one working day.</p>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        <p>&copy; {{year}} {{site.legalName}}</p>
+        <p class="site-footer__colophon">Set in EB Garamond &amp; Hanken Grotesk</p>
+      </div>
+    </div>
+  </footer>

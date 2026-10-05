@@ -1,0 +1,37 @@
+/* Folio — one stylesheet for the whole product, bundled by build.mjs in this order. */
+@import "tokens.css";
+@import "base.css";
+@import "type.css";
+@import "layout.css";
+
+/* Shared components */
+@import "components/header.css";
+@import "components/menu.css";
+@import "components/buttons.css";
+@import "components/fields.css";
+@import "components/plate.css";
+@import "components/document.css";
+@import "components/index-list.css";
+@import "components/facts.css";
+@import "components/cta.css";
+@import "components/form.css";
+@import "components/faq.css";
+@import "components/footer.css";
+
+/* Marketing pages */
+@import "marketing/home.css";
+@import "marketing/pages.css";
+@import "marketing/templates.css";
+@import "marketing/content.css";
+
+/* The application */
+@import "app/app.css";
+@import "app/editor.css";
+@import "app/preview.css";
+@import "app/library.css";
+@import "app/picker.css";
+@import "app/payments.css";
+@import "app/fonts.css";
+@import "app/print.css";
+
+@import "motion.css";

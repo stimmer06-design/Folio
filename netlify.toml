@@ -1,0 +1,14 @@
+# Netlify: builds the static site and deploys the payment-link functions.
+# Payment links need these functions, so deploy from Git or with `netlify deploy`
+# (drag-and-drop deploys upload static files only). See README › Payment links.
+
+[build]
+  command = "node build.mjs --production"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

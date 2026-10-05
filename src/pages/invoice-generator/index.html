@@ -1,0 +1,162 @@
+---
+titleFull: Online Invoice Generator — Every Field, Explained · Folio
+description: How Folio’s free online invoice generator works: what to enter in each field, how totals are calculated, and what you get when you download the PDF.
+ogTitle: Online invoice generator — Folio
+landing: invoice-generator
+crumb: Invoice generator
+schema: generator
+bodyClass: page-generator
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>Online invoice generator</h1>
+        <div class="page-head__lead" data-reveal>
+          <p class="lead muted">Fill in a form, watch the invoice set itself beside it, and download a PDF. Free, in your browser, with no account.</p>
+          <div class="actions actions--stack-sm mt-6">
+            <a class="btn" href="{{root}}app/">Open the generator {{> arrow}}</a>
+            <a class="go" href="{{root}}invoice-templates/">Start from a template {{> arrow}}</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="feature" aria-labelledby="gen-what">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">i.</p>
+          <h2 class="h2" id="gen-what">A form on one side, the invoice on the other.</h2>
+          <p class="feature__lead">The generator is a single page. You type into six short sections; the finished invoice is redrawn beside them at its real proportions, with every total worked out. When it looks right, you download it or print it.</p>
+          <ul class="feature__list">
+            <li>Nothing to install and nothing to sign up for</li>
+            <li>Saved in your browser as you type, so you can close the tab</li>
+            <li>On a phone, Edit and Preview become two tabs</li>
+          </ul>
+        </div>
+        <figure class="plate plate--stone feature__visual" data-reveal="fade">
+          <div class="plate__surface feature__surface feature__surface--doc">
+            <div class="feature__doc">{{> sample-doc}}</div>
+            <div class="feature__ui">{{> ui-items}}</div>
+          </div>
+          <figcaption class="plate__caption"><span class="label">The generator</span><p>Line items on the left become the invoice on the right.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="gen-fields">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>Every field</p>
+          <div class="opening__body">
+            <h2 class="h2" id="gen-fields" data-reveal>What to put in each section.</h2>
+            <p class="lead muted mt-5" data-reveal>Only a few fields are needed for a valid invoice. The rest are there when your work calls for them. For the reasoning behind each, read <a class="link" href="{{root}}invoice-guides/what-to-put-on-an-invoice/">what to put on an invoice</a>.</p>
+            <div class="gen-fields mt-7" data-reveal-group>
+              <table class="order" data-reveal>
+                <caption class="label">01 · Your business</caption>
+                <tbody>
+                  <tr><th scope="row">Name and logo</th><td>Your trading name as clients know it. The logo is optional and sits top left.</td></tr>
+                  <tr><th scope="row">Contact details</th><td>Email, phone and address, so the client knows who to ask about the invoice.</td></tr>
+                  <tr><th scope="row">Tax ID</th><td>Your VAT, GST or tax registration number, if you have one and your clients need it.</td></tr>
+                </tbody>
+              </table>
+              <table class="order" data-reveal>
+                <caption class="label">02 · Client</caption>
+                <tbody>
+                  <tr><th scope="row">Name</th><td>The person or company responsible for paying, which is not always the person you worked with.</td></tr>
+                  <tr><th scope="row">Email and address</th><td>Where the invoice goes, and the billing address their accounts team will expect.</td></tr>
+                </tbody>
+              </table>
+              <table class="order" data-reveal>
+                <caption class="label">03 · Invoice details</caption>
+                <tbody>
+                  <tr><th scope="row">Number</th><td>Suggested for you, one higher than your last. See <a class="link" href="{{root}}invoice-guides/how-to-number-invoices/">how to number invoices</a>.</td></tr>
+                  <tr><th scope="row">Dates and terms</th><td>The issue date and payment terms. Choose Net 30 and the due date is set for you.</td></tr>
+                  <tr><th scope="row">Currency and paper</th><td>Sixteen currencies; US Letter or A4.</td></tr>
+                </tbody>
+              </table>
+              <table class="order" data-reveal>
+                <caption class="label">04 · Line items</caption>
+                <tbody>
+                  <tr><th scope="row">Description</th><td>What you did or supplied, specific enough that the client recognizes it.</td></tr>
+                  <tr><th scope="row">Quantity and price</th><td>Hours and an hourly rate, units and a unit price, or 1 and a fixed fee.</td></tr>
+                </tbody>
+              </table>
+              <table class="order" data-reveal>
+                <caption class="label">05 · Tax, discount &amp; shipping</caption>
+                <tbody>
+                  <tr><th scope="row">Tax</th><td>Your rate and its name (sales tax, VAT, GST), applied after any discount.</td></tr>
+                  <tr><th scope="row">Discount</th><td>A percentage or a fixed amount off the subtotal.</td></tr>
+                  <tr><th scope="row">Other charge</th><td>Shipping, travel or a call-out fee, added after tax.</td></tr>
+                  <tr><th scope="row">Deposit</th><td>Anything already paid, subtracted to show the balance due.</td></tr>
+                </tbody>
+              </table>
+              <table class="order" data-reveal>
+                <caption class="label">06 · Payment &amp; notes</caption>
+                <tbody>
+                  <tr><th scope="row">Payment</th><td>How to pay you: bank details, a payment link or who to make a check out to.</td></tr>
+                  <tr><th scope="row">Notes</th><td>Anything else: a thank-you, a warranty, a late-payment term you agreed in advance.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="gen-out">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>What you get</p>
+          <div class="opening__body">
+            <h2 class="h2" id="gen-out" data-reveal>A PDF your client can open anywhere.</h2>
+            <div class="grid privacy-cols mt-7" data-reveal-group>
+              <div data-reveal><h3 class="h3">A real PDF</h3><p>Vector text in embedded typefaces: sharp at any size, searchable, and small enough to email.</p></div>
+              <div data-reveal><h3 class="h3">Or a printed page</h3><p>Print sends only the invoice to the printer, never the form around it.</p></div>
+              <div data-reveal><h3 class="h3">A record you keep</h3><p>Every invoice stays in your browser’s list until you delete it. Download a backup whenever you like.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="gen-tpl">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="gen-tpl" data-reveal>Templates</h2>
+          <div class="opening__body work-intro">
+            <p class="h2" data-reveal>Or start from an example.</p>
+            <a class="go work-intro__all" href="{{root}}invoice-templates/" data-reveal>All {{templates.countWord}} templates {{> arrow}}</a>
+          </div>
+        </div>
+        <ul class="tlib tlib--related mt-8" data-reveal-group>
+        {{library.templatesFew}}
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="gen-faq">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="gen-faq" data-reveal>Questions</h2>
+          <div class="opening__body--narrow" data-reveal>
+            <div class="faq">{{faq.generator}}</div>
+            <a class="go mt-6" href="{{root}}faq/">All questions {{> arrow}}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="gen-guides">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="gen-guides" data-reveal>Guides &amp; tools</h2>
+          <div class="opening__body work-intro">
+            <p class="h2" data-reveal>Before you send it.</p>
+            <a class="go work-intro__all" href="{{root}}invoice-guides/" data-reveal>All guides {{> arrow}}</a>
+          </div>
+        </div>
+        <div class="mt-8">{{library.guidesFew}}</div>
+      </div>
+    </section>
+
+    {{> cta}}

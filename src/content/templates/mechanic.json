@@ -1,0 +1,39 @@
+{
+  "name": "Mechanic",
+  "layout": "mechanic",
+  "title": "Free Mechanic Invoice Template",
+  "description": "A free mechanic and auto repair invoice template: vehicle, VIN and mileage, parts, labor hours and shop fees in separate sections. Download as a PDF.",
+  "summary": "Vehicle, VIN and mileage at the top; parts, labor and shop fees itemized beneath.",
+  "intro": "The vehicle at the top, parts and labor itemized separately, and shop fees where the customer can see them. Laid out like a repair order, and free to fill in and download as a PDF.",
+  "explanation": [
+    "An auto repair invoice is a record as much as a bill. The customer keeps it for the warranty, the next owner may ask for it, and a dispute about a repair usually comes down to what the invoice says was done.",
+    "This template names the vehicle, VIN and mileage in their own box, then lists parts, labor and shop fees in separate subtotalled sections. Labor is billed in hours at your shop rate, so a 1.8-hour brake job reads as exactly that.",
+    "Several states have auto repair rules that ask for exactly this separation. California, for example, requires service work and parts to be listed and subtotalled separately, and used or rebuilt parts to be identified as such. Check the rules where you work."
+  ],
+  "fieldsTitle": "What to put on a mechanic invoice",
+  "fields": [
+    { "name": "Vehicle", "text": "Year, make, model and trim, the VIN and the odometer reading at drop-off, in the Vehicle field: “2019 Honda CR-V EX · VIN 5J6RW2H5XKL004417 · 68,412 miles”." },
+    { "name": "Repair order number", "text": "Use your RO numbering as the invoice number (RO-10583) so the invoice, the work order and the customer’s call all refer to the same job." },
+    { "name": "Parts", "text": "Each part with quantity and price, and whether it is new, used, rebuilt or aftermarket where that matters to the customer or the law." },
+    { "name": "Labor", "text": "Each operation with hours at your shop rate: “Front brake service, pads and rotors, 1.8 hrs at $135”." },
+    { "name": "Shop fees", "text": "Shop supplies and disposal fees on their own line, so they don’t look hidden in the parts." },
+    { "name": "Warranty", "text": "Your parts and labor warranty (for example 12 months or 12,000 miles), in the notes." },
+    { "name": "Payment", "text": "How you take payment at collection: card, cash or check." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a brake job in the generator, set out as parts, labor and shop fees." },
+    { "title": "Enter the vehicle", "text": "Replace the customer and put the vehicle, VIN and mileage in the Vehicle field. Use your repair order number as the invoice number." },
+    { "title": "Parts, labor, fees", "text": "Add each part and each labor operation, choosing the section for every line. Hours can be decimals: 0.8, 1.5." },
+    { "title": "Print or send", "text": "Print it for the customer at collection, or download the PDF and email it with the vehicle in the subject line." }
+  ],
+  "faqs": [
+    { "q": "What should an auto repair invoice include?", "a": "Your shop’s name and contact details, the customer, the vehicle (year, make, model, VIN, mileage), each part with its price, each labor operation with its hours and rate, any shop fees, the total and your warranty. Some states require more, such as identifying used or rebuilt parts." },
+    { "q": "Can I charge tax on parts only?", "a": "Folio applies one tax rate to the whole invoice. Where only parts are taxable, you can work out the tax on parts with the [sales tax calculator](/tools/sales-tax-calculator/) and add it as a line, or ask your accountant how they prefer it shown." },
+    { "q": "How do I show labor hours?", "a": "Enter the hours as the quantity and your shop rate as the price. The Qty / hrs column accepts decimals, so 1.8 hours at $135 is calculated as $243." },
+    { "q": "Is this the same as an estimate?", "a": "No. An estimate is what you expect the repair to cost before you start; the invoice is what the work actually cost. If the final figure differs from the estimate, the invoice is where the customer sees why." }
+  ],
+  "relatedTemplates": ["contractor", "electrician", "small-business"],
+  "relatedGuides": ["what-to-put-on-an-invoice", "invoice-vs-receipt", "how-to-number-invoices"],
+  "relatedTools": ["sales-tax-calculator"],
+  "updated": "2026-10-01"
+}

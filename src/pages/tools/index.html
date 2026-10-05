@@ -1,0 +1,53 @@
+---
+titleFull: Free Invoice Tools — Numbering and Tax Calculators · Folio
+description: Free tools for invoicing: build an invoice number format, work out tax, discounts and the balance due, and add or remove sales tax. Then put the numbers on an invoice.
+bodyClass: page-tools
+hub: tools
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>Free tools</h1>
+        <p class="lead page-head__lead muted" data-reveal>{{library.toolCount}} small calculators for the parts of invoicing that involve arithmetic. Each one uses the generator’s own rules, and passes its numbers straight into a new invoice.</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-labelledby="tools-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="tools-title" data-reveal>Tools</h2>
+          <div class="opening__body">{{library.tools}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="tools-how-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="tools-how-title" data-reveal>How they work</h2>
+          <div class="opening__body">
+            <p class="statement" data-reveal>Nothing you type is sent anywhere. The tools run in your browser, like the generator, and none of them guesses a tax rate for you.</p>
+            <div class="grid privacy-cols mt-7" data-reveal-group>
+              <div data-reveal><h3 class="h3">The same arithmetic</h3><p>The tax calculator uses the generator’s own code, so its totals are the totals your invoice will show.</p></div>
+              <div data-reveal><h3 class="h3">Straight into an invoice</h3><p>Each tool opens a new invoice with its numbers filled in. Your saved invoices are left as they are.</p></div>
+              <div data-reveal><h3 class="h3">Your rate, not ours</h3><p>Tax rates depend on where and what you sell, and they change. You enter the rate; the tools do the sums.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="tools-guides-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="tools-guides-title" data-reveal>Guides</h2>
+          <div class="opening__body work-intro">
+            <p class="h2" data-reveal>The reasoning behind the numbers.</p>
+            <a class="go work-intro__all" href="{{root}}invoice-guides/" data-reveal>All guides {{> arrow}}</a>
+          </div>
+        </div>
+        <div class="mt-8">{{library.guidesFew}}</div>
+      </div>
+    </section>
+
+    {{> cta}}

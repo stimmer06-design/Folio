@@ -1,0 +1,39 @@
+{
+  "name": "Construction",
+  "layout": "construction",
+  "title": "Free Construction Invoice Template",
+  "description": "A free construction invoice template for progress billing: materials, labor, equipment and subcontractors by cost code, previous payments and the amount due.",
+  "summary": "A ruled grid for materials, labor, equipment and subcontractors, with progress payments.",
+  "intro": "Cost codes with subtotals, the job and site in their own box, and previous payments deducted to show the amount due this period. Built for builders billing in stages.",
+  "explanation": [
+    "Construction work is rarely billed once. A fit-out or a build is invoiced in stages, and each invoice has to show what this period covers and what has already been paid, so the client’s project manager can check it against the contract.",
+    "This template uses a full ruled grid that stays legible after printing, scanning and photocopying, which is how a lot of construction paperwork still travels. Every cost code (materials, labor, equipment, subcontractors) has its own subtotal, and previous payments are deducted to arrive at the amount due this period.",
+    "It is designed for general contractors, builders and fit-out companies working for commercial clients or developers. For a single residential job billed on completion, the simpler [contractor template](/invoice-templates/contractor/) reads better."
+  ],
+  "fieldsTitle": "What to put on a construction invoice",
+  "fields": [
+    { "name": "Job and site", "text": "The job name, site address and which billing this is: “Unit 4B fit-out, 220 Mercer Street — progress billing 2 of 4”." },
+    { "name": "Cost codes", "text": "Lines grouped as Materials, Labor, Equipment and Subcontractors, matching the way the contract or budget is broken down." },
+    { "name": "Subcontractors", "text": "Each subcontractor’s work as its own line, named, so the client can match it to the sub’s own invoice." },
+    { "name": "Previous payments", "text": "What the client has already paid on this contract, deducted from the total to show the amount due this period." },
+    { "name": "Your license", "text": "Your contractor license number in the Tax ID field, where your jurisdiction requires it on billing documents." },
+    { "name": "Lien waivers and retainage", "text": "If the contract requires a lien waiver with each payment application, or holds back retainage, say so in the notes so the paperwork travels together." },
+    { "name": "Payment reference", "text": "Ask the client to quote the job number with payment; large clients often pay many invoices in one transfer." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a progress billing in the generator. Change the job, the billing number and the client." },
+    { "title": "Enter this period", "text": "Add only the work completed since the last invoice, one line per item, and choose its cost code. Subtotals are calculated for you." },
+    { "title": "Deduct what’s paid", "text": "Enter previous payments in Deposit or amount paid. The invoice shows the amount due this period." },
+    { "title": "Attach and send", "text": "Download the PDF and send it with any lien waiver or supporting documents the contract asks for." }
+  ],
+  "faqs": [
+    { "q": "What is progress billing in construction?", "a": "Invoicing a project in stages as work is completed, rather than all at the end. Each invoice covers the work done in that period and deducts what has already been paid. The stages and amounts are usually set out in the contract." },
+    { "q": "Is this a replacement for AIA G702 and G703 forms?", "a": "No. Some commercial projects require the AIA Application and Certificate for Payment (G702) and its continuation sheet (G703). If your contract specifies them, use them. This template suits projects that accept an ordinary itemized invoice." },
+    { "q": "How do I show retainage?", "a": "Folio doesn’t calculate retainage automatically. Note the retained amount and the contract terms in the notes, and enter what the client has actually paid in previous payments so the amount due is correct." },
+    { "q": "Why use a ruled grid?", "a": "Construction invoices are often printed, signed, scanned and filed. Full rules keep every figure in its row even in a poor scan, which saves arguments about which line a number belongs to." }
+  ],
+  "relatedTemplates": ["contractor", "electrician", "plumber"],
+  "relatedGuides": ["how-to-number-invoices", "what-to-put-on-an-invoice", "invoice-vs-bill"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

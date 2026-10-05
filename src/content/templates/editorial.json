@@ -1,0 +1,38 @@
+{
+  "name": "Editorial",
+  "layout": "editorial",
+  "title": "Free Writer Invoice Template",
+  "description": "A free invoice template for writers, editors and journalists: the commission, word counts, fees, expenses and rights, under a large serif title. Download as PDF.",
+  "summary": "A large serif title and a ruled side column, like the opening page of a journal.",
+  "intro": "The commission named in a side column, the fee and any agreed expenses in the main one, and the rights you granted noted at the foot. Set like the opening page of a journal.",
+  "explanation": [
+    "Writers usually invoice editors, and editors forward invoices to someone else to pay. The invoice needs to say which piece it is for, in which issue or on what date, so the payments team can match it to the commission without asking.",
+    "This template sets “Invoice” as a large serif title with the number beside it, and keeps the client, dates, commission and payment details in a ruled side column. The fee, word count and expenses get the full width of the main column.",
+    "It suits freelance writers, journalists, editors, copywriters, translators and illustrators working for publications, and anyone who wants their invoice to have a little presence."
+  ],
+  "fieldsTitle": "What to put on a writer’s invoice",
+  "fields": [
+    { "name": "Commission", "text": "The piece, the publication and the issue or date: “Winter issue — ‘The Last Ferrymen’”." },
+    { "name": "Fee", "text": "The agreed fee, with the word count or format in the description: “Feature, 4,500 words”. Per-word rates work as words × rate." },
+    { "name": "Expenses", "text": "Agreed expenses, such as research travel or archive fees, as their own lines at cost." },
+    { "name": "Rights", "text": "The rights granted, for example first North American serial rights, in the notes, as agreed in the commission." },
+    { "name": "Kill fee", "text": "If a piece was cancelled under a kill-fee agreement, invoice the agreed fee and say so in the line." },
+    { "name": "Tax details", "text": "Your tax ID if the publisher needs it; in the US, publishers usually ask for a W-9." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a writer’s invoice in the generator." },
+    { "title": "Name the commission", "text": "Enter the publication and the commission in the Project field, then the fee and any expenses." },
+    { "title": "Rights and payment", "text": "Note the rights in the notes and add your payment details." },
+    { "title": "Send to the editor", "text": "Download the PDF and send it to your editor, copying the payments address if they have one." }
+  ],
+  "faqs": [
+    { "q": "How do freelance writers invoice publications?", "a": "After filing or after publication, as the commission says, to the commissioning editor or the payments team. Name the piece and issue, give the agreed fee, add agreed expenses, and include how to pay you." },
+    { "q": "Should I bill per word?", "a": "Only if that is how the fee was agreed. Enter the word count as the quantity and the per-word rate as the price; most commissions are a flat fee for a target length." },
+    { "q": "What is a kill fee?", "a": "A fee paid, under the commission’s terms, when a publication cancels a piece. Invoice it like any fee, describing it as a kill fee for the named piece." },
+    { "q": "Where do I put the rights I’m granting?", "a": "In the notes, exactly as the commission states them, so the invoice and the agreement match." }
+  ],
+  "relatedTemplates": ["minimal", "freelancer", "photographer"],
+  "relatedGuides": ["how-to-invoice-as-a-freelancer", "how-to-write-an-invoice", "how-to-send-an-invoice"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

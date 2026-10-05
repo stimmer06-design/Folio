@@ -1,0 +1,38 @@
+{
+  "name": "Executive",
+  "layout": "executive",
+  "title": "Free Retainer Invoice Template",
+  "description": "A free retainer invoice template for advisory firms and senior consultants: a formal letterhead with the retainer amount and due date set as the headline.",
+  "summary": "The amount due set as the headline, beneath a spaced-capital letterhead.",
+  "intro": "A formal letterhead in spaced capitals, the amount due set as the headline with the date beneath it, and the retainer and any additional work itemized below.",
+  "explanation": [
+    "A retainer invoice often goes to a partner or a director first and a finance team second. The first reader wants the amount and the date; the second wants the detail. This template serves both, in that order.",
+    "The business name is set in widely spaced capitals, like engraved stationery. The amount due is the headline, with the due date beneath; the invoice number, dates and engagement sit in a ruled ledger beside it, and remittance details have their own place under the client.",
+    "It suits advisory firms, law and accounting practices, fractional executives and senior consultants billing monthly or quarterly retainers."
+  ],
+  "fieldsTitle": "What to put on a retainer invoice",
+  "fields": [
+    { "name": "Engagement", "text": "The agreement the retainer falls under, and the period: “Board advisory, Q4 2026”." },
+    { "name": "Retainer", "text": "One line for the period: “Board advisory retainer — October to December”, quantity 1." },
+    { "name": "Additional work", "text": "Anything outside the retainer, such as a workshop or a project, as separate lines." },
+    { "name": "Expenses", "text": "Travel and other agreed costs, at cost." },
+    { "name": "Remittance details", "text": "Full wire details: bank, account, routing or ABA, and SWIFT for international clients." },
+    { "name": "Contact for queries", "text": "Who to contact about the invoice, in the notes." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a quarterly retainer in the generator." },
+    { "title": "The period", "text": "Name the engagement and the period, and add the retainer as one line." },
+    { "title": "Anything extra", "text": "Add additional work and expenses beneath. The headline amount updates." },
+    { "title": "Send", "text": "Download the PDF and send it to both your contact and their accounts team." }
+  ],
+  "faqs": [
+    { "q": "What is a retainer invoice?", "a": "An invoice for a fixed fee that secures your availability or a set amount of work for a period, usually billed at the start of each month or quarter. Work outside the retainer is billed separately." },
+    { "q": "When should I send a retainer invoice?", "a": "When your agreement says: commonly at the start of the period, so the retainer is paid in advance. Use the same day each period so the client can plan for it." },
+    { "q": "How do I show work beyond the retainer?", "a": "As separate lines under the retainer, each described, so the client sees what was included and what was extra." },
+    { "q": "Can I bill a retainer in advance and expenses in arrears?", "a": "Yes, on one invoice. Describe the retainer period ahead and the expenses with their past dates." }
+  ],
+  "relatedTemplates": ["consultant", "classic", "marketing-agency"],
+  "relatedGuides": ["how-to-invoice-a-client", "invoice-vs-bill", "how-to-write-an-invoice"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

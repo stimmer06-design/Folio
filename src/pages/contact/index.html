@@ -1,0 +1,74 @@
+---
+titleFull: Contact — Folio Invoice Generator
+description: Write to Folio about the invoice generator: support, feedback, or early access to Folio Pro. We reply within one working day.
+nav: contact
+bodyClass: page-contact
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        <p class="label page-head__label" data-reveal>Contact</p>
+        <h1 class="h1 page-head__title" data-reveal>Write to us.</h1>
+        <p class="lead page-head__lead muted" data-reveal>Support, feedback or early access to Pro. A person reads every message and replies within one working day.</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-label="Message">
+      <div class="wrap grid contact">
+        <p class="label contact__label">Message</p>
+        <div class="contact__form">
+          <form class="form" data-contact-form data-endpoint="{{site.formEndpoint}}" data-email="{{site.email}}" action="mailto:{{site.email}}" method="post" enctype="text/plain" novalidate>
+            <fieldset class="form__group">
+              <legend class="form__legend"><span class="label">About you</span><span class="label">Required unless marked</span></legend>
+              <div class="field">
+                <label class="label field__label" for="c-name">Name</label>
+                <input class="field__input" id="c-name" name="name" type="text" autocomplete="name" required data-msg="Please tell us your name." aria-describedby="e-name">
+                <p class="field__error" id="e-name" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label class="label field__label" for="c-email">Email</label>
+                <input class="field__input" id="c-email" name="email" type="email" autocomplete="email" inputmode="email" required data-msg="Please enter an email address we can reply to." aria-describedby="e-email">
+                <p class="field__error" id="e-email" aria-live="polite"></p>
+              </div>
+            </fieldset>
+            <fieldset class="form__group form__group--single">
+              <legend class="form__legend"><span class="label">Your message</span></legend>
+              <div class="field" role="radiogroup" aria-labelledby="topic-label">
+                <p class="label field__label" id="topic-label">What is it about?</p>
+                <div class="choices">
+                  <label class="choice"><input type="radio" name="topic" value="support" checked> Help with an invoice</label>
+                  <label class="choice"><input type="radio" name="topic" value="feedback"> Feedback or a suggestion</label>
+                  <label class="choice"><input type="radio" name="topic" value="pro"> Early access to Pro</label>
+                  <label class="choice"><input type="radio" name="topic" value="other"> Something else</label>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label field__label" for="c-message">Message</label>
+                <textarea class="field__input" id="c-message" name="message" rows="6" required data-msg="Please write a short message." aria-describedby="e-message"></textarea>
+                <p class="field__error" id="e-message" aria-live="polite"></p>
+              </div>
+            </fieldset>
+            <div class="hp" aria-hidden="true"><label for="c-website">Leave empty</label><input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+            <div class="form__foot">
+              <p class="form__note">We use your email only to reply. See the <a class="link" href="{{root}}privacy/">privacy notice</a>.</p>
+              <button class="btn" type="submit">Send message {{> arrow}}</button>
+            </div>
+          </form>
+          <div class="form__status" data-form-status role="status" aria-live="polite" hidden></div>
+        </div>
+        <aside class="contact__aside" aria-label="Other ways to reach us">
+          <div class="aside-block">
+            <h2 class="label aside-block__title">Support</h2>
+            <p><a class="link" href="mailto:{{site.supportEmail}}">{{site.supportEmail}}</a></p>
+            <p class="aside-block__muted">Replies within one working day, Monday to Friday.</p>
+          </div>
+          <div class="aside-block">
+            <h2 class="label aside-block__title">Before you write</h2>
+            <p>Most questions about saving, PDFs and tax are answered in the <a class="link" href="{{root}}faq/">FAQ</a>.</p>
+          </div>
+          <div class="aside-block">
+            <h2 class="label aside-block__title">Your invoices</h2>
+            <p class="aside-block__muted">We cannot see or recover invoices: they live only in your browser. Use Download backup in Your invoices to keep a copy.</p>
+          </div>
+        </aside>
+      </div>
+    </section>

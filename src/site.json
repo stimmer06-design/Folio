@@ -1,0 +1,18 @@
+{
+  "name": "Folio",
+  "legalName": "Folio Software",
+  "tagline": "Free Invoice Generator",
+  "description": "Folio is a free online invoice generator. Create a professional invoice in your browser, see it update as you type, and download a clean PDF. No account required.",
+  "url": "https://folioinvoice.com",
+  "email": "hello@folioinvoice.com",
+  "supportEmail": "support@folioinvoice.com",
+  "formEndpoint": "",
+  "proPrice": "9",
+  "analytics": {
+    "ga4MeasurementId": "G-MS3D1J65G6",
+    "respectPrivacySignals": true,
+    "ga4PropertyId": "",
+    "googleOAuthClientId": "",
+    "searchConsoleSite": ""
+  }
+}

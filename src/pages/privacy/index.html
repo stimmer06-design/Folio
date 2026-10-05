@@ -1,0 +1,32 @@
+---
+title: Privacy
+description: How Folio handles your data: invoices stay in your browser, payment links share only what a payment needs, and what we collect when you write to us.
+bodyClass: page-legal
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        <p class="label page-head__label">Privacy</p>
+        <h1 class="h1 page-head__title">Privacy notice</h1>
+        <p class="lead page-head__lead muted">Short, because we collect almost nothing.</p>
+      </div>
+    </header>
+    <section class="section section--flush-top">
+      <div class="wrap grid">
+        <div class="prose legal">
+          <h2 class="h3">Your invoices</h2>
+          <p>Invoices, client details and your logo are created and stored in your browser’s local storage on your device. They are not sent to Folio or to anyone else, unless you create a payment link (below). PDFs are generated in your browser. We cannot see, recover or delete your invoices; clearing your browser’s site data removes them.</p>
+          <h2 class="h3">Payment links (optional)</h2>
+          <p>Nothing is sent unless you connect Stripe or PayPal and create a payment link for an invoice. Then Folio’s payment service receives the invoice’s number, its figures (quantities, prices, tax, discount, shipping and deposit, to work out the amount due), its currency, the project line and your business name, and keeps the amount due, the currency, the number, the project line and your business name with the link so it can show them on the payment page. It never receives your client’s name, email or address, your line descriptions, notes or logo. When you connect Stripe, Stripe creates an account for you and asks for your details on its own pages; for PayPal, we keep the PayPal email address you give us. Your browser keeps a key that identifies your connection; we keep only a scrambled copy of it.</p>
+          <p>Your client pays on Stripe’s or PayPal’s own pages, under their privacy policies. Folio never sees card or bank details. Stripe and PayPal tell Folio whether an invoice has been paid, and your browser asks Folio for that status. We delete payment-link records about thirteen months after a link is created; disconnecting your account cancels its links and deletes the connection. The person who pays is not tracked by Folio’s analytics.</p>
+          <h2 class="h3">Fonts</h2>
+          <p>Fonts you upload are stored in your browser on your device. If you choose to look for fonts installed on your device, your browser asks your permission first, and the list is used only to show you the fonts; it isn’t stored or sent anywhere. Folio never receives your fonts or the names of the fonts on your device.</p>
+          <h2 class="h3">This website</h2>
+          <p>{{analytics.privacy}}</p>
+          <h2 class="h3">When you write to us</h2>
+          <p>If you use the contact form or email us, we receive your name, email address and message, and use them only to reply. Messages are deleted after twelve months unless they are part of an ongoing conversation. If you join the Pro early-access list, we will email you once when Pro is available.</p>
+          <h2 class="h3">Your rights</h2>
+          <p>You can ask us to see, correct or delete anything we hold about you by writing to <a class="link" href="mailto:{{site.email}}">{{site.email}}</a>. We respond within thirty days.</p>
+          <p class="muted small">{{site.legalName}}. Last updated October 2026.</p>
+        </div>
+      </div>
+    </section>

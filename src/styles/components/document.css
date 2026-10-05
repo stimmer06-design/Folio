@@ -1,0 +1,393 @@
+/* ==========================================================================
+   The invoice document. Shared by the app preview, the marketing samples and
+   print. Measurements are in CSS px at 96 dpi on a real page size so that
+   js/core/pdf.js can reproduce them exactly (1 px = 0.75 pt).
+   ========================================================================== */
+
+.doc {
+  --d-ink: #161513;
+  --d-text: #3a3731;
+  --d-gray: #5f5a51;
+  --d-soft: #6c665b;   /* 5.8:1 on the paper: small labels stay legible */
+  --d-rule: #d9d3c7;
+  --d-ph: #bcb6aa;
+
+  position: relative;
+  width: 816px;                 /* US Letter: 8.5in */
+  min-height: 1056px;           /* 11in */
+  padding: 64px 64px 88px;
+  background: #fffefb;
+  color: var(--d-ink);
+  font-family: var(--serif);
+  font-size: calc(13px * var(--d-scale, 1));
+  line-height: 1.5;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-kerning: normal;
+  word-spacing: 0.04em;      /* Garamond's word space is tight at invoice sizes */
+  text-align: left;
+  overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
+}
+.doc--a4 { width: 794px; min-height: 1123px; }
+.doc--sans { font-family: var(--sans); font-size: calc(12.5px * var(--d-scale, 1)); }
+.doc :where(p, dl, dd) { margin: 0; }
+
+.doc .is-ph, .doc tr.is-ph td { color: var(--d-ph); }
+.doc .is-muted { color: var(--d-ph); }
+
+/* ---- header ---- */
+.doc__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; }
+.doc__from { min-width: 0; max-width: 62%; }
+.doc__logo { display: block; max-width: 200px; max-height: 56px; width: auto; height: auto; margin-bottom: 20px; object-fit: contain; object-position: left center; }
+.doc__business { font-size: calc(26px * var(--d-scale, 1)); line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 10px; }
+.doc--sans .doc__business { font-size: calc(22px * var(--d-scale, 1)); font-weight: 600; letter-spacing: -0.015em; }
+.doc__lines { font-size: calc(12px * var(--d-scale, 1)); line-height: 1.6; color: var(--d-gray); white-space: pre-line; }
+.doc--sans .doc__lines { font-size: calc(11.5px * var(--d-scale, 1)); }
+.doc__lines + .doc__lines { margin-top: 6px; }
+
+.doc__title { flex: none; text-align: right; padding-top: 4px; }
+.doc__kind {
+  font-family: var(--sans);
+  font-size: calc(11px * var(--d-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin-right: -0.32em;
+}
+.doc__number { margin-top: 10px; font-size: calc(20px * var(--d-scale, 1)); line-height: 1.2; }
+.doc--sans .doc__number { font-size: calc(17px * var(--d-scale, 1)); }
+
+/* ---- billed to / dates / amount due ---- */
+.doc__meta {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 32px;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--d-ink);
+}
+.doc__label,
+.doc__dates dt,
+.doc__items th {
+  font-family: var(--sans);
+  font-size: calc(9.5px * var(--d-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--d-soft);
+}
+.doc__label { margin-bottom: 10px; }
+.doc__client { font-size: calc(15px * var(--d-scale, 1)); font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
+.doc--sans .doc__client { font-size: calc(14px * var(--d-scale, 1)); }
+.doc__to .doc__lines + .doc__lines { margin-top: 2px; }
+
+.doc__dates div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 7px; }
+.doc__dates dd { font-size: calc(12.5px * var(--d-scale, 1)); text-align: right; }
+
+.doc__due { text-align: right; }
+.doc__amount { font-size: calc(30px * var(--d-scale, 1)); line-height: 1.05; letter-spacing: -0.01em; }
+.doc--sans .doc__amount { font-size: calc(26px * var(--d-scale, 1)); font-weight: 600; letter-spacing: -0.02em; }
+.doc__due-on { margin-top: 8px; font-size: calc(11.5px * var(--d-scale, 1)); color: var(--d-gray); }
+
+/* ---- items ---- */
+.doc__items { width: 100%; margin-top: 48px; border-collapse: collapse; }
+.doc__items th { padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--d-ink); }
+.doc__items td { padding: 11px 0; border-bottom: 1px solid var(--d-rule); vertical-align: top; }
+.doc__items .num { text-align: right; white-space: nowrap; padding-left: 24px; font-variant-numeric: lining-nums tabular-nums; }
+.doc__items th.num { width: 1%; }
+.doc__desc { white-space: pre-line; }
+.doc__line { font-weight: 600; }
+
+/* ---- totals ---- */
+.doc__totals { width: 300px; margin: 16px 0 0 auto; }
+.doc__totals div { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; }
+.doc__totals dt { color: var(--d-gray); }
+.doc__totals dt { min-width: 0; }
+.doc__totals dd { flex: none; text-align: right; white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
+.doc__totals .doc__grand {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--d-ink);
+  font-size: calc(15px * var(--d-scale, 1));
+  font-weight: 600;
+}
+.doc__grand dt { color: var(--d-ink); }
+.doc__grand dt span { font-family: var(--sans); font-size: calc(9.5px * var(--d-scale, 1)); letter-spacing: 0.18em; color: var(--d-soft); margin-left: 4px; }
+
+/* ---- payment & notes ---- */
+.doc__notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--d-rule);
+}
+.doc__text { font-size: calc(12px * var(--d-scale, 1)); line-height: 1.6; color: var(--d-text); white-space: pre-line; }
+.doc--sans .doc__text { font-size: calc(11.5px * var(--d-scale, 1)); }
+
+/* ---- payment link: a quiet ruled button, the address for paper, an optional QR code ---- */
+.doc__pay { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; margin-bottom: 12px; }
+.doc__pay-main { flex: 0 1 auto; min-width: 0; }
+.doc__pay--qr .doc__pay-main { flex-basis: 196px; } /* the code sits beside the button, or below it in a side column */
+.doc__pay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 11px 7px 13px;
+  border: 1px solid var(--d-ink);
+  color: var(--d-ink);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: calc(9.5px * var(--d-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.doc__pay-arrow { width: 21px; height: 8px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.1; overflow: visible; }
+.doc__pay-via { margin-top: 7px; font-size: calc(11.5px * var(--d-scale, 1)); font-style: italic; line-height: 1.4; color: var(--d-gray); }
+.doc__pay-url { margin-top: 2px; font-family: var(--sans); font-size: calc(9px * var(--d-scale, 1)); line-height: 1.5; letter-spacing: 0.02em; color: var(--d-soft); overflow-wrap: anywhere; }
+.doc__qr { display: block; width: 68px; height: 68px; flex: none; }
+.doc__paid { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 10px; }
+.doc__paid-mark {
+  padding: 4px 8px 3px 9px;
+  border: 1px solid var(--d-ink);
+  font-family: var(--sans);
+  font-size: calc(10px * var(--d-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.doc__paid-on { font-size: calc(12px * var(--d-scale, 1)); color: var(--d-gray); }
+
+/* ---- footer ---- */
+.doc__foot {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  bottom: 36px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 10px;
+  border-top: 1px solid var(--d-rule);
+  font-family: var(--sans);
+  font-size: calc(9px * var(--d-scale, 1));
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--d-soft);
+}
+
+/* ==========================================================================
+   Shared parts used by the templates (templates.js / render.js)
+   ========================================================================== */
+
+/* Project / engagement / shoot / job */
+.doc__project-text { font-size: calc(14px * var(--d-scale, 1)); line-height: 1.35; }
+.doc__project--row { display: flex; align-items: baseline; gap: 20px; margin-top: 28px; }
+.doc__project--row .doc__label { margin: 0; flex: none; }
+
+/* Item title + details (multi-line descriptions) */
+.doc__item-title { display: block; }
+.doc__detail { display: block; margin-top: 2px; font-size: calc(11.5px * var(--d-scale, 1)); line-height: 1.5; color: var(--d-gray); white-space: pre-line; }
+.doc--sans .doc__detail { font-size: calc(11px * var(--d-scale, 1)); }
+
+/* Numbered rows (phases) */
+.doc__items .doc__index { width: 40px; padding-right: 8px; font-family: var(--sans); font-size: calc(10px * var(--d-scale, 1)); letter-spacing: 0.12em; color: var(--d-soft); font-variant-numeric: lining-nums tabular-nums; }
+.doc__items td.doc__index { padding-top: 13px; }
+
+/* Grouped items with subtotals */
+.doc__items .doc__group-head th { padding: 18px 0 7px; border-bottom: 1px solid var(--d-rule); color: var(--d-ink); }
+.doc__items tbody.doc__group:first-of-type .doc__group-head th { padding-top: 14px; }
+.doc__items .doc__subtotal td { padding: 8px 0 4px; border-bottom: 0; text-align: right; font-size: calc(12px * var(--d-scale, 1)); color: var(--d-gray); }
+.doc__items .doc__subtotal td.num { color: var(--d-ink); font-weight: 600; }
+
+/* Totals when a deposit has been paid */
+.doc__totals .doc__total { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--d-rule); }
+.doc__totals .doc__total dt { color: var(--d-ink); }
+
+.doc__notes--single,
+.doc__notes--stacked { grid-template-columns: 1fr; }
+.doc__notes--stacked { gap: 22px; }
+
+/* ---- density ---- */
+.doc--d-airy { padding: 80px 80px 96px; }
+.doc--d-airy .doc__foot { left: 80px; right: 80px; }
+.doc--d-compact { font-size: calc(12px * var(--d-scale, 1)); padding-bottom: 76px; }
+.doc--d-compact.doc--sans { font-size: calc(11.5px * var(--d-scale, 1)); }
+.doc--d-compact .doc__items { margin-top: 32px; }
+.doc--d-compact .doc__items td { padding: 7px 0; }
+.doc--d-compact .doc__notes { margin-top: 32px; }
+.doc--d-compact .doc__items .doc__group-head th { padding-top: 12px; padding-bottom: 6px; }
+.doc--d-compact .doc__items .doc__subtotal td { padding-top: 6px; padding-bottom: 4px; }
+.doc--d-compact.doc--c-statement .st__hero { padding: 32px 0 26px; }
+.doc--d-compact.doc--c-statement .doc__items { margin-top: 30px; }
+.doc--d-compact .lg__info, .doc--d-compact.doc--c-ledger .doc__items { margin-top: 22px; }
+.doc--d-compact.doc--c-ledger .doc__totals { margin-top: 16px; }
+.doc--d-compact .lg__notes { margin-top: 24px; }
+
+/* ==========================================================================
+   Compositions
+   ========================================================================== */
+
+/* ---- letterhead: Professional, Photographer ---------------------------- */
+.lh__head { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.doc--c-letterhead .doc__logo { margin: 0 auto 18px; object-position: center; }
+.lh__name { font-size: calc(30px * var(--d-scale, 1)); margin-bottom: 8px; }
+.doc--sans .lh__name { font-size: calc(24px * var(--d-scale, 1)); }
+.doc--name-italic .lh__name { font-style: italic; font-size: calc(36px * var(--d-scale, 1)); letter-spacing: -0.015em; }
+.lh__contact { font-size: calc(11.5px * var(--d-scale, 1)); }
+
+.lh__strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  margin-top: 32px;
+  border-top: 1px solid var(--d-ink);
+  border-bottom: 1px solid var(--d-rule);
+}
+.lh__strip > div { padding: 12px 14px 13px; border-left: 1px solid var(--d-rule); }
+.lh__strip > div:first-child { padding-left: 0; border-left: 0; }
+.lh__strip > div:last-child { padding-right: 0; text-align: right; }
+.lh__strip dt { font-family: var(--sans); font-size: calc(9.5px * var(--d-scale, 1)); font-weight: 600; letter-spacing: 0.18em; line-height: 1.4; text-transform: uppercase; color: var(--d-soft); }
+.lh__strip dd { margin-top: 6px; font-size: calc(13px * var(--d-scale, 1)); }
+.lh__strip .lh__strip-due dd { font-size: calc(17px * var(--d-scale, 1)); font-weight: 600; line-height: 1.2; }
+
+.lh__line {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+  margin-top: 30px; padding: 13px 0;
+  border-top: 1px solid var(--d-ink); border-bottom: 1px solid var(--d-rule);
+}
+.lh__facts { font-size: calc(12.5px * var(--d-scale, 1)); text-align: right; }
+.lh__dot { color: var(--d-soft); }
+
+.lh__parties { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; margin-top: 30px; }
+.doc--name-italic .lh__parties { grid-template-columns: 1.2fr 1fr 1fr; }
+.lh__project .doc__label { margin-bottom: 10px; }
+
+/* ---- title: Editorial, Freelancer -------------------------------------- */
+.ti__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--d-rule); }
+.ti__brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ti__brand .doc__logo { max-height: 40px; max-width: 140px; margin: 0; }
+.ti__brand .doc__business { margin: 0; font-size: calc(17px * var(--d-scale, 1)); }
+.doc--sans .ti__brand .doc__business { font-size: calc(15px * var(--d-scale, 1)); }
+.ti__contact { text-align: right; font-size: calc(11px * var(--d-scale, 1)); max-width: 55%; }
+
+.ti__title { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; margin-top: 48px; padding-bottom: 28px; border-bottom: 1px solid var(--d-ink); }
+.ti__word { font-size: calc(76px * var(--d-scale, 1)); line-height: 0.9; letter-spacing: -0.03em; }
+.doc--sans .ti__word { font-size: calc(60px * var(--d-scale, 1)); font-weight: 600; letter-spacing: -0.045em; }
+.ti__no { margin-top: 12px; font-size: calc(16px * var(--d-scale, 1)); font-style: italic; color: var(--d-gray); }
+.doc--sans .ti__no { font-style: normal; font-size: calc(14px * var(--d-scale, 1)); }
+.ti__due .doc__amount { font-size: calc(34px * var(--d-scale, 1)); }
+.doc--sans .ti__due .doc__amount { font-size: calc(30px * var(--d-scale, 1)); }
+
+.ti__project { display: flex; align-items: baseline; gap: 20px; margin-top: 18px; }
+.ti__project .doc__label { margin: 0; flex: none; }
+.ti__project .doc__project-text { font-size: calc(17px * var(--d-scale, 1)); }
+.doc--sans .ti__project .doc__project-text { font-size: calc(15px * var(--d-scale, 1)); font-weight: 600; }
+
+.ti__body { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 40px; margin-top: 36px; }
+.ti__side { min-width: 0; }
+.ti__side > * + * { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--d-rule); }
+.ti__side .doc__dates div { display: block; padding-bottom: 8px; }
+.ti__side .doc__dates dd { text-align: left; margin-top: 2px; }
+.ti__side .doc__text { font-size: calc(11.5px * var(--d-scale, 1)); }
+.ti__main { min-width: 0; }
+.ti__main .doc__items { margin-top: 0; }
+.ti__main .doc__totals { width: 280px; }
+
+/* ---- sidebar: Consultant, Design Studio -------------------------------- */
+.sb { display: grid; grid-template-columns: 208px minmax(0, 1fr); }
+.sb__side { min-width: 0; padding-right: 28px; border-right: 1px solid var(--d-rule); }
+.sb__side .doc__logo { max-width: 160px; max-height: 48px; }
+.sb__side .doc__business { font-size: calc(21px * var(--d-scale, 1)); }
+.doc--sans .sb__side .doc__business { font-size: calc(18px * var(--d-scale, 1)); }
+.sb__side .doc__to { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--d-ink); }
+.sb__side .doc__dates { margin-top: 26px; }
+.sb__side .doc__dates div { display: block; padding-bottom: 9px; }
+.sb__side .doc__dates dd { text-align: left; margin-top: 2px; }
+.sb__side .doc__note { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--d-rule); }
+.sb__side .doc__text { font-size: calc(11.5px * var(--d-scale, 1)); }
+.sb__main { min-width: 0; padding-left: 32px; }
+.sb__head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; }
+.sb__head .doc__number { margin: 0; }
+.sb__summary { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; margin-top: 40px; padding-bottom: 22px; border-bottom: 1px solid var(--d-ink); }
+.sb__summary .doc__due { margin-left: auto; }
+.sb__project .doc__project-text { font-size: calc(18px * var(--d-scale, 1)); line-height: 1.3; }
+.doc--sans .sb__project .doc__project-text { font-size: calc(16px * var(--d-scale, 1)); font-weight: 600; }
+.sb__main .doc__items { margin-top: 24px; }
+.sb__main .doc__totals { width: 270px; }
+.sb__main > .doc__note { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--d-rule); }
+
+/* ---- statement: Executive, Agency -------------------------------------- */
+.st__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--d-ink); }
+.st__brand { min-width: 0; max-width: 55%; }
+.st__brand .doc__business { margin: 0; }
+.doc .st__name--caps { font-size: calc(15px * var(--d-scale, 1)); font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; line-height: 1.5; }
+.st__contact { text-align: right; }
+.st__contact .doc__lines { font-size: calc(11px * var(--d-scale, 1)); }
+.st__hero { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 48px; align-items: end; padding: 44px 0 34px; border-bottom: 1px solid var(--d-rule); }
+.st__amount { margin-top: 2px; font-size: calc(54px * var(--d-scale, 1)); line-height: 1; letter-spacing: -0.02em; }
+.doc--sans .st__amount { font-size: calc(44px * var(--d-scale, 1)); font-weight: 600; letter-spacing: -0.035em; }
+.st__lead .doc__due-on { font-size: calc(12.5px * var(--d-scale, 1)); margin-top: 12px; }
+.st__ledger div { padding: 7px 0; border-top: 1px solid var(--d-rule); }
+.st__ledger div:first-child { border-top: 1px solid var(--d-ink); }
+.st__parties { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 28px; }
+.doc--c-statement .doc__items { margin-top: 40px; }
+.doc--c-statement .doc__totals { width: 330px; }
+
+/* ---- minimal: Minimal, Home Services ----------------------------------- */
+.mn__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
+.mn__from { min-width: 0; max-width: 70%; }
+.mn__from .doc__logo { max-height: 44px; margin-bottom: 16px; }
+.mn__from .doc__business { font-size: calc(19px * var(--d-scale, 1)); margin-bottom: 6px; }
+.doc--sans .mn__from .doc__business { font-size: calc(16px * var(--d-scale, 1)); }
+.mn__kind { flex: none; padding-top: 4px; font-family: var(--sans); font-size: calc(10.5px * var(--d-scale, 1)); font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--d-soft); }
+.mn__kind span { margin-left: 6px; letter-spacing: 0.06em; color: var(--d-ink); }
+.mn__facts { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px; margin-top: 72px; }
+.doc--d-compact .mn__facts { margin-top: 40px; }
+.mn__facts .doc__dates div { display: block; padding-bottom: 9px; }
+.mn__facts .doc__dates dd { text-align: left; margin-top: 2px; }
+.mn__project { display: flex; align-items: baseline; gap: 20px; margin-top: 32px; }
+.mn__project .doc__label { margin: 0; flex: none; }
+.doc--c-minimal .doc__items { margin-top: 56px; }
+.doc--c-minimal.doc--d-compact .doc__items { margin-top: 32px; }
+.doc--c-minimal .doc__items th { border-bottom-color: var(--d-rule); }
+.doc--c-minimal .doc__totals .doc__grand { border-top-color: var(--d-rule); }
+.doc--c-minimal .doc__notes { border-top: 0; padding-top: 0; }
+
+/* ---- ledger: Contractor, Construction ---------------------------------- */
+.lg__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; }
+.lg__from { min-width: 0; max-width: 58%; }
+.lg__from .doc__business { font-size: calc(22px * var(--d-scale, 1)); }
+.lg__box { flex: none; width: 252px; border: 1px solid var(--d-ink); }
+.lg__kind { padding: 10px 14px; border-bottom: 1px solid var(--d-ink); font-family: var(--sans); font-size: calc(12px * var(--d-scale, 1)); font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; }
+.lg__facts { padding: 10px 14px 4px; }
+.lg__facts div { padding-bottom: 6px; }
+.lg__info { display: grid; grid-template-columns: 1.15fr 1.15fr 1fr; margin-top: 28px; border: 1px solid var(--d-ink); }
+.lg__info > * { min-width: 0; padding: 12px 14px 14px; }
+.lg__info > * + * { border-left: 1px solid var(--d-rule); }
+.lg__info .doc__amount { font-size: calc(24px * var(--d-scale, 1)); }
+.doc--c-ledger .doc__items { margin-top: 28px; }
+.doc--c-ledger .doc__items th { padding-top: 9px; padding-bottom: 9px; border-top: 1px solid var(--d-ink); }
+.doc--c-ledger .doc__items .doc__group-head th { padding: 16px 0 7px; border-top: 0; }
+.doc--c-ledger .doc__subtotal td { border-bottom: 1px solid var(--d-ink); padding-bottom: 8px; }
+.doc--c-ledger .doc__totals { width: 320px; margin-top: 22px; padding: 6px 14px 10px; border: 1px solid var(--d-ink); }
+.lg__notes { gap: 0; margin-top: 32px; padding-top: 0; border: 1px solid var(--d-rule); }
+.lg__notes > div { padding: 12px 14px 14px; }
+.lg__notes > div + div { border-left: 1px solid var(--d-rule); }
+
+/* Construction: a full grid, legible after scanning */
+.doc--grid .doc__items { border: 1px solid var(--d-ink); }
+.doc--grid .doc__items th,
+.doc--grid .doc__items td { padding-left: 10px; padding-right: 10px; border-left: 1px solid var(--d-rule); }
+.doc--grid .doc__items th:first-child,
+.doc--grid .doc__items td:first-child { border-left: 0; }
+.doc--grid .doc__items th { border-top: 0; border-bottom: 1px solid var(--d-ink); }
+.doc--grid .doc__items .doc__group-head th { padding: 10px 10px 6px; border-bottom: 1px solid var(--d-rule); border-left: 0; }
+.doc--grid .doc__items .doc__subtotal td { border-left: 0; padding-right: 10px; border-bottom: 1px solid var(--d-ink); }
+.doc--grid .doc__items .doc__subtotal td.num { border-left: 1px solid var(--d-rule); }

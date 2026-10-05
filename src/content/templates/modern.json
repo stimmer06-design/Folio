@@ -1,0 +1,38 @@
+{
+  "name": "Modern",
+  "layout": "modern",
+  "title": "Free Modern Invoice Template",
+  "description": "A free modern invoice template set in a clean grotesque, with your logo, line items and a clear amount due. Fill it in online and download a professional PDF.",
+  "summary": "The Classic arrangement set in Grotesk: crisper, more contemporary, equally formal.",
+  "intro": "The proven letterhead arrangement, set entirely in a clean grotesque. Crisp on a phone screen, formal on paper.",
+  "explanation": [
+    "Many clients first open an invoice on a phone. A sans-serif at the right weight stays crisp at small sizes, and a semibold amount due is easy to find with a thumb and a glance.",
+    "This template keeps the arrangement of the [Classic template](/invoice-templates/classic/), letterhead left and number right, and sets everything in Hanken Grotesk, with names and totals in semibold. Nothing else changes, so it is just as easy to read and process.",
+    "It suits digital studios, technology freelancers, startups and any business whose own branding uses a sans-serif."
+  ],
+  "fieldsTitle": "What’s on the modern invoice",
+  "fields": [
+    { "name": "Letterhead", "text": "Logo and business name top left, with your contact line beneath." },
+    { "name": "Invoice number", "text": "Opposite the letterhead, in the same clean face." },
+    { "name": "Key facts", "text": "Billed to, issue date, due date and amount due on one line, the amount in semibold." },
+    { "name": "Items", "text": "Description, quantity, price and amount. Works for one line or forty; long invoices continue on further pages." },
+    { "name": "Totals", "text": "Subtotal, discount, tax, other charges and the total, right-aligned." },
+    { "name": "Payment and notes", "text": "Bank details or a payment link, and a short note, at the foot." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens the modern example in the generator." },
+    { "title": "Your details", "text": "Add your business details and logo once; they carry over to new invoices." },
+    { "title": "Items and totals", "text": "Add the client and the work. Totals are calculated as you type." },
+    { "title": "Download", "text": "Download the PDF or print it. Only the invoice is printed." }
+  ],
+  "faqs": [
+    { "q": "What makes an invoice template modern?", "a": "Mostly typography and restraint: a contemporary sans-serif, generous spacing, few rules and no decoration. The structure should still be conventional, so clients find everything where they expect it." },
+    { "q": "Is a sans-serif invoice less formal?", "a": "Not if it is set carefully. This template keeps a formal arrangement; only the typeface changes." },
+    { "q": "Will it look the same on my client’s computer?", "a": "Yes. The PDF embeds the typeface, so it doesn’t depend on the fonts your client has installed." },
+    { "q": "Can I use my brand colors?", "a": "Folio’s templates are deliberately black on white, which prints well and looks consistent. Your logo carries your brand." }
+  ],
+  "relatedTemplates": ["classic", "freelancer", "web-developer"],
+  "relatedGuides": ["how-to-create-an-invoice-pdf", "how-to-make-an-invoice", "what-to-put-on-an-invoice"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Designer",
+  "layout": "studio",
+  "title": "Free Graphic Designer Invoice Template",
+  "description": "A free graphic design invoice template organized by numbered project phases, with deliverables and revisions under each fee, deposit and balance due.",
+  "summary": "Numbered phases with deliverables listed beneath each fee, and the deposit deducted.",
+  "intro": "Each phase numbered, each fee explained by the deliverables beneath it, and the deposit you took at the start deducted from the total.",
+  "explanation": [
+    "Design is usually priced by phase, not by the hour, and clients pay more readily when they can see what each fee bought. “Identity design, $4,200” invites questions; the same line followed by “Wordmark, color and type system; two rounds of revisions” answers them.",
+    "This template numbers each phase and prints its deliverables on the line beneath. When every line is a fixed fee, the quantity and unit price columns disappear, leaving a clean list of phases and fees. The deposit taken at kick-off is shown and subtracted.",
+    "It suits graphic, brand, packaging, web and interior designers, illustrators and small design studios."
+  ],
+  "fieldsTitle": "What to put on a design invoice",
+  "fields": [
+    { "name": "Project", "text": "The project as the client knows it: “Brand identity and packaging”." },
+    { "name": "Phases", "text": "Each phase as a line (Discovery, Identity design, Packaging, Guidelines) with its fee." },
+    { "name": "Deliverables", "text": "On the line beneath each phase, what it produced: files, formats, page counts, and how many revision rounds were included." },
+    { "name": "Extra revisions", "text": "Revisions beyond those agreed, as their own line, so the client sees they are additional." },
+    { "name": "Usage and rights", "text": "If your contract licenses the work, or transfers rights on payment, say so in the notes." },
+    { "name": "Deposit and balance", "text": "The deposit received at the start, subtracted to show the balance due." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a studio’s brand project in the generator." },
+    { "title": "One line per phase", "text": "Type the phase name, press Return, then type its deliverables. The second line prints in smaller type beneath." },
+    { "title": "Deposit", "text": "Enter the deposit in Deposit or amount paid. The balance due is calculated." },
+    { "title": "Download and send", "text": "Download the PDF. If final files are released on payment, say so in the notes." }
+  ],
+  "faqs": [
+    { "q": "How should a graphic designer itemize an invoice?", "a": "By phase or deliverable, with a short description of what each includes. Clients approve “Packaging: can labels for three beers, print-ready files” far more easily than “Design work”." },
+    { "q": "Should designers take a deposit?", "a": "Many do, often a percentage of the project fee at signing, with the balance on completion. Show the deposit on the final invoice so the client sees the full price and what is left to pay." },
+    { "q": "How do I charge for extra revisions?", "a": "State the included rounds on the phase line, and bill additional rounds as a separate line at the rate in your contract." },
+    { "q": "Should I send final files before I’m paid?", "a": "That is your decision and your contract’s. A common approach is to send low-resolution or watermarked proofs, then release final files when the invoice is paid, and to say so on the invoice." }
+  ],
+  "relatedTemplates": ["photographer", "videographer", "freelancer"],
+  "relatedGuides": ["how-to-invoice-as-a-freelancer", "how-to-write-an-invoice", "how-to-invoice-a-client"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

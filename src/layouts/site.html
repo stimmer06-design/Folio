@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  {{> head}}
+  <script src="{{root}}assets/site.js?v={{jsVersion}}" defer></script>
+  {{scripts}}
+  {{schema}}
+</head>
+<body class="{{bodyClass}}" data-page-type="{{pageType}}" data-page-slug="{{pageSlug}}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{> header}}
+  <main id="main" tabindex="-1">
+{{content}}
+  </main>
+  {{> footer}}
+</body>
+</html>

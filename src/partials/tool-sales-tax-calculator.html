@@ -1,0 +1,35 @@
+<form class="tool grid" data-tool="sales-tax-calculator" novalidate>
+          <fieldset class="tool__in" data-reveal>
+            <legend class="label tool__legend">Amount and rate</legend>
+            <div class="tool__fields">
+              <div class="fld fld--full">
+                <span class="fld__label" id="s-mode-label">The amount is</span>
+                <div class="seg seg--wide" role="radiogroup" aria-labelledby="s-mode-label">
+                  <label><input type="radio" name="mode" value="add" checked><span>Before tax: add tax</span></label>
+                  <label><input type="radio" name="mode" value="remove"><span>Tax included: take it out</span></label>
+                </div>
+              </div>
+              <div class="fld">
+                <label class="fld__label" for="s-amount" data-out="amountLabel">Amount before tax</label>
+                <div class="affix"><span class="affix__start" aria-hidden="true">$</span><input class="fld__input" id="s-amount" type="text" name="amount" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
+              </div>
+              <div class="fld">
+                <label class="fld__label" for="s-rate">Tax rate</label>
+                <div class="affix"><input class="fld__input" id="s-rate" type="text" name="rate" inputmode="decimal" placeholder="0" autocomplete="off" aria-describedby="s-rate-hint"><span class="affix__end" aria-hidden="true">%</span></div>
+              </div>
+              <p class="fld__hint fld--full" id="s-rate-hint">Enter the combined rate that applies to your sale: state plus any county, city or district rate. Rates change, so check the current one with the tax authority where the sale is taxed.</p>
+            </div>
+          </fieldset>
+          <div class="tool__out" data-reveal>
+            <p class="label tool__legend" id="st-out-label">Result</p>
+            <dl class="summary tool__summary" aria-labelledby="st-out-label" aria-live="polite">
+              <div><dt>Price before tax</dt><dd data-out="net">$0.00</dd></div>
+              <div><dt data-out="taxLabel">Sales tax</dt><dd data-out="tax">$0.00</dd></div>
+              <div class="summary__total"><dt>Total with tax</dt><dd data-out="gross">$0.00</dd></div>
+            </dl>
+            <div class="tool__actions">
+              <a class="btn" href="{{root}}app/" data-out="link">Create an invoice with these numbers {{> arrow}}</a>
+            </div>
+            <noscript><p class="tool__note">This calculator needs JavaScript. The formulas are written out below.</p></noscript>
+          </div>
+        </form>

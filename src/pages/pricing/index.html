@@ -1,0 +1,71 @@
+---
+titleFull: Pricing — Free Invoice Generator, Pro Coming Soon · Folio
+description: Folio’s invoice generator is free with no limits: unlimited invoices, PDF export, your logo, no watermark. Pro, with sync and recurring invoices, is in development.
+nav: pricing
+bodyClass: page-pricing
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        <p class="label page-head__label" data-reveal>Pricing</p>
+        <h1 class="h1 page-head__title" data-reveal>Free to use. Pro when you need more.</h1>
+        <p class="lead page-head__lead muted" data-reveal>The invoice generator is free, with no limits, no watermark and no trial period. Pro will add the tools that only make sense with an account.</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-labelledby="plans-title">
+      <div class="wrap">
+        <h2 class="visually-hidden" id="plans-title">Plans</h2>
+        <div class="grid plans plans--page" data-reveal-group>
+          {{> plan-free}}
+          {{> plan-pro}}
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="compare-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="compare-title" data-reveal>Compare</h2>
+          <div class="opening__body" data-reveal>
+            <table class="compare">
+              <thead><tr><th scope="col"><span class="visually-hidden">Feature</span></th><th scope="col">Free</th><th scope="col">Pro <span class="compare__soon">planned</span></th></tr></thead>
+              <tbody>
+                <tr class="compare__group"><th scope="rowgroup" colspan="3">Invoices</th></tr>
+                <tr><th scope="row">Invoices per month</th><td>Unlimited</td><td>Unlimited</td></tr>
+                <tr><th scope="row">PDF download and print</th><td>Yes</td><td>Yes</td></tr>
+                <tr><th scope="row">Tax, discount and shipping</th><td>Yes</td><td>Yes</td></tr>
+                <tr><th scope="row">Sixteen currencies, Letter or A4</th><td>Yes</td><td>Yes</td></tr>
+                <tr><th scope="row">Watermark or Folio branding</th><td>None</td><td>None</td></tr>
+                <tr class="compare__group"><th scope="rowgroup" colspan="3">Your brand</th></tr>
+                <tr><th scope="row">Your logo</th><td>Yes</td><td>Yes</td></tr>
+                <tr><th scope="row">Invoice templates</th><td>All 14</td><td>All 14, plus additional designs</td></tr>
+                <tr class="compare__group"><th scope="rowgroup" colspan="3">Working with many invoices</th></tr>
+                <tr><th scope="row">Saved invoices</th><td>In this browser</td><td>Synced across devices</td></tr>
+                <tr><th scope="row">Duplicate and reuse</th><td>Yes</td><td>Yes</td></tr>
+                <tr><th scope="row">Client address book</th><td>—</td><td>Yes</td></tr>
+                <tr><th scope="row">Saved line items and templates</th><td>—</td><td>Yes</td></tr>
+                <tr><th scope="row">Recurring invoices and reminders</th><td>—</td><td>Yes</td></tr>
+                <tr class="compare__group"><th scope="rowgroup" colspan="3">Account</th></tr>
+                <tr><th scope="row">Account required</th><td>No</td><td>Yes</td></tr>
+                <tr><th scope="row">Price</th><td>$0</td><td>${{site.proPrice}} a month, planned</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="pricing-faq">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="pricing-faq" data-reveal>Questions</h2>
+          <div class="opening__body--narrow faq" data-reveal>
+            <details><summary>Will the free plan stay free?</summary><div class="faq__answer"><p>Yes. Creating, downloading and printing invoices will always be free and unlimited. Pro pays for the parts that need servers: sync, client lists and recurring invoices.</p></div></details>
+            <details><summary>When will Pro be available?</summary><div class="faq__answer"><p>It is in development. Join the early-access list and we will write to you once, when it is ready, with an early-access price.</p></div></details>
+            <details><summary>Will my free invoices move to Pro?</summary><div class="faq__answer"><p>Yes. Pro will import the invoices saved in your browser, so nothing you make today is lost.</p></div></details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {{> cta}}

@@ -1,0 +1,111 @@
+[
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "home": true,
+    "q": "Is Folio really free?",
+    "a": [
+      "Yes. You can create, download and print as many invoices as you like without paying or signing up. There is no watermark and no limit. A paid Pro plan for people who invoice every week is in development; the free generator will stay free."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "home": true,
+    "q": "Do I need to create an account?",
+    "a": [
+      "No. Open the invoice generator and start typing. Folio remembers your business details in your browser so the next invoice is quicker, without an account or a password."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "home": true,
+    "q": "Where are my invoices stored?",
+    "a": [
+      "In your browser’s local storage, on your own device. Nothing you type is sent to us or to anyone else, except an invoice’s number and amount when you create a payment link for it. That also means invoices stay on the device and browser you created them in, so use Download backup in Your invoices to keep a copy or move them to another computer."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "home": true,
+    "q": "Can I add my logo?",
+    "a": [
+      "Yes. Add a PNG, JPG or SVG in the From section. It appears at the top left of the invoice and in the PDF, and it is reused for your next invoices."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "q": "Can I change the invoice template after I start?",
+    "a": [
+      "Yes. Choose Change template in the editor or above the preview, at any time. Only the layout changes: your details, line items and totals stay exactly as they are. Folio has sixteen layouts, from Classic and Minimal to Freelancer, Photographer and Contractor, and the template library has worked examples for twenty trades and styles."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "q": "Does it work on a phone or tablet?",
+    "a": [
+      "Yes. On smaller screens the form and the preview sit on separate tabs, and the PDF downloads the same way it does on a computer."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "generator": true,
+    "q": "Can I edit an invoice after I download it?",
+    "a": [
+      "Yes. Every invoice is saved as you type. Open Your invoices, choose the invoice, change it and download a new PDF. You can also duplicate an invoice to start next month’s from it."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "q": "Which currencies and paper sizes are supported?",
+    "a": [
+      "Sixteen currencies, including the US dollar, euro, pound, Canadian and Australian dollars, Swiss franc, yen and rupee, and both US Letter and A4 paper."
+    ]
+  },
+  {
+    "group": "Using Folio",
+    "q": "Is there Folio branding on my invoices?",
+    "a": [
+      "No. The invoice carries your name and your logo only."
+    ]
+  },
+  {
+    "group": "Invoicing basics",
+    "q": "What should an invoice include?",
+    "a": [
+      "At minimum: your business name and contact details, the client’s name and address, a unique invoice number, the issue date and due date, a description of each product or service with quantity and price, any tax, discount or other charges, the total amount due, and how to pay. Folio has a field for each of these, and leaves out anything you leave blank."
+    ]
+  },
+  {
+    "group": "Invoicing basics",
+    "q": "How should I number my invoices?",
+    "a": [
+      "Use a sequence that never repeats, such as INV-0001, INV-0002. Folio suggests the next number automatically when you create or duplicate an invoice, and keeps any prefix you choose, for example 2026-014."
+    ]
+  },
+  {
+    "group": "Invoicing basics",
+    "q": "What does Net 30 mean?",
+    "a": [
+      "Net 30 means payment is due 30 days after the invoice date. Choose payment terms in Folio and the due date is set for you; pick a date yourself and the terms switch to Custom."
+    ]
+  },
+  {
+    "group": "Invoicing basics",
+    "generator": true,
+    "q": "How are tax and discounts calculated?",
+    "a": [
+      "Line totals are added to give the subtotal. A discount, as a percentage or a fixed amount, is taken off the subtotal, tax is charged on what remains, and shipping or another flat charge is added last. You can rename tax to VAT, GST or sales tax. Folio does the arithmetic; check with an accountant which rate applies to you."
+    ]
+  },
+  {
+    "group": "Invoicing basics",
+    "q": "Can I create an invoice without a registered company?",
+    "a": [
+      "Yes. Freelancers and sole traders invoice under their own name every day. Enter your name in place of a business name and add a tax number only if you have one."
+    ]
+  }
+]

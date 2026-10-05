@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en-US" class="app-html">
+<head>
+  {{> head}}
+  <link rel="modulepreload" href="{{root}}assets/js/app/main.js?v={{appVersion}}">
+  <script type="module" src="{{root}}assets/js/app/main.js?v={{appVersion}}"></script>
+  {{schema}}
+</head>
+<body class="app-body {{bodyClass}}">
+  <a class="skip-link" href="#editor">Skip to the invoice form</a>
+{{content}}
+</body>
+</html>

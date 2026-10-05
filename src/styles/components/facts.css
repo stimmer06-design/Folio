@@ -1,0 +1,39 @@
+/* ==========================================================================
+   Fact row — figures stated, not boasted
+   ========================================================================== */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+.fact {
+  padding-top: var(--s-4);
+  border-top: var(--hair);
+}
+.fact__num {
+  display: block;
+  font-size: var(--fs-h2);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
+}
+.fact__num small { font-size: 0.42em; letter-spacing: 0.02em; margin-left: 0.15em; font-style: italic; }
+.fact__label {
+  display: block;
+  margin-top: var(--s-3);
+  max-width: 24ch;
+  font-family: var(--serif);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.4;
+  color: var(--ash);
+}
+/* When facts open a section body, the section rule already does the job */
+.opening__body > .facts:first-child .fact { border-top: 0; padding-top: 0; }
+
+@media (max-width: 47.99rem) {
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s-6); }
+}

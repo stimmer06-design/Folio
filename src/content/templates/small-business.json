@@ -1,0 +1,39 @@
+{
+  "name": "Small Business",
+  "layout": "professional",
+  "title": "Free Small Business Invoice Template",
+  "description": "A free small business invoice template with a centered letterhead and a ruled strip of invoice details: number, dates, terms and amount due. Download as PDF.",
+  "summary": "A centered letterhead and a ruled strip of invoice facts. The small-business standard.",
+  "intro": "A centered letterhead, then every fact an accounts department looks for, the number, the dates, the terms and the amount due, in one ruled strip.",
+  "explanation": [
+    "Most small businesses invoice other businesses, and their invoices land in an accounts payable queue. The person processing them doesn’t know you; they need the invoice number, the due date and the amount quickly, and in the same place every time.",
+    "This template sets your logo and name as a centered letterhead and gathers the invoice facts into a ruled strip beneath it. The table is conventional (description, quantity, unit price, amount), so any bookkeeper recognizes it at a glance.",
+    "It suits shops, printers, caterers, wholesalers, studios and service businesses selling to other businesses: anyone who wants an invoice that looks established and gets processed without questions."
+  ],
+  "fieldsTitle": "What to put on a small business invoice",
+  "fields": [
+    { "name": "Business details", "text": "Your business name, logo, address and contact line. Add your tax or VAT number where clients need it." },
+    { "name": "Invoice number", "text": "A unique number in sequence. The [invoice number generator](/tools/invoice-number-generator/) helps you choose a format." },
+    { "name": "Dates and terms", "text": "The issue date, payment terms and due date, together in the strip." },
+    { "name": "Products or services", "text": "Each item with quantity and unit price. Use the client’s own product or service names where you can." },
+    { "name": "Discount", "text": "A percentage or a fixed amount, for repeat orders or early payment, applied before tax." },
+    { "name": "Delivery", "text": "Shipping or delivery as the separate charge beneath the tax." },
+    { "name": "Payment", "text": "Every way you accept payment, and what reference to quote." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a print shop’s invoice in the generator." },
+    { "title": "Your letterhead", "text": "Add your logo and business details once; they carry over to every new invoice." },
+    { "title": "The order", "text": "Enter the client and each item. Add a discount, tax and delivery if they apply." },
+    { "title": "Download and send", "text": "Download the PDF and send it to the client’s accounts address. Your next invoice number is suggested automatically." }
+  ],
+  "faqs": [
+    { "q": "What makes an invoice look professional?", "a": "Consistency and clarity: the same layout every time, your details at the top, a unique number, clear dates and terms, items a client recognizes, correct totals, and how to pay. Typography helps; a busy design doesn’t." },
+    { "q": "Do I need a logo?", "a": "No. A clearly set business name works as a letterhead. If you have a logo, add it once in the generator and it appears on every invoice." },
+    { "q": "How should a small business number invoices?", "a": "In one unique sequence, never reusing a number. A prefix and year (INV-2026-0042) makes them easy to find. See [how to number invoices](/invoice-guides/how-to-number-invoices/)." },
+    { "q": "Can I add my tax registration number?", "a": "Yes. Enter it in the Tax ID field and it prints with your business details." }
+  ],
+  "relatedTemplates": ["classic", "contractor", "marketing-agency"],
+  "relatedGuides": ["what-to-put-on-an-invoice", "how-to-make-an-invoice", "invoice-vs-bill"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

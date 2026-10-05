@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Payment link — a compact block at the top of "Payment & notes".
+   The editor's own materials: hairlines, sans-caps labels, italic hints.
+   ========================================================================== */
+
+.paylink { gap: 0.5rem; padding-bottom: var(--s-5); border-bottom: var(--hair); }
+.paylink__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); }
+.paylink__status {
+  font-family: var(--sans); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--ash);
+}
+.paylink__status:empty { display: none; }
+.paylink__status[data-state="paid"] { color: var(--ink); }
+.paylink__status[data-state="paid"]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 0.5em; vertical-align: 0.1em; background: var(--ink); }
+.paylink__status[data-state="changed"],
+.paylink__status[data-state="renumbered"],
+.paylink__status[data-state="failed"] { color: var(--error); }
+
+.paylink__lead { font-size: 0.9375rem; line-height: 1.45; font-style: italic; color: var(--ash); }
+.paylink__ended { margin-top: var(--s-2); font-size: 0.9375rem; line-height: 1.45; }
+.paylink__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-top: var(--s-3); }
+.paylink__row .seg span { min-width: 4.5rem; }
+.paylink__test { margin-top: var(--s-2); font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.02em; color: var(--ash); }
+
+.paylink__connect { margin-top: var(--s-4); padding: var(--s-4); border: var(--hair); background: #fbf9f4; }
+.paylink__connect > div { display: grid; gap: var(--s-3); }
+.paylink__connect p { font-size: 0.9375rem; line-height: 1.5; }
+.paylink__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem var(--s-5); }
+
+.paylink__current { display: grid; gap: 0.35rem; }
+.paylink__created { font-family: var(--sans); font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; }
+.paylink__url { font-family: var(--sans); font-size: 0.875rem; line-height: 1.4; overflow-wrap: anywhere; }
+.paylink__url a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.25em; text-decoration-color: rgba(22, 21, 19, 0.35); }
+.paylink__check { display: inline-flex; align-items: center; gap: 0.55rem; min-height: 2.25rem; font-family: var(--sans); font-size: 0.8125rem; cursor: pointer; }
+.paylink__check input { width: 1rem; height: 1rem; margin: 0; accent-color: var(--ink); }
+.paylink__warn {
+  display: grid; justify-items: start; gap: var(--s-3);
+  margin-top: var(--s-2); padding: var(--s-3) var(--s-4);
+  border-left: 2px solid var(--error);
+  background: rgba(140, 43, 31, 0.05);
+}
+.paylink__warn p { font-family: var(--sans); font-size: 0.875rem; line-height: 1.45; color: var(--error); }
+.paylink__error { margin-top: var(--s-2); }
+.paylink__account { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--s-3); margin-top: var(--s-2); font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.01em; color: var(--ash); }
+.paylink__account .link-btn { min-height: 2rem; font-size: 0.75rem; color: var(--ash); }
+
+@media (max-width: 47.99rem) {
+  .paylink__row { align-items: stretch; }
+  .paylink__row .seg { width: 100%; }
+  .paylink__row .seg label { flex: 1; }
+  .paylink__create { width: 100%; }
+  .paylink__actions .btn { flex: 1 1 100%; }
+}

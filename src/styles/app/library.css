@@ -1,0 +1,57 @@
+/* ==========================================================================
+   "Your invoices" — a side sheet (full screen on phones)
+   ========================================================================== */
+
+.library {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(28rem, 100vw);
+  max-width: 100vw;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: var(--hair-ink);
+  background-color: var(--bone);
+  background-image: var(--grain);
+  color: var(--ink);
+}
+.library::backdrop { background: rgba(22, 21, 19, 0.35); }
+@media (prefers-reduced-motion: no-preference) {
+  .library[open] { animation: sheet-in 260ms var(--ease); }
+}
+@keyframes sheet-in { from { transform: translateX(24px); opacity: 0; } }
+
+.library__inner { display: flex; flex-direction: column; height: 100%; padding: var(--s-5) var(--s-6) var(--s-6); }
+.library__head { display: flex; justify-content: space-between; align-items: center; }
+.library__title { font-size: 1.75rem; line-height: 1.1; }
+.library__close { margin-right: -0.75rem; }
+.library__new { margin-top: var(--s-5); justify-content: space-between; }
+.library__new .plus { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+.library__list { flex: 1; overflow-y: auto; margin-top: var(--s-5); border-top: var(--hair-ink); }
+.lib-item { border-bottom: var(--hair); padding-bottom: var(--s-2); }
+.lib-item__open {
+  display: grid; grid-template-columns: 1fr auto; gap: 0.15rem var(--s-4);
+  width: 100%; padding: var(--s-4) 0 var(--s-2);
+  border: 0; background: none; text-align: left; cursor: pointer; color: inherit;
+}
+.lib-item__number { font-size: 1.25rem; line-height: 1.2; font-variant-numeric: lining-nums; }
+.lib-item__total { font-family: var(--sans); font-size: 0.9375rem; font-weight: 600; font-variant-numeric: tabular-nums; align-self: center; }
+.lib-item__client { font-size: 1rem; color: var(--ink); }
+.lib-item__when { justify-self: end; font-family: var(--sans); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ash); align-self: center; }
+.lib-item__open:hover .lib-item__number { font-style: italic; }
+.lib-item.is-current .lib-item__number::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 0.6em; vertical-align: 0.2em; background: var(--ink); }
+.lib-item.is-current .lib-item__when { color: var(--ink); }
+.lib-item__actions, .lib-item__confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem var(--s-5); }
+.lib-item__confirm span { font-size: 0.9375rem; color: var(--error); flex-basis: 100%; }
+
+.library__foot { margin-top: var(--s-5); padding-top: var(--s-4); border-top: var(--hair); }
+.library__foot p { font-size: 0.9375rem; color: var(--ash); font-style: italic; line-height: 1.45; }
+.library__backup { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); margin-top: var(--s-3); }
+
+@media (max-width: 47.99rem) {
+  .library { width: 100vw; border-left: 0; }
+  .library__inner { padding: var(--s-4) var(--s-5) calc(var(--s-5) + env(safe-area-inset-bottom)); }
+}

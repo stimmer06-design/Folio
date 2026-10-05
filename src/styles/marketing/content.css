@@ -1,0 +1,125 @@
+/* ==========================================================================
+   Content pages: templates, guides, tools and their hubs.
+   Built only from the existing vocabulary: label voice, hairlines, the
+   12-column grid, italic numerals, ivory surfaces and plates.
+   ========================================================================== */
+
+/* ---- breadcrumbs: the page-head label, with links ---- */
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 0.6em; color: var(--ash); }
+.crumbs li { display: inline-flex; gap: 0.6em; }
+.crumbs li + li::before { content: "/"; color: var(--rule); }
+.crumbs a { color: var(--ink); display: inline-block; min-height: 24px; }
+.crumbs [aria-current] { color: var(--ash); }
+
+/* ---- template page ---- */
+.tdetail__prose p + p { margin-top: 1em; }
+.tdetail__prose .tdetail__audience { max-width: 36ch; margin-bottom: var(--s-5); }
+.tfields dt { font-size: var(--fs-lead); }
+.tfields dd p + p { margin-top: 0.6em; }
+
+.howto { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-7) var(--gutter); counter-reset: none; }
+.howto__step { padding-top: var(--s-5); border-top: var(--hair-ink); }
+.howto__num { font-family: var(--sans); font-size: var(--fs-label); letter-spacing: 0.16em; color: var(--ash); }
+.howto__title { margin-top: var(--s-4); font-size: var(--fs-h3); line-height: 1.15; font-weight: 400; text-wrap: balance; }
+.howto__text { margin-top: var(--s-3); max-width: 34ch; text-wrap: pretty; }
+.howto__cta { margin-top: var(--s-8); }
+.howto:has(> :nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.howto:has(> :nth-child(5)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 63.99rem) { .howto, .howto:has(> :nth-child(5)) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 34.99rem) {
+  .howto, .howto:has(> :nth-child(3):last-child), .howto:has(> :nth-child(5)) { grid-template-columns: 1fr; gap: var(--s-6); }
+  .howto__cta .btn { width: 100%; justify-content: space-between; }
+}
+
+/* ---- related links: the index list, compact ---- */
+.index--links .index__row { padding: var(--s-5) 0; }
+.index--links .index__num { font-family: var(--sans); font-style: normal; font-size: var(--fs-label); letter-spacing: 0.16em; text-transform: uppercase; }
+.opening__body .index--links .index__row { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.opening__body .index--links .index__num { display: none; }
+.opening__body .index--links .index__title { grid-column: 1 / span 4; }
+.opening__body .index--links .index__desc { grid-column: 5 / span 4; }
+.opening__body .index--links .index__go { grid-column: 9; }
+
+/* ---- guides & tool write-ups ---- */
+.article { row-gap: var(--s-7); align-items: start; }
+.article__toc { grid-column: 1 / span 3; position: sticky; top: calc(var(--header-h) + var(--s-6)); padding-top: var(--s-4); border-top: var(--hair-ink); }
+.article__toc-title { color: var(--ash); margin-bottom: var(--s-3); }
+.article__toc-list { display: grid; gap: 0.1rem; font-size: var(--fs-small); line-height: 1.35; }
+.article__toc-list a { padding: 0.3rem 0; }
+.article__body { grid-column: 4 / span 7; max-width: 66ch; padding-top: var(--s-4); border-top: var(--hair-ink); }
+.article__lead { max-width: 40ch; }
+.article__meta { margin-top: var(--s-5); color: var(--ash); }
+
+.article__body > * + * { margin-top: 1em; }
+.article__body .article__h2 { margin-top: var(--s-8); margin-bottom: var(--s-1); scroll-margin-top: calc(var(--header-h) + var(--s-5)); }
+.article__body > .article__h2:first-child { margin-top: 0; }
+.article__body .article__h3 { margin-top: var(--s-6); font-family: var(--sans); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.article__body .article__h3 + p { margin-top: var(--s-2); }
+.article__body strong { font-weight: 600; }
+.article__body code { font-family: var(--sans); font-size: 0.85em; letter-spacing: 0.02em; background: var(--oat); padding: 0.05em 0.3em; white-space: nowrap; }
+.article__list { border-top: var(--hair); }
+.article__list li { padding: var(--s-3) 0 var(--s-3) 1.6em; border-bottom: var(--hair); position: relative; }
+.article__list li::before { content: "—"; position: absolute; left: 0; color: var(--ash); }
+.article__list--ordered { counter-reset: step; }
+.article__list--ordered li { counter-increment: step; padding-left: 2.2em; }
+.article__list--ordered li::before { content: counter(step, decimal-leading-zero); font-family: var(--sans); font-size: var(--fs-label); letter-spacing: 0.12em; top: calc(var(--s-3) + 0.42em); }
+.article__note { padding: var(--s-4) var(--s-5); background: var(--ivory); border-left: 1px solid var(--ink); }
+.section--ivory .article__note { background: var(--bone); }
+.article__note p + p { margin-top: 0.6em; }
+.article__table { overflow-x: auto; }
+.article__table table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); font-variant-numeric: lining-nums tabular-nums; }
+.article__table th, .article__table td { text-align: left; vertical-align: baseline; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: var(--hair); font-weight: 400; }
+.article__table thead th { font-family: var(--sans); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash); border-bottom: var(--hair-ink); }
+.article__table tbody th { font-weight: 600; }
+.article__figure { margin-top: var(--s-7) !important; margin-bottom: var(--s-4); }
+.article__surface { aspect-ratio: auto; padding: clamp(1.25rem, 6%, 3rem) clamp(1.25rem, 12%, 5rem); }
+.article__cta { margin-top: var(--s-6) !important; }
+
+@media (max-width: 63.99rem) {
+  .article__toc { grid-column: 1 / -1; position: static; }
+  .article__toc-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .article__body { grid-column: 1 / -1; }
+}
+@media (max-width: 34.99rem) {
+  .article__toc-list { grid-template-columns: 1fr; }
+  .article__note { padding: var(--s-4); }
+}
+
+/* ---- tools ---- */
+.tool { row-gap: var(--s-7); align-items: start; }
+.tool__in { grid-column: 1 / span 6; border: 0; margin: 0; padding: var(--s-5) 0 0; border-top: var(--hair-ink); min-width: 0; }
+.tool__legend { color: var(--ash); padding: 0; margin-bottom: var(--s-5); float: left; width: 100%; }
+.tool__fields { clear: both; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5) var(--gutter); }
+.tool__out { grid-column: 8 / -1; background: var(--ivory); padding: var(--s-5) var(--s-6) var(--s-6); border-top: var(--hair-ink); position: sticky; top: calc(var(--header-h) + var(--s-5)); }
+.tool__out .tool__legend { float: none; }
+.tool__number { display: block; font-size: var(--fs-h2); line-height: 1.1; letter-spacing: -0.005em; font-variant-numeric: lining-nums tabular-nums; overflow-wrap: anywhere; }
+.tool__then { margin-top: var(--s-4); color: var(--ash); font-size: var(--fs-small); overflow-wrap: anywhere; }
+.tool__then .label { margin-right: 0.5em; }
+.tool__summary { margin-top: 0; }
+.tool__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4) var(--s-5); margin-top: var(--s-6); }
+.tool__note { margin-top: var(--s-4); font-size: var(--fs-small); color: var(--ash); font-style: italic; }
+.tool__note:empty { display: none; }
+.tool .seg--wide span { white-space: normal; text-align: center; }
+
+@media (max-width: 63.99rem) {
+  .tool__in, .tool__out { grid-column: 1 / -1; }
+  .tool__out { position: static; }
+}
+@media (max-width: 34.99rem) {
+  .tool__fields { grid-template-columns: 1fr; }
+  .tool__out { padding: var(--s-5) var(--s-4); }
+  .tool__actions .btn { width: 100%; justify-content: space-between; white-space: normal; text-align: left; line-height: 1.5; padding-block: var(--s-3); }
+}
+
+/* ---- the generator page ---- */
+.gen-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-7) var(--gutter); }
+.gen-fields .order { margin-top: 0; max-width: none; }
+.gen-fields .order th { width: 8.5rem; }
+@media (max-width: 47.99rem) { .gen-fields { grid-template-columns: 1fr; } }
+@media (max-width: 29.99rem) { .gen-fields .order th { width: 6.5rem; } }
+
+/* Long button labels (tools, guides) wrap rather than overflow a narrow column. */
+.tool__actions .btn, .article__cta .btn { max-width: 100%; white-space: normal; text-align: left; line-height: 1.5; padding-block: var(--s-3); }
+.article__body, .article__toc { min-width: 0; }
+/* Inside an opening, the opening's ink rule already heads the list. */
+.opening__body > .index--links li:first-child .index__row { border-top: 0; padding-top: 0.15rem; }

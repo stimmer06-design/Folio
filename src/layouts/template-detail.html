@@ -1,0 +1,84 @@
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>{{tpl.title}}</h1>
+        <p class="lead page-head__lead muted" data-reveal>{{tpl.intro}}</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-label="Preview">
+      <div class="wrap grid tdetail">
+        <figure class="plate plate--stone tdetail__plate" data-reveal="fade">
+          <div class="plate__surface tdetail__surface">
+            <div class="tdetail__doc">
+              <div class="doc-fit" data-doc-fit><div class="doc-fit__inner">{{tpl.doc}}</div></div>
+            </div>
+          </div>
+          <figcaption class="plate__caption"><span class="label">Example</span><p>{{tpl.caption}}</p></figcaption>
+        </figure>
+        <aside class="tdetail__aside" data-reveal>
+          <div class="tdetail__actions">
+            <a class="btn" href="{{root}}app/?template={{tpl.slug}}&amp;example" data-track="template_selected" data-track-slug="{{tpl.slug}}" data-track-cta="customize">Customize this invoice {{> arrow}}</a>
+            <a class="go" href="{{root}}app/?template={{tpl.slug}}" data-track="template_selected" data-track-slug="{{tpl.slug}}" data-track-cta="blank">Start with a blank one {{> arrow}}</a>
+          </div>
+          <dl class="tdetail__facts">
+            <div><dt class="label">Layout</dt><dd>{{tpl.layoutName}}: {{tpl.composition}}</dd></div>
+            <div><dt class="label">Typeface</dt><dd>{{tpl.typeface}}</dd></div>
+            <div><dt class="label">Columns</dt><dd>{{tpl.columns}}</dd></div>
+            <div><dt class="label">Sections</dt><dd>{{tpl.sections}}</dd></div>
+            <div><dt class="label">Price</dt><dd>Free. No account, no watermark.</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="for-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="for-title" data-reveal>Who it is for</h2>
+          <div class="opening__body--narrow prose tdetail__prose" data-reveal>{{tpl.explanation}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="fields-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>What to include</p>
+          <div class="opening__body">
+            <h2 class="h2" id="fields-title" data-reveal>{{tpl.fieldsTitle}}</h2>
+            <dl class="values tfields mt-7" data-reveal-group>{{tpl.fields}}</dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-labelledby="steps-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>How to fill it in</p>
+          <div class="opening__body">
+            <h2 class="h2" id="steps-title" data-reveal>From this page to a PDF.</h2>
+          </div>
+        </div>
+        <ol class="howto mt-8" data-reveal-group>{{tpl.steps}}</ol>
+        <div class="howto__cta" data-reveal>
+          <a class="btn" href="{{root}}app/?template={{tpl.slug}}&amp;example" data-track="template_selected" data-track-slug="{{tpl.slug}}" data-track-cta="steps">Customize this invoice {{> arrow}}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="faq-title" data-reveal>Questions</h2>
+          <div class="opening__body--narrow" data-reveal><div class="faq">{{tpl.faqs}}</div></div>
+        </div>
+      </div>
+    </section>
+
+    {{tpl.related}}
+
+    {{tpl.readNext}}
+
+    {{> cta}}

@@ -1,0 +1,39 @@
+{
+  "name": "Videographer",
+  "layout": "video",
+  "title": "Free Videographer Invoice Template",
+  "description": "A free videographer invoice template with pre-production, filming days, editing, music licensing and travel, plus the deposit and balance due. Download as a PDF.",
+  "summary": "Pre-production, filming, post-production and licensing as stages, each deliverable described.",
+  "intro": "The production billed in the order it happened: pre-production, the shoot, the edit, the licenses. Each deliverable described beneath its fee, and the deposit deducted.",
+  "explanation": [
+    "A video invoice covers weeks of work the client mostly didn’t see: scripting before the shoot, the edit and grade after it, the music and the revisions. Laying the invoice out by stage shows where the money went, and makes it easy to compare with the quote.",
+    "This template sorts lines into Pre-production, Production, Post-production, Licensing and Travel, and prints each deliverable’s details beneath its title. The production is named under the large serif title, and the booking deposit is subtracted to show the balance due.",
+    "It suits freelance videographers, wedding filmmakers, corporate and brand video producers, and small production companies."
+  ],
+  "fieldsTitle": "What to put on a videography invoice",
+  "fields": [
+    { "name": "Production", "text": "The project and its deliverables in brief: “Brand film and social cut-downs”." },
+    { "name": "Pre-production", "text": "Concept, script, storyboard, casting, location scouting: as one line or several, with what was delivered." },
+    { "name": "Filming days", "text": "Each shoot day with the crew and kit beneath: “Director, camera operator, two-camera kit and lighting”." },
+    { "name": "Post-production", "text": "Edit, color grade, sound mix, subtitles and cut-downs, with lengths, formats and included revision rounds." },
+    { "name": "Licensing", "text": "Music, stock footage or fonts licensed for the project, and the usage they cover." },
+    { "name": "Travel and expenses", "text": "Mileage, travel days and accommodation for location shoots." },
+    { "name": "Deposit and delivery", "text": "The deposit received, and when final files are delivered (often on payment of the balance)." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a brand film invoice in the generator." },
+    { "title": "Stage by stage", "text": "Add each deliverable and choose its stage. Press Return in the description to add the details beneath." },
+    { "title": "Licenses and travel", "text": "Add music or stock licenses and any travel. The balance updates as you go." },
+    { "title": "Send with the review link", "text": "Download the PDF and send it with the review or delivery link." }
+  ],
+  "faqs": [
+    { "q": "How do videographers itemize an invoice?", "a": "By stage of the production: pre-production, filming, post-production, licensing and travel. Under each, name the deliverable and what it included, such as the crew on a shoot day or the revision rounds on an edit." },
+    { "q": "Should music licenses be on the invoice?", "a": "If you bought them for the client’s project, yes, as a line under Licensing with the usage they cover. It records what the client is entitled to." },
+    { "q": "How much deposit do videographers take?", "a": "That is set in your contract; a deposit at booking with the balance before delivery is a common arrangement. Show the deposit on the final invoice so the balance is clear." },
+    { "q": "Can I bill a day rate?", "a": "Yes. Enter the number of shoot days as the quantity and your day rate as the price, and describe the crew and kit beneath." }
+  ],
+  "relatedTemplates": ["photographer", "designer", "marketing-agency"],
+  "relatedGuides": ["how-to-invoice-as-a-freelancer", "how-to-invoice-a-client", "how-to-create-an-invoice-pdf"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

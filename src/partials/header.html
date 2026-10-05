@@ -1,0 +1,38 @@
+<header class="site-header" data-header>
+    <div class="wrap site-header__inner">
+      <a class="site-header__brand" href="{{root}}" aria-label="Folio — home">{{> wordmark}}</a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" data-nav="features" href="{{root}}features/">Features</a></li>
+          <li><a class="site-nav__link" data-nav="templates" href="{{root}}invoice-templates/">Templates</a></li>
+          <li><a class="site-nav__link" data-nav="pricing" href="{{root}}pricing/">Pricing</a></li>
+          <li><a class="site-nav__link" data-nav="about" href="{{root}}about/">About</a></li>
+          <li><a class="site-nav__link" data-nav="faq" href="{{root}}faq/">FAQ</a></li>
+          <li class="site-nav__cta"><a class="btn btn--sm" href="{{root}}app/">Create an invoice {{> arrow}}</a></li>
+        </ul>
+      </nav>
+      <div class="site-header__actions">
+        <a class="btn btn--sm site-header__mobile-cta" href="{{root}}app/">Create invoice</a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+          <span class="menu-toggle__label" data-menu-label>Menu</span>
+          <span class="menu-toggle__icon" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-menu" id="mobile-menu" data-menu hidden>
+    <nav class="mobile-menu__nav wrap" aria-label="Primary">
+      <ol class="mobile-menu__list">
+        <li><a class="mobile-menu__link" data-nav="features" href="{{root}}features/"><span class="mobile-menu__num">i</span>Features</a></li>
+        <li><a class="mobile-menu__link" data-nav="templates" href="{{root}}invoice-templates/"><span class="mobile-menu__num">ii</span>Templates</a></li>
+        <li><a class="mobile-menu__link" data-nav="pricing" href="{{root}}pricing/"><span class="mobile-menu__num">iii</span>Pricing</a></li>
+        <li><a class="mobile-menu__link" data-nav="about" href="{{root}}about/"><span class="mobile-menu__num">iv</span>About</a></li>
+        <li><a class="mobile-menu__link" data-nav="faq" href="{{root}}faq/"><span class="mobile-menu__num">v</span>FAQ</a></li>
+        <li><a class="mobile-menu__link" data-nav="contact" href="{{root}}contact/"><span class="mobile-menu__num">vi</span>Contact</a></li>
+      </ol>
+      <div class="mobile-menu__foot">
+        <a class="btn" href="{{root}}app/">Create an invoice {{> arrow}}</a>
+        <p class="label">Free · No account · Saved in your browser</p>
+      </div>
+    </nav>
+  </div>

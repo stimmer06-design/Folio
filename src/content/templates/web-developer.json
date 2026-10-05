@@ -1,0 +1,38 @@
+{
+  "name": "Web Developer",
+  "layout": "freelancer",
+  "title": "Free Web Developer Invoice Template",
+  "description": "A free web developer invoice template for hourly or milestone billing: development tasks, hours, rate, hosting and handover. Fill it in online and download a PDF.",
+  "summary": "Development hours by task, with the project at the top and hosting or licenses as extra lines.",
+  "intro": "Development time broken down by task, the project at the top, and third-party costs on their own lines. Clear enough for a client who has never read a commit log.",
+  "explanation": [
+    "Web development invoices go to people who can’t see the work. The client sees a website; they don’t see the integration, the accessibility fixes or the deployment. A good invoice names those tasks in plain language, so the hours make sense.",
+    "This template uses Folio’s freelancer layout: Work, Hours and Rate columns, the project named under the title, and the terms in the side column. Hosting, domains and plugin licenses you bought for the client go on their own lines, at cost or with your markup.",
+    "It works for freelance front-end and back-end developers, WordPress and Shopify developers, and small studios billing sprints or milestones."
+  ],
+  "fieldsTitle": "What to put on a web developer invoice",
+  "fields": [
+    { "name": "Project", "text": "The site or app and the phase: “Customer portal redesign — sprint 3”. Add the client’s PO number if they use them." },
+    { "name": "Tasks in plain language", "text": "“Front-end development — dashboard and reports”, not ticket numbers. Put ticket references in the notes if the client wants them." },
+    { "name": "Hours and rate", "text": "Hours per task at your rate. For milestone billing, a quantity of 1 and the milestone fee." },
+    { "name": "Third-party costs", "text": "Hosting, domains, premium plugins or API usage you paid for, listed separately and billed at the amount you agreed." },
+    { "name": "Retainer or support", "text": "Monthly maintenance as its own line: “Support and updates — October”." },
+    { "name": "Terms", "text": "Net 14 or Net 30, and what happens to source files or credentials on payment, if your contract says." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a developer’s invoice in the generator." },
+    { "title": "Describe the work", "text": "Name the project, then add each task with its hours. Keep the descriptions client-readable." },
+    { "title": "Add costs", "text": "Add hosting, domains or licenses as separate lines. Add tax only if it applies where you work." },
+    { "title": "Send it", "text": "Download the PDF and send it to the person who approves invoices, with the project and number in the subject line." }
+  ],
+  "faqs": [
+    { "q": "Should a web developer bill hourly or by milestone?", "a": "Hourly suits ongoing work and changing scope; milestones suit a fixed brief. Many developers take a deposit, bill milestones, then bill hourly for changes. This template handles each: hours × rate, or 1 × the milestone fee." },
+    { "q": "How do I bill hosting and domains for a client?", "a": "As separate lines, at cost or at the price you agreed. If you pay them annually but bill monthly, describe the period: “Hosting — October”." },
+    { "q": "Should I include ticket numbers or commits?", "a": "Only if the client asks. A finance team approves “Checkout integration, 14 hours” faster than a list of ticket IDs. Put references in the notes or attach a timesheet." },
+    { "q": "When should I hand over the code?", "a": "That is for your contract to say. Many developers release final files or transfer ownership on payment of the final invoice; if so, say it in the notes." }
+  ],
+  "relatedTemplates": ["freelancer", "designer", "marketing-agency"],
+  "relatedGuides": ["how-to-invoice-as-a-freelancer", "how-to-invoice-a-client", "how-to-write-an-invoice"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

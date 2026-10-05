@@ -1,0 +1,66 @@
+<form class="tool grid" data-tool="invoice-tax-calculator" novalidate>
+          <fieldset class="tool__in" data-reveal>
+            <legend class="label tool__legend">The invoice</legend>
+            <div class="tool__fields">
+              <label class="fld fld--full">
+                <span class="fld__label">What it is for <span class="fld__opt">optional</span></span>
+                <input class="fld__input" type="text" name="item" maxlength="120" placeholder="e.g. Website design, October" autocomplete="off">
+              </label>
+              <div class="fld">
+                <label class="fld__label" for="t-price">Price before tax</label>
+                <div class="affix"><span class="affix__start" aria-hidden="true" data-symbol>$</span><input class="fld__input" id="t-price" type="text" name="price" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
+              </div>
+              <label class="fld">
+                <span class="fld__label">Quantity</span>
+                <input class="fld__input" type="text" name="qty" inputmode="decimal" value="1" autocomplete="off">
+              </label>
+              <div class="fld">
+                <label class="fld__label" for="t-discount">Discount <span class="fld__opt">optional</span></label>
+                <div class="combo">
+                  <input class="fld__input" id="t-discount" type="text" name="discount" inputmode="decimal" placeholder="0" autocomplete="off">
+                  <div class="seg" role="radiogroup" aria-label="Discount type">
+                    <label><input type="radio" name="discountType" value="percent" checked><span>%</span></label>
+                    <label><input type="radio" name="discountType" value="amount"><span data-symbol>$</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="fld">
+                <label class="fld__label" for="t-tax">Tax rate</label>
+                <div class="affix"><input class="fld__input" id="t-tax" type="text" name="tax" inputmode="decimal" placeholder="0" autocomplete="off" aria-describedby="t-tax-hint"><span class="affix__end" aria-hidden="true">%</span></div>
+                <span class="fld__hint" id="t-tax-hint">Your rate. We don’t guess it for you.</span>
+              </div>
+              <label class="fld">
+                <span class="fld__label">Tax name</span>
+                <input class="fld__input" type="text" name="taxLabel" value="Sales tax" maxlength="30" autocomplete="off">
+              </label>
+              <label class="fld">
+                <span class="fld__label">Currency</span>
+                <select class="fld__input" name="currency" data-currencies><option value="USD">USD — US Dollar</option></select>
+              </label>
+              <div class="fld">
+                <label class="fld__label" for="t-ship">Shipping or other charge <span class="fld__opt">untaxed</span></label>
+                <div class="affix"><span class="affix__start" aria-hidden="true" data-symbol>$</span><input class="fld__input" id="t-ship" type="text" name="shipping" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
+              </div>
+              <div class="fld">
+                <label class="fld__label" for="t-paid">Deposit already paid <span class="fld__opt">optional</span></label>
+                <div class="affix"><span class="affix__start" aria-hidden="true" data-symbol>$</span><input class="fld__input" id="t-paid" type="text" name="paid" inputmode="decimal" placeholder="0.00" autocomplete="off"></div>
+              </div>
+            </div>
+          </fieldset>
+          <div class="tool__out" data-reveal>
+            <p class="label tool__legend" id="tax-out-label">The totals, as the invoice will show them</p>
+            <dl class="summary tool__summary" aria-labelledby="tax-out-label" aria-live="polite">
+              <div><dt>Subtotal</dt><dd data-out="subtotal">$0.00</dd></div>
+              <div data-row="discount" hidden><dt data-out="discountLabel">Discount</dt><dd data-out="discount"></dd></div>
+              <div><dt data-out="taxLabel">Sales tax</dt><dd data-out="tax">$0.00</dd></div>
+              <div data-row="shipping" hidden><dt>Shipping</dt><dd data-out="shipping"></dd></div>
+              <div class="summary__total"><dt>Total <span data-out="currency">USD</span></dt><dd data-out="total">$0.00</dd></div>
+              <div data-row="paid" hidden><dt>Deposit received</dt><dd data-out="paid"></dd></div>
+              <div class="summary__due" data-row="due" hidden><dt>Balance due</dt><dd data-out="due"></dd></div>
+            </dl>
+            <div class="tool__actions">
+              <a class="btn" href="{{root}}app/" data-out="link">Create an invoice with these numbers {{> arrow}}</a>
+            </div>
+            <noscript><p class="tool__note">This calculator needs JavaScript. The formula is written out below.</p></noscript>
+          </div>
+        </form>

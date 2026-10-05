@@ -1,0 +1,5 @@
+{
+  "/invoice-templates/design-studio/": "/invoice-templates/designer/",
+  "/invoice-templates/home-services/": "/invoice-templates/landscaper/",
+  "/free-invoice-generator/": "/"
+}

@@ -1,0 +1,50 @@
+{
+  "name": "Electrician",
+  "layout": "contractor",
+  "title": "Free Electrician Invoice Template",
+  "description": "A free electrician invoice template: labor by task, materials, equipment, and permit fees as a separate charge. Fill it in online and download a PDF.",
+  "summary": "Labor by task, materials and permit fees, laid out for service calls and installations.",
+  "intro": "Each task, each material and the permit fee on its own line, so a homeowner or a business owner can match the invoice to your quote. Fill it in online and download a PDF.",
+  "explanation": [
+    "Electrical work is easy to describe badly. “Electrical work, 12 hours” tells the client nothing; “Upgrade main panel to 200 A” and “Install EV charger circuit, 60 A” tell them exactly what they paid for, and help the next electrician too.",
+    "This template uses Folio’s contractor layout: labor, materials and equipment in subtotalled sections. Permit and inspection fees go in the separate charge line beneath the tax, because they are a pass-through cost rather than your work.",
+    "It works for residential service calls, panel upgrades, rewiring, EV chargers, lighting and small commercial jobs."
+  ],
+  "fieldsTitle": "What to put on an electrician invoice",
+  "fields": [
+    { "name": "Job and address", "text": "What the job was and where: “Panel upgrade and EV charger — 418 Juniper Street”." },
+    { "name": "Labor by task", "text": "One line per task with hours at your rate. Naming the circuit, the amperage or the room makes the invoice useful as a record of the work." },
+    { "name": "Materials", "text": "Panels, breakers, wire, conduit and devices. Group small items into one line (“Wire, conduit and fittings”) unless the client asked for detail." },
+    { "name": "Equipment", "text": "Rented lifts or trenchers billed to the job." },
+    { "name": "Permits and inspection", "text": "The permit fee as a separate charge. In the generator, use Shipping or other charge and rename it “Permit and inspection”." },
+    { "name": "License number", "text": "Your electrical contractor license number, in the Tax ID field, where your state or city expects it on paperwork." },
+    { "name": "Warranty and notes", "text": "Your workmanship guarantee and anything the client should know, such as the date the inspection passed." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a panel upgrade in the generator. Replace the client, the address and the tasks." },
+    { "title": "List the work", "text": "Add each task under Labor and each material under Materials. Subtotals are worked out for you." },
+    { "title": "Add the permit", "text": "Put the permit fee in Shipping or other charge and rename it. It is added after tax." },
+    { "title": "Download and send", "text": "Check the preview, download the PDF and send it. Your numbering continues on the next invoice." }
+  ],
+  "faqs": [
+    { "q": "How should an electrician show permit fees on an invoice?", "a": "As a separate line, named, at the amount you paid. In Folio, the Shipping or other charge field can be renamed “Permit and inspection”; it is added after tax, which suits a fee you are passing through." },
+    { "q": "Should I itemize materials or give one total?", "a": "Itemize anything significant (a panel, a charger, a fixture) and group the small parts. Clients and insurers look for the big items; nobody wants forty lines of wire nuts." },
+    { "q": "Can I bill a flat rate instead of hours?", "a": "Yes. Enter a quantity of 1 and your flat price for the task, e.g. “Install EV charger circuit, flat rate”. You can mix flat-rate and hourly lines on one invoice." },
+    { "q": "Do electricians charge sales tax?", "a": "That depends on your state and the type of work; in many states materials are taxable and labor is not. Check with your state tax agency and enter the rate that applies." }
+  ],
+  "sample": {
+    "business": { "name": "Brightline Electric LLC", "email": "billing@brightline-electric.com", "phone": "(919) 555-0163", "address": "740 Atlantic Avenue\nRaleigh, NC 27604", "website": "brightline-electric.com" },
+    "client": { "name": "Juniper Street Dental", "email": "office@juniperdental.com", "address": "418 Juniper Street\nRaleigh, NC 27603" },
+    "project": "Panel upgrade and EV charger — 418 Juniper Street",
+    "number": "BE-1042",
+    "terms": "net15",
+    "items": [["Upgrade main service panel to 200 A", "8", "110", "Labor"], ["Install Level 2 EV charger circuit, 60 A", "4", "110", "Labor"], ["200 A panel, breakers and surge protector", "1", "1460", "Materials"], ["Wire, conduit and fittings", "1", "312.40", "Materials"]],
+    "adjustments": { "shipping": "225", "shippingLabel": "Permit and inspection" },
+    "payment": "ACH to Brightline Electric LLC · Account 5512 7740 · Routing 053000196\nor card at brightline-electric.com/pay",
+    "notes": "Inspection passed September 28. Workmanship guaranteed for two years."
+  },
+  "relatedTemplates": ["plumber", "contractor", "construction"],
+  "relatedGuides": ["what-to-put-on-an-invoice", "how-to-make-an-invoice", "how-to-number-invoices"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

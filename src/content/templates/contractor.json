@@ -1,0 +1,40 @@
+{
+  "name": "Contractor",
+  "layout": "contractor",
+  "title": "Free Contractor Invoice Template",
+  "description": "A free contractor invoice template with labor, materials and equipment in separate sections, sales tax, the deposit you took and the balance due. Download as a PDF.",
+  "summary": "Labor, materials and equipment in ruled sections, with deposit and balance due.",
+  "intro": "Labor and materials subtotalled separately, the job named at the top, and the deposit you took at signing subtracted from the total. Fill it in online and download a PDF.",
+  "explanation": [
+    "Homeowners and property managers read a contractor’s invoice line by line. They want to see what the work cost and what the materials cost, because those are the numbers they compare with your estimate and with other bids.",
+    "This template splits every line into Labor, Materials or Equipment and subtotals each section, so the comparison takes seconds. The project and job address sit in their own box, and the deposit is shown as a deduction rather than buried in a note, so the balance due is never in doubt.",
+    "It suits carpenters, remodelers, handymen, painters, flooring installers and general contractors on residential jobs. For commercial progress billing with previous payments and cost codes, use the [construction template](/invoice-templates/construction/)."
+  ],
+  "fieldsTitle": "What to put on a contractor invoice",
+  "fields": [
+    { "name": "Job and site", "text": "The project name and the address where the work was done, e.g. “Kitchen renovation, 14 Alder Lane”. It ties the invoice to the estimate and the contract." },
+    { "name": "Labor", "text": "Each task with hours × your rate, or a fixed price per task. “Cabinet installation and trim, 24 hrs at $65” is clearer than “Labor, $1,560”." },
+    { "name": "Materials", "text": "What you supplied, with quantities and unit prices: “Quartz countertop, 32 sq ft at $78”. If you mark up materials, bill the marked-up price; you don’t have to show your cost." },
+    { "name": "Equipment", "text": "Rentals and machine time billed to the job, such as a dumpster, a tile saw or a lift." },
+    { "name": "License number", "text": "Some states and cities require your contractor license number on bids, contracts or invoices. Put it in the Tax ID field so it prints under your name; check your licensing board for the exact rule." },
+    { "name": "Deposit and balance", "text": "The deposit taken at signing, subtracted from the total. The client sees what they have paid and what is left." },
+    { "name": "Terms and warranty", "text": "Your payment terms (Net 15 is common for residential work) and any workmanship warranty, in the notes." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens it in the generator with sample figures. Your own business details replace the sample’s if you have saved them before." },
+    { "title": "Add the job", "text": "Enter the client, the job address and the project name, then one line per task or material. Choose Labor, Materials or Equipment for each line." },
+    { "title": "Tax and deposit", "text": "Enter your sales tax rate if you collect it, then the deposit received. The balance due updates as you type." },
+    { "title": "Download and send", "text": "Download the PDF and email it with the invoice number in the subject line. See [how to send an invoice](/invoice-guides/how-to-send-an-invoice/)." }
+  ],
+  "faqs": [
+    { "q": "Should labor and materials be listed separately on a contractor invoice?", "a": "Yes. Clients compare them against your estimate, and in some states sales tax applies to materials but not to labor, so keeping them apart makes the tax easy to check. This template subtotals each section automatically." },
+    { "q": "Do I charge sales tax on a contractor invoice?", "a": "It depends on your state and the kind of work. Some states tax materials only, some tax certain services, and the rules for repairs and new construction can differ. Enter the rate that applies to you; Folio applies one rate to the invoice, so if only part of the work is taxable, ask your accountant how to show it. The [sales tax calculator](/tools/sales-tax-calculator/) helps with the arithmetic." },
+    { "q": "How do I show a deposit on a contractor invoice?", "a": "Enter the deposit in Deposit or amount paid. The invoice shows the full total, then “Less deposit received”, then the balance due, which is the amount you are asking for now." },
+    { "q": "Can I use this template for a quote or estimate?", "a": "Folio makes invoices, so the document is titled Invoice. For an estimate, send your quote separately; when the job is done, duplicate a previous invoice and change the figures to match the final work." },
+    { "q": "What payment terms should a contractor use?", "a": "Many residential contractors ask for payment on completion or within 15 days, with a deposit up front. Whatever you choose, agree it in the contract and print it on the invoice so it isn’t a surprise." }
+  ],
+  "relatedTemplates": ["construction", "plumber", "electrician"],
+  "relatedGuides": ["what-to-put-on-an-invoice", "how-to-invoice-a-client", "how-to-send-an-invoice"],
+  "relatedTools": ["sales-tax-calculator"],
+  "updated": "2026-10-01"
+}

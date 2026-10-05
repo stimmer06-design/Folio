@@ -1,0 +1,156 @@
+---
+titleFull: Features — Online Invoice Maker with PDF Export · Folio
+description: Live preview, automatic tax, discount and shipping, PDF and print, saved invoices, your logo and sixteen currencies. Everything in Folio’s free invoice generator.
+nav: features
+bodyClass: page-features
+---
+    <header class="page-head">
+      <div class="wrap grid">
+        <p class="label page-head__label" data-reveal>Features</p>
+        <h1 class="h1 page-head__title" data-reveal>Everything an invoice needs. Nothing it doesn’t.</h1>
+        <p class="lead page-head__lead muted" data-reveal>Folio does one job: it turns the details of your work into an invoice you would be proud to send. Here is what that takes.</p>
+      </div>
+    </header>
+
+    <nav class="wrap svc-toc" aria-label="On this page">
+      <ol class="svc-toc__list">
+        <li><a class="link" href="#preview">Live preview</a></li>
+        <li><a class="link" href="#calculations">Calculations</a></li>
+        <li><a class="link" href="#export">PDF &amp; print</a></li>
+        <li><a class="link" href="#library">Saved invoices</a></li>
+        <li><a class="link" href="#customise">Customisation</a></li>
+        <li><a class="link" href="#privacy">Privacy</a></li>
+      </ol>
+    </nav>
+
+    <!-- Live preview -->
+    <section class="feature" id="preview" aria-labelledby="f-preview">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">i.</p>
+          <h2 class="h2" id="f-preview">See the invoice as you write it.</h2>
+          <p class="feature__lead">The form sits on the left and the finished page on the right. Every keystroke redraws the invoice at its real size and proportions, so there are no surprises when you download it.</p>
+          <ul class="feature__list">
+            <li>Exact page preview on US Letter or A4</li>
+            <li>Muted prompts show what is still missing; they never print</li>
+            <li>Separate Edit and Preview tabs on phones and tablets</li>
+          </ul>
+        </div>
+        <figure class="plate plate--stone feature__visual" data-reveal="fade">
+          <div class="plate__surface feature__surface feature__surface--doc">
+            <div class="feature__doc">{{> sample-doc}}</div>
+            <div class="feature__ui">{{> ui-details}}</div>
+          </div>
+          <figcaption class="plate__caption"><span class="label">Preview</span><p>The business details on the left become the letterhead on the right.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Calculations -->
+    <section class="feature feature--flip" id="calculations" aria-labelledby="f-calc">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">ii.</p>
+          <h2 class="h2" id="f-calc">The arithmetic, done properly.</h2>
+          <p class="feature__lead">Line totals, subtotal, discount, tax, shipping and the amount due are calculated as you type, rounded the way an accountant expects, in the right number of decimal places for the currency.</p>
+          <table class="order">
+            <caption class="label">Order of operations</caption>
+            <tbody>
+              <tr><th scope="row">Line total</th><td>Quantity × unit price</td></tr>
+              <tr><th scope="row">Subtotal</th><td>Sum of line totals</td></tr>
+              <tr><th scope="row">Discount</th><td>A percentage or a fixed amount, never more than the subtotal</td></tr>
+              <tr><th scope="row">Tax</th><td>Your rate, on the discounted subtotal; call it VAT, GST or sales tax</td></tr>
+              <tr><th scope="row">Shipping</th><td>Or any flat charge, added after tax</td></tr>
+              <tr class="order__total"><th scope="row">Amount due</th><td>Shown on the invoice, in the PDF and in the list of saved invoices</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="feature__visual feature__visual--ui" data-reveal="fade">
+          {{> ui-items}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Export -->
+    <section class="feature" id="export" aria-labelledby="f-export">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">iii.</p>
+          <h2 class="h2" id="f-export">A PDF you can send to anyone.</h2>
+          <p class="feature__lead">Download produces a true vector PDF: the same typefaces as the preview embedded in the file, selectable and searchable text, and small enough to attach to any email. Print sends only the invoice to the printer, never the editor around it.</p>
+          <ul class="feature__list">
+            <li>Embedded Garamond and Grotesk; the PDF looks the same everywhere</li>
+            <li>Long invoices continue onto further pages with page numbers</li>
+            <li>Files named for you: <span class="feature__mono">Invoice-INV-0042-Client.pdf</span></li>
+            <li>No watermark and no Folio branding</li>
+          </ul>
+        </div>
+        <div class="feature__visual feature__visual--ui" data-reveal="fade">
+          {{> ui-export}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Library -->
+    <section class="feature feature--flip" id="library" aria-labelledby="f-library">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">iv.</p>
+          <h2 class="h2" id="f-library">Every invoice, kept.</h2>
+          <p class="feature__lead">Folio saves as you type. Your invoices wait in one list, newest first, with the client and amount at a glance. Open one to correct it, duplicate last month’s to start this month’s, or delete what you no longer need.</p>
+          <ul class="feature__list">
+            <li>Automatic saving, with the next invoice number suggested for you</li>
+            <li>Duplicate copies the client and items and resets the dates</li>
+            <li>Your business details and logo carry over to every new invoice</li>
+            <li>Download a backup file and restore it on another computer</li>
+          </ul>
+        </div>
+        <div class="feature__visual feature__visual--ui" data-reveal="fade">
+          {{> ui-library}}
+        </div>
+      </div>
+    </section>
+
+    <!-- Customise -->
+    <section class="feature" id="customise" aria-labelledby="f-custom">
+      <div class="wrap grid feature__grid">
+        <div class="feature__text" data-reveal>
+          <p class="feature__num">v.</p>
+          <h2 class="h2" id="f-custom">Yours, not ours.</h2>
+          <p class="feature__lead">Add your logo, choose from {{templates.countWord}} invoice templates, and set the currency, paper size and payment terms your clients expect.</p>
+          <ul class="feature__list">
+            <li><a class="link" href="{{root}}invoice-templates/">{{templates.CountWord}} templates</a> for trades and styles, on {{templates.layouts}} layouts in Garamond or Grotesk</li>
+            <li>Your logo in PNG, JPG or SVG</li>
+            <li>Sixteen currencies, from US dollars to Japanese yen</li>
+            <li>Due on receipt, Net 7 to Net 90, or a date of your choosing</li>
+            <li>Payment instructions and notes printed at the foot of the page</li>
+          </ul>
+        </div>
+        <figure class="plate plate--oat feature__visual" data-reveal="fade">
+          <div class="plate__surface feature__surface feature__surface--pair">
+            <div class="feature__pair">{{> sample-doc}}</div>
+            <div class="feature__pair">{{> sample-doc-sans}}</div>
+          </div>
+          <figcaption class="plate__caption"><span class="label">Two of {{templates.countWord}}</span><p>Classic and Modern. The same invoice, one click apart.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="section section--ivory" id="privacy" aria-labelledby="f-privacy">
+      <div class="wrap">
+        <div class="grid opening">
+          <p class="label opening__label" data-reveal>Privacy</p>
+          <div class="opening__body">
+            <h2 class="h2" id="f-privacy" data-reveal>Your clients’ details are none of our business.</h2>
+            <div class="grid privacy-cols mt-7" data-reveal-group>
+              <div data-reveal><h3 class="h3">No account</h3><p>No sign-up, password or email address. Open the page and start.</p></div>
+              <div data-reveal><h3 class="h3">On your device</h3><p>Invoices are created and stored in your browser. Nothing you type is sent to us, unless you add a payment link: then only the invoice’s number and amount.</p></div>
+              <div data-reveal><h3 class="h3">Your backup</h3><p>Download all your invoices as a single file whenever you like, and restore them anywhere.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {{> cta}}

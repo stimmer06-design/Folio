@@ -1,0 +1,37 @@
+{
+  "name": "Minimal",
+  "layout": "minimal",
+  "title": "Free Simple Invoice Template",
+  "description": "A free simple invoice template with one column, generous white space and only the essentials. Fill it in online in minutes and download a clean PDF.",
+  "summary": "One column, almost no rules, generous margins. Only what the client needs.",
+  "intro": "One column, read top to bottom, with nothing on it that the client doesn’t need. When an invoice has three lines, this makes it look deliberate rather than empty.",
+  "explanation": [
+    "A simple invoice is not a lesser one. If you bill a few items, a short and quiet page is easier to read, and easier to pay, than a grid built for forty lines.",
+    "This template uses a single column with generous margins. The dates and amount due are set as a quiet row of facts beneath the header, items are separated only by hairlines, and there is plenty of room at the foot for a personal note.",
+    "It suits writers, translators, tutors, coaches, therapists, musicians and anyone whose invoices usually have a handful of lines."
+  ],
+  "fieldsTitle": "What a simple invoice still needs",
+  "fields": [
+    { "name": "Who it is from", "text": "Your name or business name, with an email address. Add a postal address and tax ID if your clients need them." },
+    { "name": "Who it is to", "text": "The client’s name, and their address if they are a business." },
+    { "name": "A number and a date", "text": "A unique invoice number and the date you issued it. Both are needed for anyone’s records, including yours." },
+    { "name": "What it is for", "text": "One line per piece of work, described plainly, with the amount." },
+    { "name": "When and how to pay", "text": "The due date and your payment details. This is the part a simple invoice most often leaves out." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens the simple example in the generator." },
+    { "title": "Fill in the essentials", "text": "Your name, the client, a line or two of work. The number and dates are filled in for you." },
+    { "title": "Add how to pay", "text": "Your bank details or payment link, and a short note if you like." },
+    { "title": "Download", "text": "Download the PDF and send it." }
+  ],
+  "faqs": [
+    { "q": "What is the simplest invoice I can send?", "a": "One that shows who it is from and to, a unique number, the date, what it is for, the amount, and when and how to pay. That is a complete invoice for most small jobs; add tax details if you charge tax." },
+    { "q": "Can a simple invoice be handwritten or typed in an email?", "a": "It can, but a PDF with a number and your details is easier for the client to file and for you to keep track of. The generator makes one in a couple of minutes." },
+    { "q": "Is this template good for one-off jobs?", "a": "Yes. It is designed for invoices with a few lines, which is what most one-off jobs need." },
+    { "q": "Does simple mean less professional?", "a": "No. Clarity reads as professional. A well-set simple invoice looks more considered than a crowded one." }
+  ],
+  "relatedTemplates": ["classic", "freelancer", "cleaning-service"],
+  "relatedGuides": ["how-to-make-an-invoice", "what-to-put-on-an-invoice", "how-to-write-an-invoice"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

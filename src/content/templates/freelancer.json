@@ -1,0 +1,48 @@
+{
+  "name": "Freelancer",
+  "layout": "freelancer",
+  "title": "Free Freelancer Invoice Template",
+  "description": "A free freelancer invoice template for hourly or fixed-fee work: project name, hours, rate, payment terms and how to pay you. Fill it in online, download a PDF.",
+  "summary": "Hours × rate, with the project named at the top and the terms in the side column.",
+  "intro": "Your hours and rate, the project the work belongs to, and the terms you agreed, set out so a client can approve it without writing back. Free to fill in and download as a PDF.",
+  "explanation": [
+    "When you freelance, the invoice is often the only document a client’s finance team sees. They didn’t brief you and they don’t know the project, so the invoice has to explain itself: who you are, what the work was, which project or purchase order it belongs to, and when and how to pay.",
+    "This template puts the project directly under the title and uses Hours and Rate columns, so time-based work reads naturally. Fixed fees work too: a quantity of 1 and the fee as the rate. Your details, the client, the dates and the payment terms sit in a side column, away from the figures.",
+    "It suits writers, designers, developers, editors, translators, virtual assistants, researchers and anyone billing their own time. If you don’t yet have a routine, read [how to invoice as a freelancer](/invoice-guides/how-to-invoice-as-a-freelancer/)."
+  ],
+  "fieldsTitle": "What to put on a freelance invoice",
+  "fields": [
+    { "name": "Your name or business", "text": "The name you trade under, with an email and, if you have them, a website and tax ID. A sole trader’s own name is fine." },
+    { "name": "Project or PO", "text": "The project name, and the client’s purchase order number if they gave you one. Many companies can’t pay an invoice without it." },
+    { "name": "Work and hours", "text": "Each piece of work with the hours spent and your rate. Group small tasks; split the work the client will recognize." },
+    { "name": "Fixed fees", "text": "For a fixed-price job, a quantity of 1 and the agreed fee. You can mix fixed and hourly lines." },
+    { "name": "Expenses", "text": "Agreed expenses at cost, such as software, travel or stock images, as their own lines." },
+    { "name": "Payment terms", "text": "When payment is due (Net 14 or Net 30 are common) and any late fee you agreed in your contract." },
+    { "name": "How to pay you", "text": "Bank details, a payment link or both. The easier it is, the sooner it happens." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a freelance invoice in the generator. Your saved name and details are kept." },
+    { "title": "Name the project", "text": "Enter the client and the project (and PO number if there is one), then each piece of work with hours and rate." },
+    { "title": "Terms and payment", "text": "Pick your payment terms; the due date is set for you. Add your bank details or payment link." },
+    { "title": "Download and send", "text": "Download the PDF and email it to whoever pays invoices, not only your contact. See [how to send an invoice](/invoice-guides/how-to-send-an-invoice/)." }
+  ],
+  "faqs": [
+    { "q": "What should a freelance invoice include?", "a": "Your name and contact details, the client’s name and address, an invoice number, the issue and due dates, a description of the work with hours or fees, the total, and how to pay. Add a tax ID and tax where they apply. The full list is in [what to put on an invoice](/invoice-guides/what-to-put-on-an-invoice/)." },
+    { "q": "Can I invoice without a registered business?", "a": "In many countries, including the US and the UK, you can invoice as an individual under your own name. You may still need to register for tax once you earn above a threshold; check the rules where you live." },
+    { "q": "Should I bill hourly or by the project?", "a": "Both are common. Hourly suits open-ended work; a fixed fee suits work with a clear scope. This template handles either, and you can combine them on one invoice." },
+    { "q": "How do I add a late fee?", "a": "Only charge one you agreed in advance, usually in your contract. State it in the notes (“Late payments incur a 1.5% monthly fee”), and if a payment is late, add the fee as a line on a follow-up invoice." }
+  ],
+  "sample": {
+    "business": { "name": "Maya Okafor", "email": "maya@mayaokafor.com", "phone": "(503) 555-0114", "address": "1120 NW Couch Street, Apt 412\nPortland, OR 97209", "website": "mayaokafor.com" },
+    "client": { "name": "Tidewater Outdoor Co.", "email": "accounts@tidewateroutdoor.com", "address": "2305 NW Raleigh Street\nPortland, OR 97210" },
+    "project": "Autumn catalog copy · PO 4471",
+    "terms": "net14",
+    "items": [["Research and product interviews", "6", "75"], ["Catalog copy, 32 products", "18", "75"], ["Revisions after review", "3", "75"]],
+    "payment": "Bank transfer to Maya Okafor\nAccount 4021 8876 · Routing 123000220\nor pay online: mayaokafor.com/pay",
+    "notes": "Thank you. Payment within 14 days, please."
+  },
+  "relatedTemplates": ["web-developer", "consultant", "designer"],
+  "relatedGuides": ["how-to-invoice-as-a-freelancer", "what-to-put-on-an-invoice", "how-to-invoice-a-client"],
+  "relatedTools": ["invoice-number-generator"],
+  "updated": "2026-10-01"
+}

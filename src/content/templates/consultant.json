@@ -1,0 +1,38 @@
+{
+  "name": "Consultant",
+  "layout": "consultant",
+  "title": "Free Consulting Invoice Template",
+  "description": "A free consulting invoice template that separates professional fees from expenses, with hours, rates and the engagement named. Download a PDF for free.",
+  "summary": "Professional fees and expenses in separate, subtotalled sections, with the engagement named.",
+  "intro": "Fees and expenses in separate sections with their own subtotals, the engagement named in the side column, and nothing a finance team would have to ask about.",
+  "explanation": [
+    "Consulting clients usually book fees and reimbursable expenses to different budget lines, and their accounts payable team needs to see them apart. A single list mixing a strategy workshop with a train ticket gets sent back.",
+    "This template divides the invoice into Professional fees and Expenses, each subtotalled. Fees show hours and an hourly rate; expenses are listed at cost. The engagement name, your details and the payment terms sit in a ruled side column in Garamond, which reads as the formal document it is.",
+    "It suits management and operations consultants, advisers, coaches, interim executives and independent researchers. For retainers billed as a headline amount, the [Executive template](/invoice-templates/executive/) is an alternative."
+  ],
+  "fieldsTitle": "What to put on a consulting invoice",
+  "fields": [
+    { "name": "Engagement", "text": "The engagement or statement of work it falls under: “Q3 operations review”. Add the PO or contract reference if there is one." },
+    { "name": "Professional fees", "text": "Each activity with hours and rate: analysis, interviews, workshops, reporting. Day rates work too: days as quantity." },
+    { "name": "Expenses", "text": "Travel, accommodation, materials or third-party costs, at cost, with the date or destination. Say receipts are attached." },
+    { "name": "Period", "text": "The dates the invoice covers, in the engagement name or the notes, for monthly or phase billing." },
+    { "name": "Tax ID", "text": "Your tax or VAT number where clients need it; in the US, a client may ask for a W-9 before the first payment." },
+    { "name": "Payment terms", "text": "Net 30 is common for corporate clients. Give wire or ACH details in full." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens a consulting invoice with fees and expenses in the generator." },
+    { "title": "Fees, then expenses", "text": "Add each activity under Professional fees with its hours, then each cost under Expenses. Subtotals appear when a section has more than one line." },
+    { "title": "Name the engagement", "text": "Enter the engagement and any PO number. Choose terms; the due date follows." },
+    { "title": "Attach receipts and send", "text": "Download the PDF and send it with the expense receipts to accounts payable." }
+  ],
+  "faqs": [
+    { "q": "Should consulting expenses be on the same invoice as fees?", "a": "They can be, as long as they are clearly separated. This template puts them in their own section with a subtotal, which is what most finance teams ask for. Some clients prefer a separate expense invoice; follow their process." },
+    { "q": "Should I bill hourly or a day rate?", "a": "Bill the way your proposal priced the work. For a day rate, enter days as the quantity and your day rate as the rate; the column heading still reads Hours, so say “days” in the description." },
+    { "q": "Do I mark up expenses?", "a": "Usually not; consulting expenses are commonly billed at cost with receipts. If your contract allows an administrative fee, show it as its own line." },
+    { "q": "How do I invoice a retainer?", "a": "One line for the period (“Advisory retainer — October”) with a quantity of 1. Add any work outside the retainer as separate fee lines." }
+  ],
+  "relatedTemplates": ["executive", "freelancer", "marketing-agency"],
+  "relatedGuides": ["how-to-invoice-a-client", "how-to-write-an-invoice", "what-to-put-on-an-invoice"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}

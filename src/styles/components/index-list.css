@@ -1,0 +1,41 @@
+/* ==========================================================================
+   Index list — numbered rows separated by hairlines (services on Home)
+   ========================================================================== */
+
+.index { border-bottom: var(--hair); }
+.index__row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: baseline;
+  padding: var(--s-6) 0;
+  border-top: var(--hair);
+  transition: background-color var(--t-mid) var(--ease);
+}
+.index li:first-child .index__row { border-top-color: var(--ink); }
+.index__num { grid-column: 1 / span 3; }
+.index__title { grid-column: 4 / span 4; }
+.index__desc { grid-column: 8 / span 4; }
+.index__go { grid-column: 12; }
+.index__num {
+  font-style: italic;
+  color: var(--ash);
+  font-size: var(--fs-small);
+}
+.index__title { font-size: var(--fs-h3); line-height: 1.15; letter-spacing: -0.005em; text-wrap: balance; }
+.index__desc { color: var(--ash); max-width: 46ch; text-wrap: pretty; transition: color var(--t-mid) var(--ease); }
+.index__go { justify-self: end; align-self: center; }
+a.index__row:hover .index__desc { color: var(--ink); }
+a.index__row:hover .arrow { transform: translateX(4px); }
+
+@media (max-width: 63.99rem) {
+  .index__row { grid-template-columns: 3rem minmax(0, 1fr) 2.5rem; row-gap: var(--s-3); }
+  .index__num { grid-column: 1; }
+  .index__title { grid-column: 2; }
+  .index__desc { grid-column: 2 / 3; }
+  .index__go { grid-row: 1; grid-column: 3; align-self: baseline; padding-top: 0.6em; }
+}
+@media (max-width: 29.99rem) {
+  .index__row { grid-template-columns: 2.25rem minmax(0, 1fr) 1.75rem; padding: var(--s-5) 0; }
+  .index__go .arrow { width: 20px; }
+}

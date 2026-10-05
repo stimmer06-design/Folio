@@ -1,0 +1,40 @@
+    <header class="page-head">
+      <div class="wrap grid">
+        {{crumbs}}
+        <h1 class="h1 page-head__title" data-reveal>{{tool.title}}</h1>
+        <p class="lead page-head__lead muted" data-reveal>{{tool.lead}}</p>
+      </div>
+    </header>
+
+    <section class="section section--flush-top" aria-label="Calculator">
+      <div class="wrap">
+{{tool.widget}}
+      </div>
+    </section>
+
+    <section class="section section--ivory" aria-label="How it works">
+      <div class="wrap grid article">
+        <nav class="article__toc" aria-labelledby="toc-title">
+          <h2 class="label article__toc-title" id="toc-title">On this page</h2>
+          <ol class="svc-toc__list article__toc-list">{{tool.toc}}</ol>
+        </nav>
+        <article class="article__body prose">
+{{tool.body}}
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="grid opening">
+          <h2 class="label opening__label" id="faq-title" data-reveal>Questions</h2>
+          <div class="opening__body--narrow" data-reveal><div class="faq">{{tool.faqs}}</div></div>
+        </div>
+      </div>
+    </section>
+
+    {{tool.related}}
+
+    {{tool.readNext}}
+
+    {{> cta}}

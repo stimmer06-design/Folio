@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Tokens — the whole visual system in one place. See DESIGN.md.
+   ========================================================================== */
+
+@font-face {
+  font-family: "EB Garamond";
+  src: url("fonts/eb-garamond-roman.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EB Garamond";
+  src: url("fonts/eb-garamond-italic.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("fonts/hanken-grotesk.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Colour — ink on paper. No accent. */
+  --bone: #efeae0;
+  --ivory: #f7f4ee;
+  --oat: #e4ddd0;
+  --stone: #d8d1c4;
+  --rule: #cdc5b6;
+  --ash: #655f55;          /* secondary text — 5.3:1 on bone */
+  --charcoal: #2a2825;
+  --moss: #4b4f47;
+  --ink: #161513;
+  --error: #8c2b1f;        /* functional only: form errors */
+
+  /* Type families */
+  --serif: "EB Garamond", Garamond, "Times New Roman", serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+
+  /* Fluid type scale: 390px → 1440px */
+  --fs-display: clamp(2.875rem, 1.714rem + 4.762vw, 6rem);
+  --fs-h1: clamp(2.625rem, 1.836rem + 3.238vw, 4.75rem);
+  --fs-h2: clamp(2rem, 1.489rem + 2.095vw, 3.375rem);
+  --fs-h3: clamp(1.5625rem, 1.4rem + 0.667vw, 2rem);
+  --fs-lead: clamp(1.3125rem, 1.173rem + 0.571vw, 1.6875rem);
+  --fs-body: clamp(1.125rem, 1.079rem + 0.19vw, 1.25rem);
+  --fs-small: clamp(0.9375rem, 0.914rem + 0.095vw, 1rem);
+  --fs-label: 0.75rem;
+
+  /* Spacing scale */
+  --s-1: 0.25rem;  /* 4 */
+  --s-2: 0.5rem;   /* 8 */
+  --s-3: 0.75rem;  /* 12 */
+  --s-4: 1rem;     /* 16 */
+  --s-5: 1.5rem;   /* 24 */
+  --s-6: 2rem;     /* 32 */
+  --s-7: 3rem;     /* 48 */
+  --s-8: 4rem;     /* 64 */
+  --s-9: 6rem;     /* 96 */
+  --s-10: 8rem;    /* 128 */
+  --s-11: 11rem;   /* 176 */
+
+  /* Layout */
+  --max: 82.5rem;                              /* 1320 */
+  --margin: clamp(1.25rem, 5vw, 4.5rem);       /* 20 → 72 */
+  --gutter: clamp(1rem, 0.5rem + 1.25vw, 1.5rem);
+  --section: clamp(4.5rem, 2.086rem + 9.905vw, 11rem);   /* 72 → 176 */
+  --section-sm: clamp(3.5rem, 2rem + 6vw, 7rem);
+  --header-h: 5.5rem;
+
+  /* Lines */
+  --hair: 1px solid var(--rule);
+  --hair-ink: 1px solid var(--ink);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --t-fast: 180ms;
+  --t-mid: 320ms;
+  --t-slow: 700ms;
+
+  /* Paper grain (very faint) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2  0 0 0 0 .17  0 0 0 0 .12  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 47.99rem) {
+  :root { --header-h: 4rem; }
+}

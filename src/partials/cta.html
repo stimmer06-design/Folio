@@ -1,0 +1,12 @@
+<section class="cta" aria-labelledby="cta-title">
+      <div class="wrap cta__inner">
+        <p class="label cta__label" data-reveal>{{cta.label}}</p>
+        <h2 class="cta__title" id="cta-title" data-reveal>{{cta.title}}</h2>
+        <div class="cta__body" data-reveal>
+          <p>{{cta.text}}</p>
+          <div class="cta__actions">
+            <a class="btn btn--light" href="{{cta.href}}" data-track="{{cta.track}}" data-track-slug="{{cta.slug}}" data-track-cta="bottom">{{cta.button}} {{> arrow}}</a>
+          </div>
+        </div>
+      </div>
+    </section>

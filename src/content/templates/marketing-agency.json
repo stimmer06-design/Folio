@@ -1,0 +1,38 @@
+{
+  "name": "Marketing Agency",
+  "layout": "agency",
+  "title": "Free Marketing Agency Invoice Template",
+  "description": "A free marketing agency invoice template that separates retainer, production and media spend, each with a subtotal, and names the campaign. Download as PDF.",
+  "summary": "Retainer, production and media spend in separate sections, the total stated up front.",
+  "intro": "The retainer, the production costs and the media spend in separate subtotalled sections, so your client can match each to its budget line. The total due is stated first.",
+  "explanation": [
+    "Agency invoices mix very different money: your monthly fee, one-off production work, and media spend that passes straight through to the platforms. Clients manage these from different budgets and often need to approve them separately.",
+    "This template puts each in its own section, Retainer, Production and Media, with subtotals, and names the campaign beside the invoice details. The total due is set at the top in a strong semibold, because the person approving it reads that first.",
+    "It suits marketing, digital, social media, PR, SEO and creative agencies, and freelance marketers working on retainers."
+  ],
+  "fieldsTitle": "What to put on a marketing agency invoice",
+  "fields": [
+    { "name": "Campaign or account", "text": "The campaign or workstream: “Autumn 2026 launch”, and the client’s PO number if they issue one." },
+    { "name": "Retainer", "text": "The monthly fee and the period it covers: “Monthly retainer — October”." },
+    { "name": "Production", "text": "One-off creative work: shoots, video edits, landing pages, print." },
+    { "name": "Media spend", "text": "Ad spend at cost, stated as such, so the client can reconcile it with platform reports." },
+    { "name": "Management fee", "text": "If you charge a percentage on media, show it as its own line with the percentage: “Media management fee, 12%”." },
+    { "name": "Terms", "text": "Payment terms, and any rule about paying media in advance, in the notes." }
+  ],
+  "steps": [
+    { "title": "Open the example", "text": "Customize this invoice opens an agency invoice with all three sections in the generator." },
+    { "title": "Sort each line", "text": "Add the retainer, production and media lines and choose a section for each. Subtotals appear automatically." },
+    { "title": "Campaign and PO", "text": "Name the campaign and add the PO number, if any, so the client’s finance team can match it." },
+    { "title": "Send to finance", "text": "Download the PDF and send it to the client’s accounts payable contact as well as your marketing contact." }
+  ],
+  "faqs": [
+    { "q": "Should media spend be on the same invoice as agency fees?", "a": "Often it is, in its own section. Some clients prefer media billed separately or paid directly to the platforms. Ask at onboarding and follow their process; this template separates them either way." },
+    { "q": "How do I show a media management fee?", "a": "As its own line under Media, with the percentage in the description and the calculated amount as the price. That keeps the fee transparent." },
+    { "q": "How do I invoice a retainer?", "a": "One line per period with a quantity of 1. Bill retainers at the start of the month if your contract says so, and out-of-scope work at the end." },
+    { "q": "Can I add more sections?", "a": "The sections are Retainer, Production and Media. For anything else, use the line description: “Production — event staffing”." }
+  ],
+  "relatedTemplates": ["consultant", "web-developer", "small-business"],
+  "relatedGuides": ["how-to-invoice-a-client", "invoice-vs-bill", "how-to-number-invoices"],
+  "relatedTools": ["invoice-tax-calculator"],
+  "updated": "2026-10-01"
+}
