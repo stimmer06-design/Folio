@@ -1,0 +1,16 @@
+{
+  "name": "andromeda-assembly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Andromeda Assembly - a 3D PC build & pack game for Andromeda Insights",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node tests/smoke.mjs && node tests/ui.mjs",
+    "test:fast": "node build.mjs && FAST=1 node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "three": "0.180.0"
+  }
+}
