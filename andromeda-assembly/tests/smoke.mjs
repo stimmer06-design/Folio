@@ -25,14 +25,19 @@ const sleep = (ms) => page.waitForTimeout(ms);
 await page.goto(file);
 await page.waitForFunction(() => window.__game && window.__game.state === 'title', null, { timeout: 90000 });
 await sleep(9000);
-await page.screenshot({ path: `${OUT}/01-title.png` });
+for (let i = 0; i < 5 && (await page.$('#splash')); i++) {
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(1500);
+}
+await sleep(1500);
+await page.screenshot({ timeout: 120000, path: `${OUT}/01-title.png` });
 if (process.env.PRESET) await page.evaluate((p) => { const g = window.__game; const o = JSON.parse(p); for (const k in o) g.save[k] = typeof o[k] === 'object' && !Array.isArray(o[k]) && g.save[k] ? { ...g.save[k], ...o[k] } : o[k]; }, process.env.PRESET);
 if (process.env.FAST) await page.evaluate(() => (window.__fast = true));
 if (process.env.QAFAIL) await page.evaluate(() => (window.__qafail = true));
 await page.click('#title [data-a]', { timeout: 120000 });
 
 let shotN = 2;
-const shot = async (name) => page.screenshot({ path: `${OUT}/${String(shotN++).padStart(2, '0')}-${name}.png` });
+const shot = async (name) => page.screenshot({ timeout: 120000, path: `${OUT}/${String(shotN++).padStart(2, '0')}-${name}.png` });
 
 async function settle() {
   for (let i = 0; i < 60; i++) {
@@ -138,7 +143,7 @@ while (done < ORDERS && guard++ < 600) {
       done++;
       await page.click('#resnext');
     } else if (kind === 'crate') {
-      await page.click('#crate');
+      await page.click('#crate', { force: true });
       await sleep(1800);
       if (shotN < 12) await shot('crate');
       await page.click('#cnext');
@@ -196,6 +201,11 @@ while (done < ORDERS && guard++ < 600) {
     await page.mouse.click(a.at[0], a.at[1]);
     await sleep(a.id === 'power' ? 600 : 400);
     if (a.id === 'power') { await sleep(2500); await shot('qa'); }
+    if (a.id === 'ship') {
+      for (let i = 0; i < 200 && (await page.evaluate(() => window.__game.view !== 'launch' && window.__game.state === 'pack')); i++) await sleep(100);
+      await sleep(3500);
+      await shot('launch');
+    }
   }
   const st = await page.evaluate(() => window.__game.state + ':' + (window.__game.packing.stage || ''));
   if (st === 'pack:flaps' && shotN < 12) await shot('pack');

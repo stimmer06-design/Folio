@@ -86,7 +86,7 @@ export function buildStation(theme) {
   mesh(new THREE.PlaneGeometry(ww, wh), glassM, wcx, wcy, WZ - 0.05, g, { cast: false });
 
   // ---------------------------------------------------------------- outside: sky, Saturn, Titan, ships
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(420, 48, 32), skyMaterial(V3(0.5, 0.3, -0.81)));
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(420, 48, 32), skyMaterial(V3(0.48, 0.2, -0.85)));
   sky.renderOrder = 1; // after opaque geometry so early-z skips hidden sky pixels
   g.add(sky);
   const saturn = new THREE.Group();
@@ -114,11 +114,11 @@ export function buildStation(theme) {
   titan.position.set(70, -80, -140);
   g.add(titan);
   // distant traffic
-  const glowTex = T.ringSpriteTexture();
+  const glowTex = T.glowDotTexture();
   const ships = [];
   for (let i = 0; i < 4; i++) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: i % 2 ? '#7dd3fc' : '#fde68a', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
-    s.scale.setScalar(0.8 + i * 0.3);
+    s.scale.setScalar(0.5 + i * 0.15);
     s.userData = { speed: 0.6 + i * 0.25, y: 3 + i * 2.2, z: -40 - i * 22, phase: i * 37 };
     g.add(s);
     ships.push(s);

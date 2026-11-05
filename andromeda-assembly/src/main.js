@@ -24,7 +24,7 @@ const VIEWS = {
   test: { pos: V3(2.2, 4.5, 10.6), look: V3(2.2, 2.9, -0.8) },
   pack: { pos: V3(-4.6, 15.5, 15.0), look: V3(-4.6, 1.2, 0.3) },
   packClose: { pos: V3(-8.4, 15.0, 11.9), look: V3(-8.9, 1.7, 0.8) },
-  ship: { pos: V3(-12.5, 7.5, 12.5), look: V3(-15.5, -1.2, 0) },
+  ship: { pos: V3(-13.5, 10.5, 17), look: V3(-17, -0.8, -0.5) },
   launch: { pos: V3(-17, 3.5, 7), look: V3(-10.2, 3.8, -9.7) },
 };
 const PLAYING = new Set(['arrive', 'assemble', 'test', 'pack']);
@@ -420,6 +420,7 @@ class Game {
     this.view = 'title';
     writeSave(this.save);
     this.ui.showTitle(this.save);
+    if (first) this.ui.splash();
   }
 
   async startShift() {
@@ -667,7 +668,7 @@ class Game {
     if (!s.dayStats.best || res.time < s.dayStats.best) s.dayStats.best = res.time;
     const gOrder = 'SABCD';
     if (!s.dayStats.bestGrade || gOrder.indexOf(res.grade.id) < gOrder.indexOf(s.dayStats.bestGrade)) s.dayStats.bestGrade = res.grade.id;
-    if (this.order.special) s.signal = 100;
+    if (this.order.special || s.finaleDone) s.signal = 100;
     else if (res.signalGain) s.signal = Math.min(99, sigBefore + res.signalGain);
     res.signal = s.signal;
     // contract stats from the finished order
@@ -810,7 +811,7 @@ class Game {
     const xpBoost = (this.save.xpBoost || 0) > 0;
     const xp = Math.round((30 + gBonus + Math.min(4, tierIdx) * 8) * (xpBoost ? 2 : 1));
     const rank = rankFor(this.save.xp);
-    const sg = rank >= 3 && !o.special ? signalGain(o, quality) : 0;
+    const sg = rank >= 3 && !o.special && !this.save.finaleDone ? signalGain(o, quality) : 0;
     const reviewStars = { S: 5, A: 5, B: 4, C: 3, D: 2 }[grade.id];
     return {
       no: o.no, city: o.city, customer: o.customerFull, rows, total, grade, quality, xp, xpBoost, time, par,

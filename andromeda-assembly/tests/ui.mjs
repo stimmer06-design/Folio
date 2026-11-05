@@ -15,7 +15,12 @@ await page.goto('file://' + path.resolve('release/AndromedaAssembly.html'));
 await page.waitForFunction(() => window.__game && window.__game.state === 'title', null, { timeout: 90000 });
 page.setDefaultTimeout(120000);
 await page.waitForTimeout(8000);
-const shot = async (n) => { await page.waitForTimeout(700); await page.screenshot({ path: `${OUT}/${n}.png` }); };
+for (let i = 0; i < 5 && (await page.$('#splash')); i++) {
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(1500);
+}
+await page.waitForTimeout(1200);
+const shot = async (n) => { await page.waitForTimeout(700); await page.screenshot({ timeout: 120000, path: `${OUT}/${n}.png` }); };
 const fail = (m) => errors.push(m);
 await shot('title');
 

@@ -59,6 +59,13 @@ button{font-family:var(--font)}
 @keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(330%)}}
 #loading p{color:var(--muted);letter-spacing:.3em;font-size:12px;text-transform:uppercase;font-family:var(--disp)}
 
+/* ---------- splash ---------- */
+#splash{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at center,rgba(3,4,12,.55),rgba(2,3,8,.95));cursor:pointer;transition:opacity .9s,backdrop-filter .9s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#splash img{width:min(520px,76vw);filter:drop-shadow(0 0 40px rgba(139,92,246,.55))}
+#splash .sp-t{font-family:var(--disp);font-weight:700;letter-spacing:.5em;color:var(--muted);font-size:14px}
+#splash .sp-c{font-family:var(--disp);font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:#fff;font-size:18px;margin-top:20px;animation:pulse 1.6s infinite}
+#splash.out{opacity:0;backdrop-filter:blur(0);pointer-events:none}
+
 /* ---------- title ---------- */
 #title{position:fixed;inset:0;display:flex;align-items:center;padding:0 6vw;background:linear-gradient(90deg,rgba(3,4,12,.94) 0%,rgba(3,4,12,.7) 34%,rgba(3,4,12,0) 62%);z-index:20}
 #title .inner{max-width:560px;animation:slidein .9s cubic-bezier(.2,1,.3,1)}

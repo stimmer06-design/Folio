@@ -666,7 +666,7 @@ export class Packing {
     await wait(0.5);
     const pod = this.pod;
     pod.visible = true;
-    const P = [V3(-23.5, -1.5, -8), V3(-16, 1, -24), V3(15, 4, -55), V3(60, 4, -80)];
+    const P = [V3(-14.5, -0.5, -9), V3(-9, 1.5, -24), V3(15, 4, -55), V3(60, 4, -80)];
     const bez = (t) => {
       const u = 1 - t;
       return P[0].clone().multiplyScalar(u * u * u).add(P[1].clone().multiplyScalar(3 * u * u * t)).add(P[2].clone().multiplyScalar(3 * u * t * t)).add(P[3].clone().multiplyScalar(t * t * t));
@@ -676,7 +676,7 @@ export class Packing {
     const q = new THREE.Quaternion();
     let lastBurst = 0;
     await tweens.add({
-      duration: 2.8, ease: Ease.inCubic,
+      duration: 3.0, ease: Ease.inQuad,
       update: (e, k) => {
         const p = bez(e), p2 = bez(Math.min(1, e + 0.02));
         pod.position.copy(p);

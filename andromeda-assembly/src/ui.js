@@ -165,6 +165,27 @@ export class UI {
       this.g.menuAction(b.dataset.a);
     }));
   }
+  // first-launch splash: the click unlocks audio so the soundtrack starts with the title
+  splash() {
+    return new Promise((resolve) => {
+      const el = document.createElement('div');
+      el.id = 'splash';
+      el.innerHTML = `<img src="${this.logoURL}" alt="Andromeda Insights"><div class="sp-t">FORGE-7 · TITAN ORBIT · 2291</div><div class="sp-c">Click anywhere to dock</div>`;
+      document.getElementById('ui').appendChild(el);
+      const go = () => {
+        el.removeEventListener('pointerdown', go);
+        removeEventListener('keydown', go);
+        audio.init();
+        audio.play('transmission');
+        audio.play('whoosh');
+        el.classList.add('out');
+        setTimeout(() => el.remove(), 900);
+        resolve();
+      };
+      el.addEventListener('pointerdown', go);
+      addEventListener('keydown', go);
+    });
+  }
   hideTitle() {
     $('title').classList.add('hidden');
   }

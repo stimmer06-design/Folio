@@ -708,3 +708,14 @@ export function holoLabelCanvas(title, sub, color, w = 512, h = 160) {
     ctx.fillText(sub.toUpperCase(), w / 2, h * 0.74);
   });
 }
+
+export function glowDotTexture() {
+  const [c, ctx] = canvas(64, 64);
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.25, 'rgba(255,255,255,0.6)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  return toTex(c, { shared: true });
+}
