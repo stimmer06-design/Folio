@@ -38,9 +38,9 @@ export function skyMaterial(galaxyDir = new THREE.Vector3(0.32, 0.28, -0.9)) {
         vec2 np = d.xz/(1.2+d.y) + d.y*0.7;
         float n1 = fbm(np*2.4 + vec2(0.0, uTime*0.004));
         float n2 = fbm(np*4.2 - vec2(uTime*0.003, 0.0) + n1);
-        col += vec3(0.34,0.12,0.58) * pow(n1, 3.0) * 0.6;
-        col += vec3(0.05,0.32,0.52) * pow(n2, 4.0) * 0.65;
-        col += vec3(0.6,0.15,0.32) * pow(fbm(np*1.4+7.0), 5.0) * 0.45;
+        col += vec3(0.34,0.12,0.58) * pow(max(n1, 0.0), 3.0) * 0.6;
+        col += vec3(0.05,0.32,0.52) * pow(max(n2, 0.0), 4.0) * 0.65;
+        col += vec3(0.6,0.15,0.32) * pow(max(fbm(np*1.4+7.0), 0.0), 5.0) * 0.45;
         col += stars(d, 220.0, 0.95);
         col += stars(d, 70.0, 0.975) * 1.6;
         // Andromeda galaxy (gnomonic projection around uG)
@@ -51,8 +51,8 @@ export function skyMaterial(galaxyDir = new THREE.Vector3(0.32, 0.28, -0.9)) {
           vec2 q = vec2(dot(d,u), dot(d,v)) / dg;
           float ang = -0.5; mat2 R = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
           q = R*q; q.y /= 0.32; q *= 6.0;
-          float r = length(q) + 1e-4; float th = atan(q.y, q.x);
-          float arms = pow(0.5 + 0.5*cos(2.0*(th - 2.6*log(r)) + uTime*0.01), 3.0);
+          float r = length(q) + 1e-3; float th = atan(q.y, q.x + 1e-6);
+          float arms = pow(clamp(0.5 + 0.5*cos(2.0*(th - 2.6*log(r)) + uTime*0.01), 0.0, 1.0), 3.0);
           float disc = exp(-r*1.15);
           float dust = smoothstep(0.35, 0.75, fbm(q*3.0 + 4.0)) * smoothstep(0.15, 0.9, r) * (1.0-arms);
           float gl = disc*(0.35 + arms*0.9) - dust*disc*0.55 + fbm(q*6.0)*disc*0.25;
@@ -80,7 +80,7 @@ export function planetMaterial(bandTex) {
         vec3 band = texture2D(uMap, vec2(vUv.x + uTime*0.002, vUv.y)).rgb;
         float l = dot(normalize(vN), uSun);
         float lit = smoothstep(-0.15, 0.6, l);
-        float rim = pow(1.0 - max(dot(normalize(vN), vV), 0.0), 3.0);
+        float rim = pow(clamp(1.0 - dot(normalize(vN), normalize(vV)), 0.0, 1.0), 3.0);
         vec3 col = band * lit * 1.25 + vec3(0.9,0.75,0.5) * rim * smoothstep(-0.3, 0.3, l) * 0.6;
         col += band * 0.02;
         gl_FragColor = vec4(col, 1.0);
@@ -117,7 +117,7 @@ export function holoMaterial(color = '#67e8f9', opacity = 0.6, { scan = 1, map =
         float rim = 1.0 - abs(dot(normalize(vN), normalize(vV)));
         float scan = 0.75 + 0.25*sin(vW.y*90.0 - uTime*8.0);
         float band = smoothstep(0.0, 0.04, abs(fract(vW.y*1.6 - uTime*0.6) - 0.5) - 0.42);
-        float a = (pow(rim, 1.6)*0.9 + 0.12) * mix(1.0, scan, uScan) + band*0.25*uScan;
+        float a = (pow(clamp(rim, 0.0, 1.0), 1.6)*0.9 + 0.12) * mix(1.0, scan, uScan) + band*0.25*uScan;
         vec3 col = uColor;
         if (uHasMap > 0.5) { vec4 t = texture2D(uMap, vUv); col = mix(uColor, t.rgb, 0.85); a = t.a * (0.85 + 0.15*scan); }
         float flick = 0.94 + 0.06*sin(uTime*37.0 + vW.x*3.0);
@@ -139,9 +139,9 @@ export function beamMaterial(color = '#fff1d6', intensity = 0.22) {
       ${NOISE}
       void main(){
         float facing = abs(dot(normalize(vN), normalize(vV)));
-        float edge = pow(facing, 2.2);
+        float edge = pow(clamp(facing, 0.0, 1.0), 2.2);
         float h = mix(vUv.y, 1.0 - vUv.y, uFlip); // 1 at the light source
-        float fall = pow(h, 1.4) * smoothstep(0.0, 0.25, h);
+        float fall = pow(clamp(h, 0.0, 1.0), 1.4) * smoothstep(0.0, 0.25, h);
         float dust = 0.75 + 0.25*noise(vW.xz*1.6 + vec2(0.0, uTime*0.1) + vW.y*0.6);
         float a = edge * fall * dust * uI;
         gl_FragColor = vec4(uColor * a, a);
@@ -189,5 +189,20 @@ export const FinalShader = {
       col += uEdgeColor * edge;
       col = mix(col, uFlashColor, uFlash);
       gl_FragColor = vec4(max(col, vec3(0.0)), 1.0);
+    }`,
+};
+
+export const SanitizeShader = {
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: /* glsl */ `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: /* glsl */ `
+    uniform sampler2D tDiffuse; varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      bool bad = any(isnan(c)) || any(isinf(c));
+      // also catch NaNs on drivers where isnan() is optimised away
+      bad = bad || !(c.r >= 0.0 || c.r <= 0.0) || !(c.g >= 0.0 || c.g <= 0.0) || !(c.b >= 0.0 || c.b <= 0.0);
+      if (bad) c = vec4(0.0, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4(clamp(c.rgb, 0.0, 64.0), 1.0);
     }`,
 };

@@ -6,7 +6,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-import { FinalShader } from './shaders.js';
+import { FinalShader, SanitizeShader } from './shaders.js';
 
 export class Post {
   constructor(renderer, scene, camera) {
@@ -40,7 +40,9 @@ export class Post {
     this.bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.6, 0.6, 0.82);
     this.output = new OutputPass();
     this.final = new ShaderPass(FinalShader);
+    this.sanitize = new ShaderPass(SanitizeShader);
     this.composer.addPass(this.gtao);
+    this.composer.addPass(this.sanitize);
     this.composer.addPass(this.bloom);
     this.composer.addPass(this.output);
     this.composer.addPass(this.final);
