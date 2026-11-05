@@ -279,6 +279,84 @@ export class AudioEngine {
         this.play('cash');
         this.tone({ f: NOTE(84), dur: 0.4, gain: 0.06, type: 'triangle', t: 0.2, rev: 0.7 });
         break;
+      case 'perfect': {
+        // bright stacked chime — climbs with the combo
+        const base = 76 + Math.min(14, opt.combo || 0);
+        [0, 7, 12, 16].forEach((iv, i) => this.tone({ f: NOTE(base + iv), dur: 0.55, gain: 0.07 - i * 0.01, type: i ? 'sine' : 'triangle', t: i * 0.018, rev: 0.9 }));
+        this.noise({ dur: 0.25, type: 'highpass', f: 7000, gain: 0.05, attack: 0.01, rev: 0.5 });
+        break;
+      }
+      case 'great': {
+        const base = 74 + Math.min(12, opt.combo || 0);
+        [0, 7, 12].forEach((iv, i) => this.tone({ f: NOTE(base + iv), dur: 0.35, gain: 0.06, type: 'triangle', t: i * 0.02, rev: 0.6 }));
+        break;
+      }
+      case 'good':
+        this.tone({ f: NOTE(69 + Math.min(10, opt.combo || 0)), dur: 0.25, gain: 0.06, type: 'triangle', rev: 0.4 });
+        break;
+      case 'sloppy':
+        this.tone({ f: 330, f2: 220, dur: 0.22, gain: 0.07, type: 'square', q: 1400 });
+        break;
+      case 'overdrive': {
+        const lvl = opt.tier || 1;
+        this.noise({ dur: 0.7, type: 'bandpass', f: 300, f2: 6000, Q: 1.4, gain: 0.16, attack: 0.5 });
+        this.tone({ f: 55, f2: 110, dur: 0.8, gain: 0.18, type: 'sawtooth', q: 900, attack: 0.5 });
+        [0, 4, 7, 12].forEach((iv, i) => this.tone({ f: NOTE(60 + lvl * 2 + iv), dur: 1.1, gain: 0.06, type: 'sawtooth', q: 2600, t: 0.55 + i * 0.03, rev: 1 }));
+        this.tone({ f: 70, f2: 35, dur: 0.6, gain: 0.5, type: 'sine', t: 0.55 });
+        break;
+      }
+      case 'flowlost':
+        this.tone({ f: 600, f2: 150, dur: 0.4, gain: 0.06, type: 'sawtooth', q: 1200 });
+        break;
+      case 'gauge':
+        this.tone({ f: 900 + (opt.v || 0) * 1400, dur: 0.025, gain: 0.03, type: 'square', q: 4000 });
+        break;
+      case 'zone':
+        this.tone({ f: 2093, dur: 0.12, gain: 0.04, type: 'sine', rev: 0.5 });
+        break;
+      case 'squish':
+        this.noise({ dur: 0.12, type: 'lowpass', f: 700 + (opt.v || 0) * 600, gain: 0.08, attack: 0.03 });
+        break;
+      case 'grade': {
+        this.tone({ f: 60, f2: 30, dur: 0.9, gain: 0.6, type: 'sine' });
+        this.noise({ dur: 0.5, type: 'lowpass', f: 900, gain: 0.4 });
+        const good = opt.g === 'S' || opt.g === 'A';
+        const ch = good ? [60, 64, 67, 72, 76] : [57, 60, 64, 69];
+        ch.forEach((n, i) => this.tone({ f: NOTE(n), dur: 1.6, gain: 0.05, type: 'sawtooth', q: 2400, t: 0.04, rev: 1 }));
+        break;
+      }
+      case 'crate':
+        this.noise({ dur: 0.08, type: 'bandpass', f: 900, Q: 3, gain: 0.25 });
+        this.tone({ f: 180, f2: 120, dur: 0.12, gain: 0.15, type: 'triangle' });
+        break;
+      case 'reveal': {
+        const r = { common: 0, rare: 1, epic: 2, legendary: 3 }[opt.r] || 0;
+        this.noise({ dur: 0.5 + r * 0.2, type: 'highpass', f: 3000, gain: 0.12 + r * 0.04, attack: 0.02, rev: 1 });
+        const seq = [[72, 76, 79], [72, 76, 79, 84], [71, 74, 78, 83, 86], [72, 76, 79, 84, 88, 91]][r];
+        seq.forEach((n, i) => this.tone({ f: NOTE(n), dur: 0.9 + r * 0.3, gain: 0.08, type: 'triangle', t: i * 0.07, rev: 1 }));
+        if (r >= 2) this.tone({ f: NOTE(48), dur: 1.6, gain: 0.12, type: 'sawtooth', q: 900, attack: 0.05 });
+        break;
+      }
+      case 'launch':
+        this.noise({ dur: 2.4, type: 'lowpass', f: 200, f2: 1600, gain: 0.45, attack: 0.3 });
+        this.tone({ f: 40, f2: 90, dur: 2.2, gain: 0.3, type: 'sawtooth', q: 400, attack: 0.3 });
+        this.noise({ dur: 1.4, type: 'bandpass', f: 600, f2: 4000, Q: 0.7, gain: 0.15, attack: 0.6, t: 0.6 });
+        break;
+      case 'blip':
+        this.tone({ f: (opt.f || 880) * (0.95 + Math.random() * 0.1), dur: 0.03, gain: 0.02, type: 'square', q: 3000 });
+        break;
+      case 'contract':
+        [67, 71, 74, 79, 83].forEach((n, i) => this.tone({ f: NOTE(n), dur: 0.5, gain: 0.07, type: 'triangle', t: i * 0.06, rev: 0.9 }));
+        this.play('cash');
+        break;
+      case 'transmission':
+        this.tone({ f: 1320, dur: 0.08, gain: 0.05, type: 'sine' });
+        this.tone({ f: 1760, dur: 0.12, gain: 0.05, type: 'sine', t: 0.09, rev: 0.6 });
+        this.noise({ dur: 0.3, type: 'bandpass', f: 2500, Q: 3, gain: 0.04, attack: 0.05 });
+        break;
+      case 'whisper':
+        [48, 55, 60, 67].forEach((n, i) => this.tone({ f: NOTE(n), dur: 3, gain: 0.05, type: 'sine', attack: 0.8, t: i * 0.2, rev: 1 }));
+        break;
       case 'glass':
         this.tone({ f: 2400, dur: 0.5, gain: 0.04, type: 'sine', rev: 0.8 });
         this.tone({ f: 3300, dur: 0.4, gain: 0.03, type: 'sine', rev: 0.8, t: 0.02 });
@@ -352,36 +430,64 @@ export class AudioEngine {
     this.loops.hum = null;
   }
 
-  // ---------- generative lo-fi soundtrack ----------
+  // ---------- adaptive generative soundtrack ----------
+  // Layers (pad, keys, bass, drums, arp) fade in as the Overdrive intensity rises.
   setMood(m) {
     this.mood = m;
+    if (m !== 'shift') this.setIntensity(0);
+  }
+  setIntensity(i) {
+    this.intensity = i;
+    if (!this.ctx || !this.layers) return;
+    const t = this.ctx.currentTime;
+    const shift = this.mood === 'shift';
+    const want = {
+      pad: 1,
+      keys: shift ? 0.9 : 0.6,
+      bass: shift ? (i >= 1 ? 1 : 0.55) : 0,
+      drums: shift ? (i >= 1 ? 1 : 0.6) : 0,
+      hats: shift ? (i >= 2 ? 1 : i >= 1 ? 0.5 : 0) : 0,
+      arp: shift ? (i >= 2 ? 1 : 0) : this.mood === 'title' ? 0.35 : 0,
+      lead: shift && i >= 3 ? 1 : this.mood === 'finale' ? 1 : 0,
+    };
+    for (const k in this.layers) this.layers[k].gain.setTargetAtTime(want[k] || 0, t, 0.6);
   }
   startMusic() {
     const ctx = this.ctx;
-    this.bpm = 76;
+    this.layers = {};
+    for (const k of ['pad', 'keys', 'bass', 'drums', 'hats', 'arp', 'lead']) {
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      g.connect(this.music);
+      if (k !== 'drums' && k !== 'bass' && k !== 'hats') g.connect(this.musicRev);
+      this.layers[k] = g;
+    }
+    this.intensity = 0;
+    this.setIntensity(0);
+    this.bpm = 92;
     this.step = 0;
     this.nextT = ctx.currentTime + 0.2;
-    // Dmaj9 - Bm9 - Gmaj7 - A6/9 ... cosy & spacey
+    // F#m9 – Dmaj7 – A6/9 – E6sus ... spacey, hopeful
     this.prog = [
-      { root: 50, notes: [62, 66, 69, 73, 76] },
-      { root: 47, notes: [59, 62, 66, 69, 73] },
-      { root: 43, notes: [59, 62, 66, 71, 74] },
-      { root: 45, notes: [61, 64, 66, 69, 71] },
-      { root: 50, notes: [62, 66, 69, 71, 76] },
-      { root: 42, notes: [61, 64, 69, 73, 76] },
-      { root: 43, notes: [62, 66, 67, 71, 74] },
-      { root: 45, notes: [61, 64, 67, 69, 73] },
+      { root: 42, notes: [57, 61, 64, 68, 73] },
+      { root: 38, notes: [57, 61, 62, 66, 69] },
+      { root: 45, notes: [59, 61, 64, 66, 71] },
+      { root: 40, notes: [56, 59, 61, 64, 68] },
+      { root: 42, notes: [57, 61, 64, 68, 71] },
+      { root: 38, notes: [54, 57, 62, 66, 69] },
+      { root: 47, notes: [59, 62, 66, 69, 71] },
+      { root: 40, notes: [56, 59, 64, 68, 71] },
     ];
+    this.arpPat = [0, 2, 1, 3, 2, 4, 3, 1];
     this.musicTimer = setInterval(() => this.schedule(), 30);
   }
   schedule() {
     const ctx = this.ctx;
     if (!ctx || ctx.state !== 'running') return;
-    const spb = 60 / this.bpm / 4; // 16th
+    const spb = 60 / this.bpm / 4;
     while (this.nextT < ctx.currentTime + 0.15) {
       this.playStep(this.step, this.nextT, spb);
-      const swing = this.step % 2 === 0 ? 1.12 : 0.88;
-      this.nextT += spb * swing;
+      this.nextT += spb * (this.step % 2 === 0 ? 1.06 : 0.94);
       this.step++;
     }
   }
@@ -390,55 +496,27 @@ export class AudioEngine {
     const s = step % 16;
     const chord = this.prog[bar % this.prog.length];
     const ctx = this.ctx;
-    const mood = this.mood;
-    const full = mood === 'shift';
-    const out = this.music;
+    const L = this.layers;
 
-    const voice = (f, dur, gain, type, attack, filt, detune = 0) => {
+    const voice = (out, f, dur, gain, type, attack, filt, detune = 0, filtEnv = 0) => {
       const o = ctx.createOscillator();
       o.type = type;
       o.frequency.value = f;
       o.detune.value = detune;
       const fl = ctx.createBiquadFilter();
       fl.type = 'lowpass';
-      fl.frequency.value = filt;
+      fl.frequency.setValueAtTime(filt + filtEnv, at);
+      if (filtEnv) fl.frequency.exponentialRampToValueAtTime(filt, at + dur * 0.6);
       const g = ctx.createGain();
       g.gain.setValueAtTime(0.0001, at);
       g.gain.exponentialRampToValueAtTime(gain, at + attack);
-      g.gain.setValueAtTime(gain, at + Math.max(attack, dur * 0.5));
+      g.gain.setValueAtTime(gain, at + Math.max(attack, dur * 0.4));
       g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
-      o.connect(fl).connect(g);
-      g.connect(out);
-      g.connect(this.musicRev);
+      o.connect(fl).connect(g).connect(out);
       o.start(at);
       o.stop(at + dur + 0.1);
     };
-
-    // pad: once per bar
-    if (s === 0) {
-      const barDur = spb * 16;
-      for (const n of chord.notes.slice(0, 4)) {
-        voice(NOTE(n), barDur * 1.05, 0.018, 'sawtooth', 0.9, 900, -6);
-        voice(NOTE(n), barDur * 1.05, 0.018, 'triangle', 0.9, 1400, 7);
-      }
-    }
-    // bass
-    if (full && (s === 0 || s === 7 || s === 10)) {
-      const n = s === 10 ? chord.root + 7 : chord.root;
-      voice(NOTE(n - 12 + 12), spb * (s === 0 ? 5 : 2.5), 0.12, 'sine', 0.01, 600);
-      voice(NOTE(n), spb * (s === 0 ? 5 : 2.5), 0.03, 'triangle', 0.01, 500);
-    }
-    // e-piano style arpeggio
-    const pattern = full ? [0, 3, 6, 8, 11, 14] : [0, 6, 11];
-    if (pattern.includes(s) && Math.random() < (full ? 0.82 : 0.6)) {
-      const n = chord.notes[Math.floor(Math.random() * chord.notes.length)] + (Math.random() < 0.25 ? 12 : 0);
-      const f = NOTE(n);
-      voice(f, spb * 6, 0.035, 'sine', 0.005, 3000);
-      voice(f * 2, spb * 2, 0.008, 'triangle', 0.003, 4000);
-    }
-    if (!full) return;
-    // drums
-    const noiseHit = (dur, type, f, gain, Q = 1) => {
+    const noiseHit = (out, dur, type, f, gain, Q = 1) => {
       const src = ctx.createBufferSource();
       src.buffer = this.noiseBuf;
       const fl = ctx.createBiquadFilter();
@@ -452,24 +530,59 @@ export class AudioEngine {
       src.start(at, Math.random());
       src.stop(at + dur + 0.05);
     };
-    if (s === 0 || s === 10 || (s === 7 && bar % 2 === 1)) {
+
+    if (s === 0) {
+      const barDur = spb * 16;
+      for (const n of chord.notes.slice(0, 4)) {
+        voice(L.pad, NOTE(n), barDur * 1.08, 0.014, 'sawtooth', 1.0, 900, -7);
+        voice(L.pad, NOTE(n), barDur * 1.08, 0.014, 'sawtooth', 1.0, 1100, 7);
+        voice(L.pad, NOTE(n - 12), barDur * 1.08, 0.012, 'triangle', 1.2, 700);
+      }
+    }
+    // keys (soft e-piano)
+    if ([0, 3, 6, 10, 13].includes(s) && Math.random() < 0.8) {
+      const n = chord.notes[(Math.random() * chord.notes.length) | 0] + (Math.random() < 0.2 ? 12 : 0);
+      voice(L.keys, NOTE(n), spb * 7, 0.03, 'sine', 0.005, 3000);
+      voice(L.keys, NOTE(n) * 2, spb * 2, 0.007, 'triangle', 0.003, 4000);
+    }
+    // bass
+    if (s === 0 || s === 6 || s === 10 || (s === 14 && bar % 2)) {
+      const n = s === 10 ? chord.root + 7 : chord.root;
+      voice(L.bass, NOTE(n), spb * (s === 0 ? 5 : 3), 0.11, 'sine', 0.01, 500);
+      voice(L.bass, NOTE(n), spb * (s === 0 ? 5 : 3), 0.035, 'sawtooth', 0.01, 300, 0, 900);
+    }
+    // arp (synthwave pluck)
+    if (s % 2 === 0) {
+      const idx = this.arpPat[(s / 2) % 8];
+      const n = chord.notes[idx % chord.notes.length] + 12;
+      voice(L.arp, NOTE(n), spb * 1.8, 0.03, 'sawtooth', 0.004, 900, 0, 2600);
+    }
+    // lead (overdrive III) — simple melodic motif
+    if (s === 0 || s === 4 || s === 7 || s === 12) {
+      const motif = [4, 3, 2, 3];
+      const n = chord.notes[motif[[0, 4, 7, 12].indexOf(s)]] + 12;
+      voice(L.lead, NOTE(n), spb * 3.5, 0.03, 'square', 0.02, 2400, 5);
+      voice(L.lead, NOTE(n), spb * 3.5, 0.02, 'sawtooth', 0.02, 2000, -5);
+    }
+    // drums
+    if (s === 0 || s === 8 || (s === 10 && bar % 2 === 1)) {
       const o = ctx.createOscillator();
-      o.frequency.setValueAtTime(110, at);
-      o.frequency.exponentialRampToValueAtTime(42, at + 0.18);
+      o.frequency.setValueAtTime(120, at);
+      o.frequency.exponentialRampToValueAtTime(40, at + 0.16);
       const g = ctx.createGain();
-      g.gain.setValueAtTime(0.32, at);
-      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.32);
-      o.connect(g).connect(out);
+      g.gain.setValueAtTime(0.4, at);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.3);
+      o.connect(g).connect(L.drums);
       o.start(at);
-      o.stop(at + 0.4);
+      o.stop(at + 0.35);
     }
     if (s === 4 || s === 12) {
-      noiseHit(0.18, 'bandpass', 1800, 0.09, 0.8);
-      noiseHit(0.08, 'lowpass', 400, 0.06);
+      noiseHit(L.drums, 0.2, 'bandpass', 1900, 0.11, 0.7);
+      noiseHit(L.drums, 0.07, 'lowpass', 500, 0.08);
     }
-    if (s % 2 === 0) noiseHit(0.035, 'highpass', 7000, s % 4 === 2 ? 0.035 : 0.02);
-    // vinyl crackle
-    if (Math.random() < 0.25) noiseHit(0.01, 'highpass', 3000, 0.012 + Math.random() * 0.02);
+    if (s % 2 === 0) noiseHit(L.hats, 0.04, 'highpass', 8000, s % 4 === 2 ? 0.04 : 0.022);
+    if (s % 2 === 1 && Math.random() < 0.4) noiseHit(L.hats, 0.02, 'highpass', 9000, 0.015);
+    if (Math.random() < 0.2) noiseHit(L.keys, 0.01, 'highpass', 3000, 0.01 + Math.random() * 0.015);
   }
 }
 

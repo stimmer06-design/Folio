@@ -11,16 +11,20 @@ const PC_IN_BOX = V3(0, 0.48, 0); // box-local
 const TOP_FOAM_Y = 5.48;
 const BOX_TOP_WORLD = BOX_POS.y + BOX.H;
 const TABLE_Y = -2.2;
+const TAPE_BINS = 52;
+const TAPE_HALF = BOX.W / 2;
+const TAPE_Y = BOX.H + 0.072;
 
 const ITEM_SPOTS = {
-  foam: { pos: V3(-11.6, TABLE_Y, 0.2), quat: qEuler(0, Math.PI / 2, 0) },
-  kit: { pos: V3(-10.0, TABLE_Y, 3.25), quat: qEuler(0, 0.12, 0) },
-  keyboard: { pos: V3(-7.4, TABLE_Y, 3.3), quat: qEuler(0, -0.05, 0) },
-  mouse: { pos: V3(-5.4, TABLE_Y, 3.3), quat: qEuler(0, 0.2, 0) },
+  foam: { pos: V3(-11.4, TABLE_Y, 0.4), quat: qEuler(0, Math.PI / 2, 0) },
+  kit: { pos: V3(-9.6, TABLE_Y, 3.25), quat: qEuler(0, 0.12, 0) },
+  keyboard: { pos: V3(-7.1, TABLE_Y, 3.3), quat: qEuler(0, -0.05, 0) },
+  mouse: { pos: V3(-5.0, TABLE_Y, 3.3), quat: qEuler(0, 0.2, 0) },
   card: { pos: V3(-4.25, TABLE_Y, 2.1), quat: qEuler(0, -0.3, 0) },
 };
 const PRINTER_POS = V3(-4.25, TABLE_Y, 0.25);
 const BUTTON_POS = V3(-4.2, TABLE_Y, -1.75);
+const LABEL_LOCAL = V3(1.4, BOX.H + 0.08, -0.8);
 
 export class Packing {
   constructor(game) {
@@ -43,6 +47,20 @@ export class Packing {
     this.hintArrow = MD.buildHintArrow();
     this.hintArrow.visible = false;
     this.scene.add(this.hintArrow);
+    this.pod = MD.buildPod();
+    this.pod.visible = false;
+    this.scene.add(this.pod);
+    // stamp timing rings
+    const ring = (color, op) => {
+      const m = new THREE.Mesh(new THREE.RingGeometry(0.62, 0.7, 64), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+      m.rotation.x = -Math.PI / 2;
+      m.renderOrder = 999;
+      m.visible = false;
+      this.scene.add(m);
+      return m;
+    };
+    this.stampTarget = ring('#facc15', 0.9);
+    this.stampCloser = ring('#67e8f9', 0.9);
     this.tmp = V3();
   }
 
@@ -53,14 +71,14 @@ export class Packing {
     this.pc = null;
     this.items = [];
     this.clickables = [];
-    this.tape = { lo: 0, hi: 0, started: false, done: false, mesh: null };
     this.labelDone = false;
+    this.folds = [];
+    this.stamp = null;
     const box = MD.buildBox();
     box.position.copy(BOX_POS);
     this.scene.add(box);
     this.box = box;
     this.flaps = box.userData.flaps;
-    // items on the table
     const need = ['kit', ...order.peripherals];
     const addItem = (kind, required, obj) => {
       const spot = ITEM_SPOTS[kind];
@@ -75,21 +93,28 @@ export class Packing {
     this.foam = addItem('foam', true, MD.buildTopFoam());
     for (const k of need) addItem(k, true, MD.buildAccessory(k));
     this.card = addItem('card', false, MD.buildAccessory('card'));
-    // tape strip
-    const tapeMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 0.008, 0.42), M.tape);
-    tapeMesh.position.set(0, BOX.H + 0.072, 0);
-    tapeMesh.visible = false;
-    tapeMesh.castShadow = false;
-    box.add(tapeMesh);
-    this.tape.mesh = tapeMesh;
+    // freehand tape ribbon
+    this.tape = { bins: new Array(TAPE_BINS).fill(null), started: false, done: false, strokes: 0, dragging: false, lastX: 0 };
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(TAPE_BINS * 2 * 3), 3));
+    geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(TAPE_BINS * 2 * 2), 2));
+    const idx = [];
+    for (let i = 0; i < TAPE_BINS - 1; i++) {
+      const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
+      idx.push(a, c, b, b, c, d);
+    }
+    geo.setIndex(idx);
+    geo.setDrawRange(0, 0);
+    this.tapeMesh = new THREE.Mesh(geo, M.tape);
+    this.tapeMesh.frustumCulled = false;
+    box.add(this.tapeMesh);
     this.tapeEnds = [-1, 1].map((sx) => {
       const m = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.6, 0.42), M.tape);
-      m.position.set(sx * (BOX.W / 2 + 0.004), BOX.H - 0.25, 0);
+      m.position.set(sx * (TAPE_HALF + 0.004), BOX.H - 0.25, 0);
       m.visible = false;
       box.add(m);
       return m;
     });
-    // label
     const tex = T.toTex(MD.labelCanvas(order));
     this.labelTex = tex;
     const label = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.79), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7 }));
@@ -118,18 +143,17 @@ export class Packing {
       });
       f.piv.userData.it = { type: 'click', c, flap: f };
     });
-    const tc = add({
+    add({
       id: 'tape', color: '#fde047', size: 0.8,
       avail: () => this.stage === 'tape' && !this.tape.started,
-      pos: () => this.box.localToWorld(V3(-BOX.W / 2 + 0.2, BOX.H + 0.2, 0)),
+      pos: () => this.box.localToWorld(V3(-TAPE_HALF + 0.2, BOX.H + 0.2, 0)),
       onClick: () => {},
     });
-    this.tapeClick = tc;
     const lc = add({
       id: 'label', color: '#fde047', size: 0.7,
       avail: () => this.stage === 'label' && this.label.userData.ready,
       pos: () => this.label.getWorldPosition(this.tmp).clone().add(V3(0, 0.2, 0)),
-      onClick: () => this.applyLabel(),
+      onClick: () => this.pickLabel(),
     });
     this.label.userData.it = { type: 'click', c: lc };
     const sc = add({
@@ -154,7 +178,7 @@ export class Packing {
     for (const c of this.clickables) c.marker.removeFromParent();
     if (this.box) {
       this.box.removeFromParent();
-      this.tape.mesh.geometry.dispose();
+      this.tapeMesh.geometry.dispose();
       this.tapeEnds.forEach((m) => m.geometry.dispose());
     }
     if (this.label) {
@@ -164,7 +188,6 @@ export class Packing {
       this.labelTex.dispose();
     }
     if (this.pc) {
-      // free per-order geometry (cables, pick-boxes); shared part geometry stays cached
       this.pc.traverse((o) => {
         if (o.isMesh && o.geometry && !o.geometry.userData.shared) o.geometry.dispose();
       });
@@ -177,6 +200,8 @@ export class Packing {
     this.held = null;
     this.hintArrow.visible = false;
     this.tapeGun.visible = false;
+    this.stampTarget.visible = this.stampCloser.visible = false;
+    this.pod.visible = false;
     M.redBtn.emissiveIntensity = 0.2;
   }
 
@@ -186,7 +211,7 @@ export class Packing {
   }
   currentStep() {
     const s = this.stage;
-    if (s === 'pc') return { text: 'Drag the finished PC into the shipping box', target: () => this.pc.localToWorld(V3(0, 5.4, 0)) };
+    if (s === 'pc') return { text: 'Drag the finished PC into the shipping box — centre it for a PERFECT', target: () => this.pc.localToWorld(V3(0, 5.4, 0)) };
     if (s === 'foam') return { text: 'Drag the top foam insert onto the PC', target: () => this.foam.obj.localToWorld(V3(0, 0.6, 0)) };
     if (s === 'acc') {
       const next = this.items.find((i) => i.required && i.state === 'table' && i.kind !== 'foam');
@@ -198,11 +223,12 @@ export class Packing {
     if (s === 'flaps') {
       const shortOpen = this.flaps.filter((f) => f.kind === 'short' && !f.done);
       const f = shortOpen[0] || this.flaps.find((x) => !x.done);
-      const extra = this.card.state === 'table' ? '  ·  Tip: a thank-you card earns a bonus!' : '';
-      return { text: (shortOpen.length ? 'Fold the short side flaps first' : 'Now fold the long flaps') + extra, target: () => f.piv.children[0].getWorldPosition(V3()) };
+      const extra = this.card.state === 'table' && !this.flaps.some((x) => x.done) ? '  ·  Add the thank-you card for a tip!' : '';
+      return { text: (shortOpen.length ? 'Fold the short flaps, then the long ones — fast for a SPEED FOLD' : 'Now fold the long flaps') + extra, target: () => f.piv.children[0].getWorldPosition(V3()) };
     }
-    if (s === 'tape') return { text: this.g.hasUpgrade('tapegun') ? 'Click the seam to fire the tape gun' : 'Drag along the seam to tape the box shut', target: () => this.box.localToWorld(V3(this.tape.started ? this.tape.hi : -BOX.W / 2 + 0.3, BOX.H + 0.1, 0)) };
-    if (s === 'label') return { text: 'Click the printed shipping label to stick it on', target: () => this.label.getWorldPosition(V3()) };
+    if (s === 'tape') return { text: this.g.hasUpgrade('tapegun') ? 'Click the seam to fire the tape gun' : 'Drag ONE straight line along the seam to tape the box', target: () => this.box.localToWorld(V3(this.tape.started ? this.tape.lastX : -TAPE_HALF + 0.3, BOX.H + 0.1, 0)) };
+    if (s === 'label') return { text: 'Click the printed shipping label', target: () => this.label.getWorldPosition(V3()) };
+    if (s === 'stamp') return { text: 'CLICK when the blue ring meets the gold ring!', target: () => this.box.localToWorld(LABEL_LOCAL.clone()) };
     if (s === 'ship') return { text: 'Hit the big red SHIP button!', target: () => this.button.localToWorld(V3(0, 1.4, 0)) };
     return null;
   }
@@ -241,12 +267,16 @@ export class Packing {
 
   onDown(ndc, ev) {
     if (!this.active || this.busy) return;
+    if (this.stage === 'stamp') {
+      this.doStamp();
+      return;
+    }
     if (this.held) {
       if (this.held.sticky) this.release();
       return;
     }
     const it = this.pickHit(ndc);
-    if (this.stage === 'tape' && it && (it.type === 'box' || (it.type === 'click' && (it.c.id === 'tape' || it.c.id.startsWith('flap'))))) {
+    if (this.stage === 'tape' && it && (it.type === 'box' || it.type === 'pc' || (it.type === 'click' && (it.c.id === 'tape' || it.c.id.startsWith('flap'))))) {
       this.startTape(ndc);
       return;
     }
@@ -298,7 +328,7 @@ export class Packing {
   startHold(item, ev, planeY) {
     item.state = 'held';
     tweens.cancel(item.obj.uuid + ':xf');
-    this.held = { item, plane: new THREE.Plane(V3(0, 1, 0), -planeY), planeY, t0: performance.now(), x0: ev.clientX, y0: ev.clientY, moved: false, sticky: false, magnet: false, grab: null };
+    this.held = { item, plane: new THREE.Plane(V3(0, 1, 0), -planeY), planeY, t0: performance.now(), x0: ev.clientX, y0: ev.clientY, moved: false, sticky: false, magnet: false, d: 9 };
     audio.play('pick', { pitch: item.kind === 'pc' ? 0.6 : 1 });
   }
 
@@ -311,14 +341,15 @@ export class Packing {
     if (this.tape.dragging) return;
     const it = this.pickHit(ndc);
     let cur = 'default';
-    if (it) {
+    if (this.stage === 'stamp') cur = 'crosshair';
+    else if (it) {
       if (it.type === 'item' && it.item.state === 'table') cur = 'grab';
       else if (it.type === 'pc' && this.stage === 'pc') cur = 'grab';
       else if (it.type === 'click' && it.c.avail()) cur = 'pointer';
       else if (this.stage === 'tape' && (it.type === 'box' || it.type === 'click')) cur = 'crosshair';
     }
     this.g.setCursor(cur);
-    if (it && it.type === 'item' && it.item.state === 'table' && it.item.kind === 'card') this.g.ui.tooltip({ title: 'Thank-you card', sub: 'Optional — customers love it (+tip)', cat: 'Bonus', color: '#facc15' }, ev.clientX, ev.clientY);
+    if (it && it.type === 'item' && it.item.state === 'table' && it.item.kind === 'card') this.g.ui.tooltip({ title: 'Thank-you card', sub: 'Optional — colonists love it (+tip)', cat: 'Bonus', color: '#facc15' }, ev.clientX, ev.clientY);
     else this.g.ui.tooltip(null);
   }
 
@@ -341,9 +372,11 @@ export class Packing {
     const h = this.held;
     if (!h) return;
     this.held = null;
-    const item = h.item;
-    if (h.magnet) this.drop(item);
-    else this.returnHome(item);
+    if (h.magnet) {
+      const big = h.item.kind === 'pc' || h.item.kind === 'foam';
+      const tier = h.d < (big ? 0.35 : 0.18) ? 'perfect' : h.d < (big ? 0.8 : 0.4) ? 'great' : 'good';
+      this.drop(h.item, tier);
+    } else this.returnHome(h.item);
   }
 
   async returnHome(item) {
@@ -353,15 +386,15 @@ export class Packing {
     item.state = item.kind === 'pc' ? 'bench' : 'table';
   }
 
-  async drop(item) {
+  async drop(item, tier) {
     item.state = 'anim';
     this.busy = true;
     const target = this.targetFor(item);
     const obj = item.obj;
     const over = target.clone();
     over.y = obj.position.y;
-    await tweenObj(obj, { pos: over, quat: QI(), duration: 0.12 });
-    const fall = item.kind === 'pc' ? 0.75 : 0.3;
+    await tweenObj(obj, { pos: over, quat: QI(), duration: 0.1 });
+    const fall = item.kind === 'pc' ? 0.6 : 0.26;
     await tweenObj(obj, { pos: target, duration: fall, ease: item.kind === 'pc' ? Ease.inOutSine : Ease.inQuad });
     this.box.attach(obj);
     item.state = 'in';
@@ -370,122 +403,166 @@ export class Packing {
     if (item.kind === 'pc') {
       audio.play('foam');
       audio.play('thump');
-      this.g.fx.shake(0.1);
-      this.g.fx.burst(this.box.localToWorld(V3(0, 0.6, 1.6)), { count: 30, color: '#e2e8f0', color2: '#cbd5e1', speed: 2.5, up: 0.5 });
-      this.g.onAction(wp.add(V3(0, 5, 0)), 'Snug as a bug!');
+      this.g.fx.shake(0.12);
+      this.g.fx.burst(this.box.localToWorld(V3(0, 0.6, 1.6)), { count: 36, color: '#e2e8f0', color2: '#cbd5e1', speed: 2.8, up: 0.5 });
+      this.g.judge('pack', tier, wp.add(V3(0, 5, 0)), tier === 'perfect' ? 'Dead centre!' : null);
       this.stage = 'foam';
       this.g.onPackStage('foam');
     } else if (item.kind === 'foam') {
       audio.play('foam');
-      this.g.fx.burst(wp, { count: 24, color: '#f1f5f9', color2: '#e2e8f0', speed: 2.2, up: 0.4 });
-      this.g.onAction(wp, 'Cushioned!');
+      this.g.fx.burst(wp, { count: 26, color: '#f1f5f9', color2: '#e2e8f0', speed: 2.2, up: 0.4 });
+      this.g.judge('pack', tier, wp);
       this.stage = this.requiredItemsIn() ? 'flaps' : 'acc';
     } else {
       audio.play(item.kind === 'card' ? 'pop' : 'cardboard', { pitch: 1.3 });
-      this.g.fx.burst(wp, { count: 16, speed: 1.8 });
-      this.g.onAction(wp, item.kind === 'card' ? 'Aww! +Tip' : 'Packed!');
-      if (item.kind === 'card') this.g.orderStats.card = true;
+      this.g.fx.burst(wp, { count: 18, speed: 1.8 });
+      if (item.kind === 'card') {
+        this.g.orderStats.card = true;
+        this.g.action(wp, '♥ +TIP');
+      } else this.g.judge('pack', tier, wp);
       if (this.stage === 'acc' && this.requiredItemsIn()) this.stage = 'flaps';
     }
   }
 
   async clickFlap(f) {
-    const list = this.g.hasUpgrade('flapper')
+    if (this.card.state === 'held') return;
+    const flapper = this.g.hasUpgrade('flapper');
+    const list = flapper
       ? [...this.flaps.filter((x) => x.kind === 'short' && !x.done), ...this.flaps.filter((x) => x.kind === 'long' && !x.done)]
       : [f];
-    if (this.card.state === 'held') return;
     for (const fl of list) fl.done = true;
     this.busy = true;
     for (const fl of list) {
       const a0 = fl.piv.rotation[fl.axis];
-      await tweens.add({ duration: 0.26, ease: Ease.outBackSoft, update: (e) => (fl.piv.rotation[fl.axis] = a0 * (1 - e)) });
-      audio.play('cardboard', { pitch: 0.9 + Math.random() * 0.3 });
-      this.g.fx.shake(0.025);
+      await tweens.add({ duration: 0.2, ease: Ease.outBackSoft, update: (e) => (fl.piv.rotation[fl.axis] = a0 * (1 - e)) });
+      audio.play('cardboard', { pitch: 0.9 + this.folds.length * 0.08 });
+      this.g.fx.shake(0.03);
+      this.folds.push(this.g.time);
     }
     this.busy = false;
-    this.g.onAction(f.piv.getWorldPosition(V3()).add(V3(0, 0.6, 0)), list.length > 1 ? 'Folded ×' + list.length : 'Fold!');
+    const pos = f.piv.getWorldPosition(V3()).add(V3(0, 0.6, 0));
     if (this.flaps.every((x) => x.done)) {
-      // the card/accessories can no longer be added
+      const span = this.folds[this.folds.length - 1] - this.folds[0];
+      const speed = flapper || span < 2.6;
+      this.g.judge('fold', speed ? 'perfect' : 'great', this.box.localToWorld(V3(0, BOX.H + 0.8, 0)), speed ? 'SPEED FOLD!' : 'Folded');
       this.stage = 'tape';
       this.tapeGun.visible = true;
-      this.tapeGun.position.copy(this.box.localToWorld(V3(-BOX.W / 2 - 0.1, BOX.H + 0.08, 0)));
+      this.tapeGun.position.copy(this.box.localToWorld(V3(-TAPE_HALF - 0.1, BOX.H + 0.08, 0)));
       this.tapeGun.rotation.set(0, Math.PI, 0);
-    }
+    } else this.g.action(pos, 'FOLD');
   }
 
-  // ------------------------------------------------------------------ tape
+  // ------------------------------------------------------------------ tape (freehand ribbon)
   startTape(ndc) {
+    if (this.tape.done) return;
     if (this.g.hasUpgrade('tapegun')) {
       this.autoTape();
       return;
     }
-    const x = this.tapeX(ndc);
-    if (x === null) return;
-    if (!this.tape.started) {
-      this.tape.started = true;
-      this.tape.lo = this.tape.hi = x;
-      this.tape.mesh.visible = true;
-    }
+    const p = this.tapePoint(ndc);
+    if (!p) return;
+    this.tape.started = true;
     this.tape.dragging = true;
-    this.tape.lastX = x;
+    this.tape.strokes++;
+    this.tape.lastX = p.x;
     this.tape.lastT = performance.now();
     audio.tapeStart();
   }
-  tapeX(ndc) {
+  tapePoint(ndc) {
     const rc = this.g.raycaster;
     rc.setFromCamera(ndc, this.g.camera);
     const plane = new THREE.Plane(V3(0, 1, 0), -(BOX_TOP_WORLD + 0.07));
     const p = rc.ray.intersectPlane(plane, V3());
     if (!p) return null;
-    const local = this.box.worldToLocal(p);
-    return clamp(local.x, -BOX.W / 2, BOX.W / 2);
+    const l = this.box.worldToLocal(p);
+    return { x: clamp(l.x, -TAPE_HALF, TAPE_HALF), z: clamp(l.z, -0.6, 0.6) };
   }
-  updateTapeMesh() {
-    const t = this.tape;
-    const len = Math.max(0.02, t.hi - t.lo);
-    t.mesh.scale.x = len;
-    t.mesh.position.x = (t.lo + t.hi) / 2;
-    M.tape.map.repeat.x = len / 2.4;
-    M.tape.map.offset.x = 0;
-    this.tapeGun.position.copy(this.box.localToWorld(V3(t.lastX !== undefined ? t.lastX : t.hi, BOX.H + 0.08, 0)));
+  binX(i) {
+    return -TAPE_HALF + (i / (TAPE_BINS - 1)) * BOX.W;
+  }
+  paintTape(x0, x1, z) {
+    const a = Math.min(x0, x1), b = Math.max(x0, x1);
+    for (let i = 0; i < TAPE_BINS; i++) {
+      const bx = this.binX(i);
+      if (bx >= a - 0.06 && bx <= b + 0.06 && this.tape.bins[i] === null) this.tape.bins[i] = z;
+    }
+  }
+  rebuildTape() {
+    const bins = this.tape.bins;
+    const pos = this.tapeMesh.geometry.attributes.position;
+    const uv = this.tapeMesh.geometry.attributes.uv;
+    let first = -1, last = -1;
+    for (let i = 0; i < TAPE_BINS; i++) if (bins[i] !== null) {
+      if (first < 0) first = i;
+      last = i;
+    }
+    if (first < 0) return;
+    // interpolate holes inside the covered span
+    let k = 0;
+    for (let i = first; i <= last; i++) {
+      let z = bins[i];
+      if (z === null) {
+        let j = i + 1;
+        while (j <= last && bins[j] === null) j++;
+        const zl = bins[i - 1] !== null ? bins[i - 1] : 0, zr = j <= last ? bins[j] : zl;
+        z = zl + (zr - zl) * 0.5;
+      }
+      const x = this.binX(i);
+      pos.setXYZ(k * 2, x, TAPE_Y, z - 0.21);
+      pos.setXYZ(k * 2 + 1, x, TAPE_Y, z + 0.21);
+      uv.setXY(k * 2, x / 2.4, 0);
+      uv.setXY(k * 2 + 1, x / 2.4, 1);
+      k++;
+    }
+    pos.needsUpdate = uv.needsUpdate = true;
+    this.tapeMesh.geometry.setDrawRange(0, Math.max(0, (k - 1) * 6));
+    this.tapeMesh.geometry.computeBoundingSphere();
+    this.tape.coverage = k / TAPE_BINS;
   }
   async autoTape() {
-    if (this.tape.done) return;
     this.tape.started = true;
-    this.tape.mesh.visible = true;
     this.busy = true;
     audio.tapeStart();
-    this.tape.lo = -BOX.W / 2;
     await tweens.add({
-      duration: 0.65, ease: Ease.inOutSine,
+      duration: 0.6, ease: Ease.inOutSine,
       update: (e) => {
-        this.tape.hi = -BOX.W / 2 + e * BOX.W;
-        this.tape.lastX = this.tape.hi;
+        const x = -TAPE_HALF + e * BOX.W;
+        this.paintTape(-TAPE_HALF, x, 0);
+        this.tape.lastX = x;
         audio.tapeLevel(0.3);
-        this.updateTapeMesh();
+        this.rebuildTape();
+        this.tapeGun.position.copy(this.box.localToWorld(V3(x, BOX.H + 0.08, 0)));
       },
     });
     audio.tapeStop();
     this.busy = false;
-    this.finishTape();
+    this.finishTape(true);
   }
-  finishTape() {
+  finishTape(auto = false) {
     if (this.tape.done) return;
     this.tape.done = true;
     this.tape.dragging = false;
     audio.tapeStop();
-    this.tape.lo = -BOX.W / 2;
-    this.tape.hi = BOX.W / 2;
-    this.updateTapeMesh();
+    const bins = this.tape.bins;
+    for (let i = 0; i < TAPE_BINS; i++) if (bins[i] === null) bins[i] = bins[i - 1] !== undefined && bins[i - 1] !== null ? bins[i - 1] : 0;
+    this.rebuildTape();
+    this.tapeEnds[0].position.z = bins[0];
+    this.tapeEnds[1].position.z = bins[TAPE_BINS - 1];
     this.tapeEnds.forEach((m) => (m.visible = true));
     audio.play('rip');
-    this.g.fx.burst(this.box.localToWorld(V3(BOX.W / 2, BOX.H, 0)), { count: 20, color: '#fde68a', color2: '#fbbf24', speed: 2 });
-    this.g.onAction(this.box.localToWorld(V3(0, BOX.H + 0.6, 0)), 'Sealed tight!');
+    // grade: how straight and how continuous was the run?
+    const mean = bins.reduce((a, z) => a + Math.abs(z), 0) / TAPE_BINS;
+    const straight = clamp(1 - mean / 0.3, 0, 1) * (this.tape.strokes <= 1 ? 1 : this.tape.strokes === 2 ? 0.8 : 0.6);
+    const tier = auto ? 'perfect' : straight >= 0.82 ? 'perfect' : straight >= 0.6 ? 'great' : straight >= 0.35 ? 'good' : 'sloppy';
+    const at = this.box.localToWorld(V3(0, BOX.H + 0.6, 0));
+    this.g.fx.burst(this.box.localToWorld(V3(TAPE_HALF, BOX.H, 0)), { count: 24, color: '#fde68a', color2: '#fbbf24', speed: 2 });
+    this.g.judge('tape', tier, at, tier === 'perfect' ? 'Laser straight!' : tier === 'sloppy' ? 'Wonky tape…' : null);
     this.tapeGun.visible = false;
     this.stage = 'label';
     this.printLabel();
   }
 
+  // ------------------------------------------------------------------ label & stamp timing
   async printLabel() {
     const lbl = this.label;
     lbl.userData.ready = false;
@@ -496,34 +573,66 @@ export class Packing {
     lbl.scale.set(0.6, 0.01, 0.6);
     audio.play('printer');
     const out = this.printer.localToWorld(V3(0, 0.5, 0.85));
-    await tweens.add({ duration: 0.65, ease: Ease.linear, update: (e) => { lbl.position.lerpVectors(base, out, e); lbl.scale.set(0.6, 0.01 + e * 0.59, 0.6); } });
+    await tweens.add({ duration: 0.6, ease: Ease.linear, update: (e) => { lbl.position.lerpVectors(base, out, e); lbl.scale.set(0.6, 0.01 + e * 0.59, 0.6); } });
     lbl.scale.set(0.6, 0.6, 0.6);
     lbl.userData.ready = true;
     if (this.g.hasUpgrade('labeler')) {
-      await wait(0.15);
-      this.applyLabel();
+      await wait(0.1);
+      this.pickLabel(true);
     }
   }
 
-  async applyLabel() {
-    if (this.labelDone) return;
+  async pickLabel(auto = false) {
+    if (this.labelDone || this.stage !== 'label') return;
     this.labelDone = true;
     const lbl = this.label;
     lbl.userData.ready = false;
     audio.play('whoosh');
-    const target = this.box.localToWorld(V3(1.4, BOX.H + 0.08, -0.8));
+    const target = this.box.localToWorld(LABEL_LOCAL.clone());
     const q = this.box.quaternion.clone().multiply(qEuler(-Math.PI / 2, 0, 0.06));
-    const lift = target.clone().add(V3(0, 1.0, 0));
-    await tweenObj(lbl, { pos: lift, quat: q, scale: 1.0, duration: 0.35, ease: Ease.inOutCubic });
-    await tweenObj(lbl, { pos: target, duration: 0.1, ease: Ease.inQuad });
+    await tweenObj(lbl, { pos: target.clone().add(V3(0, 1.1, 0)), quat: q, scale: 1.0, duration: 0.32, ease: Ease.inOutCubic });
+    if (auto) {
+      this.stamp = { t0: this.g.time, auto: true };
+      this.doStamp(true);
+      return;
+    }
+    this.stage = 'stamp';
+    this.stamp = { t0: this.g.time };
+    this.stampTarget.visible = this.stampCloser.visible = true;
+    this.stampTarget.position.copy(target).add(V3(0, 0.05, 0));
+    this.stampCloser.position.copy(this.stampTarget.position);
+  }
+  stampScale() {
+    const period = 1.0;
+    const k = ((this.g.time - this.stamp.t0) % period) / period;
+    return 3.0 - k * 2.6; // 3.0 → 0.4, target is 1.0
+  }
+  async doStamp(auto = false) {
+    if (!this.stamp || this.stamp.done) return;
+    this.stamp.done = true;
+    const err = auto ? 0 : Math.abs(this.stampScale() - 1);
+    const tier = err < 0.13 ? 'perfect' : err < 0.32 ? 'great' : err < 0.65 ? 'good' : 'sloppy';
+    this.stampTarget.visible = this.stampCloser.visible = false;
+    const lbl = this.label;
+    const target = this.box.localToWorld(LABEL_LOCAL.clone());
+    // sloppy stamps land a little crooked
+    if (tier !== 'perfect') {
+      const off = { great: 0.06, good: 0.14, sloppy: 0.28 }[tier];
+      target.x += (Math.random() - 0.5) * off * 2;
+      target.z += (Math.random() - 0.5) * off * 2;
+      lbl.rotateZ((Math.random() - 0.5) * off * 2);
+    }
+    await tweenObj(lbl, { pos: target, duration: 0.08, ease: Ease.inQuad });
     this.box.attach(lbl);
     audio.play('stamp');
-    this.g.fx.shake(0.06);
-    this.g.fx.burst(target.clone().add(V3(0, 0.1, 0)), { count: 20, speed: 2.5, color: '#ffffff', color2: '#c4b5fd' });
-    this.g.onAction(target.clone().add(V3(0, 0.5, 0)), 'Labelled!');
+    this.g.fx.shake(tier === 'perfect' ? 0.1 : 0.05);
+    this.g.fx.ring(target.clone().add(V3(0, 0.05, 0)), { color: tier === 'perfect' ? '#facc15' : '#ffffff', radius: 1.4, axis: 'y' });
+    this.g.fx.burst(target.clone().add(V3(0, 0.1, 0)), { count: 24, speed: 2.6, color: '#ffffff', color2: '#c4b5fd' });
+    this.g.judge('stamp', tier, target.clone().add(V3(0, 0.6, 0)), tier === 'perfect' ? 'Dead centre!' : null);
     this.stage = 'ship';
   }
 
+  // ------------------------------------------------------------------ ship & launch
   async ship() {
     if (this.stage !== 'ship') return;
     this.stage = 'shipping';
@@ -532,20 +641,64 @@ export class Packing {
     await tweens.add({ duration: 0.08, update: (e) => (cap.position.y = 1.2 - e * 0.08) });
     audio.play('stamp');
     tweens.add({ duration: 0.2, delay: 0.1, update: (e) => (cap.position.y = 1.12 + e * 0.08) });
+    this.g.action(this.button.getWorldPosition(V3()).add(V3(0, 1.6, 0)), 'SHIP IT!');
     this.g.onShipStart();
+    const air = this.g.env.airlock;
+    air.target = 1;
+    air.alarm = 4;
     audio.play('conveyor');
     this.spinRollers = true;
     const from = this.box.position.clone();
-    const to = V3(-25, from.y, from.z);
-    await tweens.add({ duration: 2.1, ease: Ease.inCubic, update: (e) => this.box.position.lerpVectors(from, to, e) });
+    const to = V3(-24.5, from.y, from.z);
+    await tweens.add({ duration: 1.8, ease: Ease.inCubic, update: (e) => this.box.position.lerpVectors(from, to, e) });
     this.spinRollers = false;
+    this.box.visible = false;
+    air.target = 0;
+    if (gen !== this.g.gen) return;
+    await this.launchPod(gen);
     if (gen !== this.g.gen) return;
     audio.play('cash');
     this.g.onShipped();
   }
 
+  async launchPod(gen) {
+    this.g.onLaunch();
+    await wait(0.5);
+    const pod = this.pod;
+    pod.visible = true;
+    const P = [V3(-23.5, -1.5, -8), V3(-16, 1, -24), V3(15, 4, -55), V3(60, 4, -80)];
+    const bez = (t) => {
+      const u = 1 - t;
+      return P[0].clone().multiplyScalar(u * u * u).add(P[1].clone().multiplyScalar(3 * u * u * t)).add(P[2].clone().multiplyScalar(3 * u * t * t)).add(P[3].clone().multiplyScalar(t * t * t));
+    };
+    audio.play('launch');
+    this.g.post.pulse('#bae6fd', 0.15);
+    const q = new THREE.Quaternion();
+    let lastBurst = 0;
+    await tweens.add({
+      duration: 2.8, ease: Ease.inCubic,
+      update: (e, k) => {
+        const p = bez(e), p2 = bez(Math.min(1, e + 0.02));
+        pod.position.copy(p);
+        const dir = p2.sub(p);
+        if (dir.lengthSq() > 1e-6) {
+          q.setFromUnitVectors(V3(1, 0, 0), dir.normalize());
+          pod.quaternion.copy(q);
+        }
+        pod.userData.flame.scale.set(1, 0.8 + Math.random() * 0.5, 1);
+        if (k - lastBurst > 0.02) {
+          lastBurst = k;
+          const tail = pod.localToWorld(V3(-3.2, 0, 0));
+          this.g.fx.burst(tail, { count: 6, color: '#7dd3fc', color2: '#fb923c', speed: 1.2, size: 1.4, life: 1.1, up: 0 });
+        }
+      },
+    });
+    pod.visible = false;
+    if (gen === this.g.gen) this.g.post.pulse('#ffffff', 0.12);
+  }
+
   // ------------------------------------------------------------------ frame
-  update(dt, t, ndc) {
+  update(dt, t) {
     if (this.spinRollers) for (const r of this.g.env.rollers) r.rotation.y += dt * 12;
     if (!this.active) return;
     const h = this.held;
@@ -559,10 +712,11 @@ export class Packing {
         const target = this.targetFor(h.item);
         const pos = p.clone();
         const d = Math.hypot(pos.x - target.x, pos.z - target.z);
+        h.d = d;
         h.magnet = d < (h.item.kind === 'pc' || h.item.kind === 'foam' ? 1.8 : 0.9);
         if (h.magnet) {
-          pos.x = target.x * 0.85 + pos.x * 0.15;
-          pos.z = target.z * 0.85 + pos.z * 0.15;
+          pos.x = target.x * 0.6 + pos.x * 0.4;
+          pos.z = target.z * 0.6 + pos.z * 0.4;
         }
         obj.position.x = damp(obj.position.x, pos.x, 16, dt);
         obj.position.z = damp(obj.position.z, pos.z, 16, dt);
@@ -570,20 +724,25 @@ export class Packing {
       }
     }
     if (this.tape.dragging) {
-      const x = this.tapeX(this.g.pointer);
-      if (x !== null) {
+      const p = this.tapePoint(this.g.pointer);
+      if (p) {
         const now = performance.now();
-        const v = Math.abs(x - this.tape.lastX) / Math.max(1, now - this.tape.lastT) * 1000;
-        this.tape.lastX = x;
+        const v = (Math.abs(p.x - this.tape.lastX) / Math.max(1, now - this.tape.lastT)) * 1000;
+        this.paintTape(this.tape.lastX, p.x, p.z);
+        this.tape.lastX = p.x;
         this.tape.lastT = now;
-        this.tape.lo = Math.min(this.tape.lo, x);
-        this.tape.hi = Math.max(this.tape.hi, x);
         audio.tapeLevel(clamp(v / 12, 0, 1) * 0.35);
-        this.updateTapeMesh();
-        if (this.tape.hi - this.tape.lo >= BOX.W * 0.94) this.finishTape();
+        this.rebuildTape();
+        this.tapeGun.position.copy(this.box.localToWorld(V3(p.x, BOX.H + 0.08, p.z)));
+        if (this.tape.coverage >= 0.96) this.finishTape();
       }
     }
-    // markers
+    if (this.stage === 'stamp' && this.stamp && !this.stamp.done) {
+      const s = this.stampScale();
+      this.stampCloser.scale.setScalar(s);
+      const err = Math.abs(s - 1);
+      this.stampCloser.material.color.set(err < 0.13 ? '#facc15' : '#67e8f9');
+    }
     const pulse = 1 + Math.sin(t * 6) * 0.12;
     for (const c of this.clickables) {
       const v = c.avail() && !this.held && !this.busy;
@@ -595,16 +754,19 @@ export class Packing {
       }
     }
     M.redBtn.emissiveIntensity = this.stage === 'ship' ? 1.2 + Math.sin(t * 8) * 0.8 : 0.2;
-    // ghost-ish target glow for held items
     const st = this.held ? null : this.currentStep();
     const idle = (performance.now() - this.lastAction) / 1000;
-    const show = st && this.g.save.settings.hints && (this.order.tutorial || this.g.forceHint || idle > 7) && !this.busy;
+    const show = st && this.stage !== 'stamp' && this.g.save.settings.hints && (this.order.tutorial || this.g.forceHint || idle > 7) && !this.busy;
     this.hintArrow.visible = !!show;
     if (show) {
       const p = st.target();
       this.hintArrow.position.set(p.x, p.y + 0.6 + Math.abs(Math.sin(t * 4)) * 0.3, p.z);
     }
+    if (this.stage !== this.lastStage) {
+      this.lastStage = this.stage;
+      this.g.onStep(this.stage);
+    }
     if (this.stage === 'shipping') this.g.ui.prompt(null);
-    else this.g.ui.prompt(this.held ? (this.held.magnet ? 'Release to drop it in' : 'Carry it over the box') : this.tape.dragging ? 'Keep dragging along the seam…' : st ? st.text : null);
+    else this.g.ui.prompt(this.held ? (this.held.magnet ? 'Release to drop it in' : 'Carry it over the box') : this.tape.dragging ? 'Keep it straight along the seam…' : st ? st.text : null);
   }
 }

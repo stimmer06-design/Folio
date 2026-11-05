@@ -10,19 +10,20 @@ export function dayLength(day) {
 
 // Count of player actions for the build, without any upgrades. Used for par time.
 export function baseActions(order) {
-  let a = 1 + 4 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 2 + 1 + 1; // mb, screws, cpu, lever, cooler, ram, ssd, ssd screw, psu, 2 cables, panel, power
+  let a = 1 + 4 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 2 + 1 + 1; // mb, screws, cpu, lever, paste, cooler, ram, ssd, ssd screw, psu, 2 cables, panel, power
   if (order.parts.gpu) a += 3; // gpu, screw, cable
-  a += 1 + 1 + 1 + 4 + 1 + 1 + 1; // pc in box, foam, kit, flaps, tape, label, ship
+  a += 1 + 1 + 1 + 4 + 1 + 1 + 1 + 1; // pc in box, foam, kit, flaps, tape, label, stamp, ship
   a += order.peripherals.length;
   if (order.rgb) a += 1;
   return a;
 }
 
-export function generateOrder(save, { tutorial = false } = {}) {
+export function generateOrder(save, { tutorial = false, special = false } = {}) {
   const rank = rankFor(save.xp);
-  const unlocked = TIERS.filter((t) => t.minRank <= rank);
+  const unlocked = TIERS.filter((t) => t.minRank <= rank && !t.special);
   let tier;
-  if (tutorial) tier = TIERS[0];
+  if (special) tier = TIERS.find((t) => t.special);
+  else if (tutorial) tier = TIERS[0];
   else {
     // favour the newest tiers, but keep variety
     const weights = unlocked.map((t, i) => 1 + i * 1.4);
@@ -51,6 +52,15 @@ export function generateOrder(save, { tutorial = false } = {}) {
     if (Math.random() < 0.4) peripherals.push('keyboard');
     if (Math.random() < 0.4) peripherals.push('mouse');
   }
+  if (special) {
+    const decoys = ['orionx', 'q90', 'r128', 's4', 'w1200'].sort(() => Math.random() - 0.5).slice(0, 3);
+    return {
+      no: 'LH-001', seed: 777, tier: tier.id, tierName: tier.name, tierColor: tier.color, pay: tier.pay,
+      customer: 'Deep Space Array', customerFull: 'Forge-7 Deep Space Array', address: 'Array Spoke 1', city: 'Forge-7 · Titan orbit',
+      note: NOTES.lighthouse[0], caseVariant: CASES.find((c) => c.id === 'lighthouse'), parts, decoys, peripherals: [], rgb: 'rainbow',
+      rush: false, vip: true, tutorial: false, special: true,
+    };
+  }
   let rgb = null;
   if (!tutorial && rank >= 4 && (tier.id === 'enthusiast' || tier.id === 'workstation' || Math.random() < 0.55) && tier.id !== 'office') {
     rgb = pick(RGB_COLORS).id;
@@ -64,7 +74,7 @@ export function generateOrder(save, { tutorial = false } = {}) {
   const cats = shuffle(['cpu', 'cooler', 'ram', 'ssd', 'gpu', 'psu'].filter((c) => parts[c]));
   for (const c of cats) {
     if (decoys.length >= nDecoys) break;
-    const opts = Object.values(BY_CAT[c]).filter((p) => p.id !== parts[c]);
+    const opts = Object.values(BY_CAT[c]).filter((p) => p.id !== parts[c] && !p.legendary);
     if (!opts.length) continue;
     // prefer neighbours in the lineup (they look the most similar)
     const cur = PARTS[parts[c]].rank;
@@ -87,7 +97,7 @@ export function generateOrder(save, { tutorial = false } = {}) {
     address: `${10 + Math.floor(Math.random() * 280)} ${pick(STREETS)}`,
     city: pick(CITIES),
     note: tutorial ? 'Training build — take your time and follow the prompts!' : pick(NOTES[tier.id]),
-    caseVariant: tutorial ? CASES[0] : pick(CASES),
+    caseVariant: tutorial ? CASES[0] : pick(CASES.filter((c) => !c.legendary)),
     parts,
     decoys,
     peripherals,

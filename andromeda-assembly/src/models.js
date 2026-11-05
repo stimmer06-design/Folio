@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as T from './textures.js';
 
 // ---------------------------------------------------------------------------
@@ -24,6 +25,11 @@ const planeG = (w, h) => G(`p${w}|${h}`, () => new THREE.PlaneGeometry(w, h));
 
 export function std(o) {
   const m = new THREE.MeshStandardMaterial(o);
+  m.userData.shared = true;
+  return m;
+}
+export function phys(o) {
+  const m = new THREE.MeshPhysicalMaterial(o);
   m.userData.shared = true;
   return m;
 }
@@ -57,34 +63,40 @@ export function mesh(geo, mat, x = 0, y = 0, z = 0, parent, o = {}) {
 }
 
 export function initMaterials() {
+  const nBrushed = T.brushedNormal();
+  const nPcb = T.pcbNormal();
+  const nCard = T.corrugatedNormal();
   M.pcbTex = T.pcbTexture();
-  M.pcb = std({ map: M.pcbTex, roughness: 0.7, metalness: 0.2 });
-  M.black = std({ color: '#16171c', roughness: 0.62, metalness: 0.2 });
-  M.blackGloss = std({ color: '#0c0d11', roughness: 0.22, metalness: 0.5 });
-  M.darkMetal = std({ color: '#30343d', roughness: 0.38, metalness: 0.85 });
-  M.alu = std({ color: '#cfd4dc', roughness: 0.3, metalness: 0.95, map: T.brushedTexture(2, 210) });
-  M.aluDark = std({ color: '#5b6170', roughness: 0.35, metalness: 0.9, map: T.brushedTexture(3, 160) });
-  M.copper = std({ color: '#c47a48', roughness: 0.28, metalness: 1 });
-  M.gold = std({ color: '#d9ad4f', roughness: 0.28, metalness: 1 });
-  M.silver = std({ color: '#d8dce2', roughness: 0.22, metalness: 1 });
-  M.brass = std({ color: '#b8923c', roughness: 0.35, metalness: 1 });
-  M.plastic = std({ color: '#23262d', roughness: 0.55, metalness: 0.05 });
-  M.plasticWhite = std({ color: '#eceef2', roughness: 0.45, metalness: 0.02 });
+  M.pcb = std({ map: M.pcbTex, roughness: 0.62, metalness: 0.25, normalMap: nPcb, normalScale: new THREE.Vector2(0.5, 0.5) });
+  M.black = std({ color: '#15161b', roughness: 0.55, metalness: 0.25 });
+  M.blackGloss = phys({ color: '#0b0c10', roughness: 0.25, metalness: 0.4, clearcoat: 1, clearcoatRoughness: 0.12 });
+  M.darkMetal = std({ color: '#2e323b', roughness: 0.32, metalness: 0.9, normalMap: nBrushed, normalScale: new THREE.Vector2(0.35, 0.35) });
+  M.alu = std({ color: '#d2d7df', roughness: 0.26, metalness: 0.96, map: T.brushedTexture(2, 215), normalMap: nBrushed, normalScale: new THREE.Vector2(0.4, 0.4) });
+  M.aluDark = std({ color: '#5b6170', roughness: 0.3, metalness: 0.92, map: T.brushedTexture(3, 160), normalMap: nBrushed, normalScale: new THREE.Vector2(0.4, 0.4) });
+  M.copper = std({ color: '#c97a45', roughness: 0.22, metalness: 1, normalMap: nBrushed, normalScale: new THREE.Vector2(0.2, 0.2) });
+  M.gold = std({ color: '#e0b04f', roughness: 0.22, metalness: 1 });
+  M.silver = std({ color: '#dde1e7', roughness: 0.18, metalness: 1 });
+  M.brass = std({ color: '#bf953c', roughness: 0.3, metalness: 1 });
+  M.plastic = std({ color: '#23262d', roughness: 0.5, metalness: 0.05 });
+  M.plasticWhite = phys({ color: '#eef0f4', roughness: 0.4, metalness: 0.0, clearcoat: 0.4, clearcoatRoughness: 0.3 });
   M.rubber = std({ color: '#0b0b0d', roughness: 0.95 });
-  M.ramPcb = std({ color: '#1d4d34', roughness: 0.6 });
-  M.chip = std({ color: '#0a0a0c', roughness: 0.35, metalness: 0.2 });
-  M.fan = std({ color: '#17181d', roughness: 0.55, metalness: 0.1 });
-  M.fanWhite = std({ color: '#e7e9ee', roughness: 0.5, metalness: 0.05 });
-  M.glass = std({ color: '#b6c8dc', roughness: 0.03, metalness: 0.2, transparent: true, opacity: 0.14, depthWrite: false, envMapIntensity: 2 });
-  M.cable = std({ color: '#121317', roughness: 0.75, metalness: 0.05 });
-  M.cardboard = std({ map: T.cardboardTexture(false), roughness: 0.92 });
-  M.cardboardPrint = std({ map: T.cardboardTexture(true), roughness: 0.92 });
-  M.cardboardInner = std({ color: '#9c6d43', roughness: 0.96 });
-  M.foam = std({ map: T.foamTexture(), roughness: 1 });
-  M.tape = std({ map: T.tapeTexture(), transparent: true, roughness: 0.3, metalness: 0.05 });
-  // RGB: the "live" material that lights up on power, and the idle look for parts on the rack
+  M.ramPcb = std({ color: '#1b4a33', roughness: 0.55, normalMap: nPcb, normalScale: new THREE.Vector2(0.3, 0.3) });
+  M.chip = std({ color: '#0a0a0c', roughness: 0.3, metalness: 0.25 });
+  M.fan = std({ color: '#16171c', roughness: 0.45, metalness: 0.15 });
+  M.fanWhite = std({ color: '#e7e9ee', roughness: 0.45, metalness: 0.05 });
+  M.glass = phys({ color: '#b9cbe2', roughness: 0.04, metalness: 0.0, transparent: true, opacity: 0.07, depthWrite: false, envMapIntensity: 0.9, ior: 1.5, specularIntensity: 0.6 });
+  M.sleeveN = T.sleeveTextures();
+  M.cable = std({ color: '#121317', roughness: 0.6, metalness: 0.1, normalMap: M.sleeveN, normalScale: new THREE.Vector2(0.8, 0.8) });
+  M.cardboard = std({ map: T.cardboardTexture(false), roughness: 0.9, normalMap: nCard, normalScale: new THREE.Vector2(0.5, 0.5) });
+  M.cardboardPrint = std({ map: T.cardboardTexture(true), roughness: 0.88, normalMap: nCard, normalScale: new THREE.Vector2(0.5, 0.5) });
+  M.cardboardInner = std({ color: '#9c6d43', roughness: 0.96, normalMap: nCard, normalScale: new THREE.Vector2(0.6, 0.6) });
+  M.foam = std({ map: T.foamTexture(), roughness: 1, normalMap: T.foamNormal(), normalScale: new THREE.Vector2(0.8, 0.8) });
+  M.tape = std({ map: T.tapeTexture(), transparent: true, roughness: 0.25, metalness: 0.05 });
+  M.paste = std({ color: '#a9adb5', roughness: 0.35, metalness: 0.6 });
+  // RGB: the "live" material that lights up on power, and the idle look for parts on the pads
   M.rgb = std({ color: '#111', emissive: new THREE.Color('#8b5cf6'), emissiveIntensity: 0, roughness: 0.3 });
-  M.rgbIdle = std({ color: '#2b2d35', roughness: 0.25, metalness: 0.1 });
+  M.rgbIdle = std({ color: '#2b2d35', roughness: 0.2, metalness: 0.1 });
+  M.legend = std({ color: '#221a05', emissive: new THREE.Color('#facc15'), emissiveIntensity: 1.6, roughness: 0.3 });
   M.ghost = basic({ color: '#7dd3fc', transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending });
   M.ghostHot = basic({ color: '#a5f3fc', transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending });
   M.hint = basic({ color: '#67e8f9', transparent: true, opacity: 0.95, depthTest: false });
@@ -130,13 +142,28 @@ export function buildFan(size = 1.1, thick = 0.25, frameMat = M.fan, rgb = M.rgb
   rotor.userData.isRotor = true;
   g.add(rotor);
   mesh(cylG(size * 0.17, size * 0.17, thick * 0.8, 20), frameMat, 0, 0, 0, rotor, { rx: Math.PI / 2 });
-  const bladeGeo = boxG(size * 0.3, size * 0.16, 0.012);
-  for (let i = 0; i < 7; i++) {
-    const piv = new THREE.Group();
-    piv.rotation.z = (i / 7) * Math.PI * 2;
-    rotor.add(piv);
-    mesh(bladeGeo, frameMat, size * 0.3, 0, 0, piv, { rx: 0.55 });
-  }
+  // all nine curved blades merged into one geometry (one draw call per rotor)
+  const bladesGeo = G(`blades${size}`, () => {
+    const L = size * 0.31, w = size * 0.2;
+    const sh = new THREE.Shape();
+    sh.moveTo(0, -w * 0.25);
+    sh.quadraticCurveTo(L * 0.55, -w * 0.75, L, -w * 0.35);
+    sh.quadraticCurveTo(L * 1.04, w * 0.1, L * 0.92, w * 0.5);
+    sh.quadraticCurveTo(L * 0.45, w * 0.35, 0, w * 0.25);
+    sh.closePath();
+    const blade = new THREE.ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: false, curveSegments: 6 });
+    blade.translate(0, 0, -0.006);
+    const parts = [];
+    const m = new THREE.Matrix4(), r = new THREE.Matrix4(), t = new THREE.Matrix4();
+    for (let i = 0; i < 9; i++) {
+      m.makeRotationZ((i / 9) * Math.PI * 2);
+      t.makeTranslation(size * 0.13, 0, 0);
+      r.makeRotationX(0.5);
+      parts.push(blade.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(m, t).multiply(r)));
+    }
+    return mergeGeometries(parts);
+  });
+  mesh(bladesGeo, frameMat, 0, 0, 0, rotor, { cast: false });
   mesh(torG(size * 0.455, 0.014), rgb, 0, 0, thick / 2 + 0.002, g, { cast: false });
   if (rgbBack) mesh(torG(size * 0.455, 0.014), rgb, 0, 0, -thick / 2 - 0.002, g, { cast: false });
   return g;
@@ -178,8 +205,8 @@ export function buildCase(variant) {
   g.name = 'case';
   const { W, H, D } = CASE;
   const t = 0.06;
-  const body = cmat('case' + variant.id, () => std({ color: variant.body, roughness: 0.42, metalness: 0.55 }));
-  const frame = cmat('frame' + variant.id, () => std({ color: variant.frame, roughness: 0.35, metalness: 0.6 }));
+  const body = cmat('case' + variant.id, () => phys({ color: variant.body, roughness: 0.38, metalness: 0.55, clearcoat: 0.8, clearcoatRoughness: 0.18 }));
+  const frame = cmat('frame' + variant.id, () => phys({ color: variant.frame, roughness: 0.3, metalness: 0.65, clearcoat: 1, clearcoatRoughness: 0.1 }));
   const fanMat = variant.id === 'lumen' ? M.fanWhite : M.fan;
 
   mesh(boxG(W, H, t), body, 0, H / 2, -D / 2 + t / 2, g); // motherboard tray
@@ -388,13 +415,18 @@ export function buildCooler(spec) {
   const g = new THREE.Group();
   if (spec.kind === 'stock') {
     mesh(cylG(0.36, 0.36, 0.08, 32), M.copper, 0, 0, 0.04, g, { rx: Math.PI / 2 });
-    for (let i = 0; i < 18; i++) {
-      const p = new THREE.Group();
-      p.rotation.z = (i / 18) * Math.PI * 2;
-      p.position.z = 0.2;
-      g.add(p);
-      mesh(boxG(0.34, 0.025, 0.22), M.alu, 0.2, 0, 0, p);
-    }
+    const finsGeo = G('stockfins', () => {
+      const parts = [];
+      for (let i = 0; i < 18; i++) {
+        const b = new THREE.BoxGeometry(0.34, 0.025, 0.22);
+        b.translate(0.2, 0, 0);
+        b.rotateZ((i / 18) * Math.PI * 2);
+        b.translate(0, 0, 0.2);
+        parts.push(b);
+      }
+      return mergeGeometries(parts);
+    });
+    mesh(finsGeo, M.alu, 0, 0, 0, g);
     const f = buildFan(0.78, 0.12, M.fan, M.rgbIdle, false);
     f.position.z = 0.38;
     g.add(f);
@@ -543,7 +575,7 @@ export function buildGPU(spec) {
   const g = new THREE.Group();
   const L = spec.len, Tk = spec.thick;
   const cx = 0.83 - L / 2;
-  const shroud = cmat('gpushroud' + spec.id, () => std({ color: spec.body, roughness: 0.4, metalness: 0.55 }));
+  const shroud = cmat('gpushroud' + spec.id, () => phys({ color: spec.body, roughness: 0.32, metalness: 0.6, clearcoat: 1, clearcoatRoughness: 0.15 }));
   const accent = cmat('gpuaccent' + spec.id, () => std({ color: spec.accent, roughness: 0.3, metalness: 0.6 }));
   mesh(boxG(L - 0.05, 0.03, 1.15), M.ramPcb, cx, 0, 0.6, g);
   mesh(boxG(0.5, 0.03, 0.08), M.gold, 0.3, 0, 0.02, g, { cast: false });
@@ -568,8 +600,14 @@ export function buildGPU(spec) {
   mesh(boxG(L - 0.08, 0.025, 1.13), [M.darkMetal, M.darkMetal, back, M.darkMetal, M.darkMetal, M.darkMetal], cx, 0.03, 0.6, g);
   const sh = mesh(rboxG(L - 0.06, Tk, 1.2, 0.05), shroud, cx, -Tk / 2 - 0.02, 0.62, g);
   sh.userData.gpuShroud = true;
-  // heatsink fins visible in the gap
-  mesh(boxG(L - 0.3, Tk * 0.4, 1.05), M.aluDark, cx, -Tk * 0.5, 0.6, g);
+  // angular armour plates
+  const plate = (x, w, ang) => mesh(boxG(w, Tk * 0.18, 0.04), accent, x, -Tk * 0.86, 1.245, g, { rz: ang, cast: false });
+  plate(cx - L * 0.32, L * 0.22, 0.22);
+  plate(cx + L * 0.3, L * 0.18, -0.22);
+  if (spec.legendary) {
+    mesh(boxG(L - 0.1, 0.03, 0.03), M.legend, cx, -0.01, 1.24, g, { cast: false });
+    mesh(boxG(L - 0.1, 0.03, 0.03), M.legend, cx, -Tk - 0.03, 1.24, g, { cast: false });
+  }
   // accent stripes along the side facing the glass
   mesh(boxG(L - 0.2, 0.05, 0.02), accent, cx, -Tk * 0.85, 1.225, g, { cast: false });
   mesh(boxG(L * 0.55, 0.04, 0.02), M.rgbIdle, cx - L * 0.12, -Tk * 0.25, 1.225, g, { cast: false });
@@ -883,126 +921,31 @@ export function buildShipButton() {
 }
 
 // ---------------------------------------------------------------------------
-// Workshop environment
+// Thermal paste blob & launch pod
 // ---------------------------------------------------------------------------
-export function buildEnvironment(theme) {
+export function buildPasteBlob() {
+  const m = new THREE.Mesh(G('paste', () => new THREE.SphereGeometry(0.1, 20, 12)), M.paste);
+  m.scale.set(1, 1, 0.45);
+  return m;
+}
+
+export function buildPod() {
   const g = new THREE.Group();
-  const accentA = std({ color: '#111', emissive: new THREE.Color(theme.a), emissiveIntensity: 1.6 });
-  const accentB = std({ color: '#111', emissive: new THREE.Color(theme.b), emissiveIntensity: 1.2 });
-  const floor = std({ map: T.concreteTexture(), roughness: 0.85, metalness: 0.05 });
-  mesh(planeG(80, 40), floor, -4, -4.0, 4, g, { rx: -Math.PI / 2, cast: false });
-  const wallM = std({ color: '#1b1d27', roughness: 0.85 });
-  mesh(boxG(70, 22, 0.3), wallM, -4, 7, -3.6, g, { cast: false });
-  // wall panel lines
-  for (let x = -38; x < 30; x += 4) mesh(boxG(0.04, 22, 0.05), std({ color: '#151720', roughness: 0.9 }), x, 7, -3.43, g, { cast: false });
-  mesh(boxG(70, 0.06, 0.1), accentA, -4, -3.85, -3.4, g, { cast: false });
-
-  // panoramic window with the Andromeda galaxy
-  const starM = std({ color: '#000', emissive: new THREE.Color('#ffffff'), emissiveMap: T.starfieldTexture(), emissiveIntensity: 1.0 });
-  mesh(planeG(13, 6.5), starM, -9.8, 4.6, -3.44, g, { cast: false });
-  const frameM = std({ color: '#0d0e13', roughness: 0.4, metalness: 0.7 });
-  mesh(boxG(13.4, 0.2, 0.25), frameM, -9.8, 7.9, -3.35, g);
-  mesh(boxG(13.4, 0.2, 0.25), frameM, -9.8, 1.3, -3.35, g);
-  for (const x of [-16.4, -12.0, -7.6, -3.2]) mesh(boxG(0.18, 6.8, 0.25), frameM, x, 4.6, -3.35, g);
-
-  // neon sign
-  const signTex = T.toTex(T.logoCanvas(2048, 512), { shared: true });
-  const signM = std({ color: '#000', emissive: new THREE.Color('#ffffff'), emissiveMap: signTex, transparent: true, map: signTex, emissiveIntensity: 1.25 });
-  mesh(planeG(5.6, 1.4), signM, -0.2, 6.35, -3.42, g, { cast: false });
-  mesh(boxG(6.2, 0.05, 0.05), accentA, -0.2, 5.55, -3.4, g, { cast: false });
-
-  // assembly bench
-  const wood = std({ map: T.woodTexture(), roughness: 0.55, metalness: 0.05 });
-  const steel = std({ color: '#2a2e38', roughness: 0.35, metalness: 0.85 });
-  mesh(boxG(11.8, 0.25, 4.6), wood, 2.3, -0.125, -0.1, g);
-  mesh(boxG(11.8, 0.05, 0.05), accentA, 2.3, -0.2, 2.2, g, { cast: false });
-  for (const x of [-3.3, 7.9]) for (const z of [-2.1, 1.9]) mesh(boxG(0.2, 3.8, 0.2), steel, x, -2.15, z, g);
-  mesh(boxG(11.4, 0.12, 0.12), steel, 2.3, -3.2, -2.1, g);
-  // ESD mat under the case
-  const mat = std({ map: T.matTexture(theme.a), roughness: 0.9 });
-  mesh(boxG(5.4, 0.02, 3.4), mat, 0, 0.01, 0.2, g, { cast: false });
-
-  // parts rack (4 tiers)
-  const rackM = std({ color: '#262a35', roughness: 0.45, metalness: 0.6 });
-  const tiers = [{ y: 0.3, z: 1.75 }, { y: 1.05, z: 0.85 }, { y: 1.8, z: -0.05 }, { y: 2.55, z: -0.95 }];
-  tiers.forEach((t, i) => {
-    mesh(boxG(4.5, t.y, 0.9), rackM, 5.0, t.y / 2, t.z, g);
-    mesh(boxG(4.5, 0.035, 0.035), i % 2 ? accentB : accentA, 5.0, t.y - 0.02, t.z + 0.46, g, { cast: false });
-  });
-  // QA monitor, wall-mounted above the parts rack
-  const mon = new THREE.Group();
-  mon.position.set(5.0, 4.6, -3.3);
-  g.add(mon);
-  mesh(boxG(0.6, 0.5, 0.2), steel, 0, 0, -0.05, mon);
-  mesh(rboxG(3.1, 1.9, 0.12, 0.04), M.blackGloss, 0, 0, 0.1, mon);
-  mesh(boxG(3.0, 0.03, 0.03), accentB, 0, -0.97, 0.12, mon, { cast: false });
-  const [sc, sctx] = T.canvas(1024, 600);
-  const screenTex = T.toTex(sc);
-  const screenM = std({ color: '#000', emissive: new THREE.Color('#ffffff'), emissiveMap: screenTex, emissiveIntensity: 1.0, roughness: 0.2 });
-  const screen = mesh(planeG(2.94, 1.72), screenM, 0, 0, 0.162, mon, { cast: false });
-
-  // packing table (lower)
-  mesh(boxG(10.2, 0.25, 7.0), steel, -8.5, -2.325, 0.6, g);
-  mesh(boxG(10.2, 0.05, 0.05), accentB, -8.5, -2.4, 4.1, g, { cast: false });
-  for (const x of [-13.4, -3.6]) for (const z of [-2.7, 3.9]) mesh(boxG(0.2, 1.7, 0.2), steel, x, -3.15, z, g);
-  // conveyor to shipping hatch
-  const conv = new THREE.Group();
-  g.add(conv);
-  mesh(boxG(9, 0.2, 3.6), steel, -18.1, -2.6, -0.2, conv);
-  const rollers = [];
-  for (let x = -22.4; x < -13.8; x += 0.45) {
-    const r = mesh(cylG(0.09, 0.09, 3.3, 12), M.silver, x, -2.36, -0.2, conv, { rx: Math.PI / 2 });
-    rollers.push(r);
+  const hull = cmat('podhull', () => phys({ color: '#e8ebf1', roughness: 0.3, metalness: 0.4, clearcoat: 1, clearcoatRoughness: 0.1 }));
+  const body = mesh(G('podbody', () => new THREE.CapsuleGeometry(0.9, 2.2, 8, 20)), hull, 0, 0, 0, g);
+  body.rotation.z = Math.PI / 2;
+  const stripe = cmat('podstripe', () => std({ color: '#111', emissive: new THREE.Color('#8b5cf6'), emissiveIntensity: 2.2 }));
+  mesh(torG(0.92, 0.05, 40), stripe, 0.6, 0, 0, g, { ry: Math.PI / 2, cast: false });
+  mesh(torG(0.92, 0.05, 40), stripe, -0.6, 0, 0, g, { ry: Math.PI / 2, cast: false });
+  for (let i = 0; i < 4; i++) {
+    const fin = new THREE.Group();
+    fin.rotation.x = (i / 4) * Math.PI * 2;
+    fin.position.x = -1.3;
+    g.add(fin);
+    mesh(boxG(0.8, 0.05, 0.6), M.darkMetal, 0, 0, 0.95, fin);
   }
-  mesh(boxG(9, 0.35, 0.1), steel, -18.1, -2.3, 1.6, conv);
-  mesh(boxG(9, 0.35, 0.1), steel, -18.1, -2.3, -2.0, conv);
-  // shipping wall with hatch
-  mesh(boxG(0.4, 14, 10), wallM, -22.6, 3, 1.5, g);
-  const hatchM = std({ color: '#06070a', roughness: 1 });
-  mesh(planeG(4.2, 7.0), hatchM, -22.39, 1.2, -0.2, g, { ry: Math.PI / 2, cast: false });
-  for (let i = 0; i < 9; i++) mesh(boxG(0.03, 6.6, 0.42), std({ color: '#3a3f4d', roughness: 0.6, transparent: true, opacity: 0.85 }), -22.35, 1.4, -2.0 + i * 0.45, g, { cast: false });
-  const shipSign = std({ color: '#000', emissive: new THREE.Color(theme.b), emissiveIntensity: 1.4, emissiveMap: T.toTex(T.textCanvas(512, 128, (ctx) => {
-    ctx.fillStyle = '#fff';
-    ctx.font = T.font(800, 80);
-    ctx.textAlign = 'center';
-    ctx.fillText('SHIPPING', 256, 95);
-  })) });
-  mesh(planeG(3, 0.75), shipSign, -22.38, 5.4, -0.2, g, { ry: Math.PI / 2, cast: false });
-
-  // props
-  const props = {};
-  // espresso machine
-  const esp = new THREE.Group();
-  esp.position.set(7.4, 0, -1.7);
-  g.add(esp);
-  mesh(rboxG(0.9, 1.3, 0.9, 0.08), std({ color: '#b91c1c', roughness: 0.35, metalness: 0.3 }), 0, 0.65, 0, esp);
-  mesh(rboxG(0.95, 0.15, 0.95, 0.05), M.silver, 0, 1.35, 0, esp);
-  mesh(cylG(0.13, 0.11, 0.24, 16), M.plasticWhite, 0, 0.12, 0.5, esp);
-  props.espresso = esp;
-  // screwdriver
-  const drv = new THREE.Group();
-  drv.position.set(-2.9, 0.12, 1.6);
-  drv.rotation.y = 0.6;
-  g.add(drv);
-  mesh(rboxG(0.9, 0.24, 0.24, 0.08), std({ color: '#f59e0b', roughness: 0.5 }), 0, 0, 0, drv);
-  mesh(cylG(0.04, 0.04, 0.5, 8), M.silver, 0.65, 0, 0, drv, { rz: Math.PI / 2 });
-  props.driver = drv;
-  // gloves
-  const glv = new THREE.Group();
-  glv.position.set(-2.9, 0.06, 0.5);
-  g.add(glv);
-  mesh(rboxG(0.55, 0.1, 0.8, 0.05), std({ color: theme.a, roughness: 0.8 }), 0, 0, 0, glv);
-  mesh(rboxG(0.55, 0.1, 0.8, 0.05), std({ color: theme.b, roughness: 0.8 }), 0.15, 0.08, -0.15, glv, { ry: 0.4 });
-  props.gloves = glv;
-  // tape gun on the packing table
-  const tg = buildTapeGun();
-  tg.position.set(-12.5, -2.2, 3.4);
-  tg.rotation.y = 0.5;
-  g.add(tg);
-  props.tapegun = tg;
-  // flat-packed boxes in the corner
-  for (let i = 0; i < 6; i++) mesh(boxG(4.2, 0.08, 3.0), M.cardboard, -15.5 + (i % 2) * 0.1, -2.15 + i * 0.09, 2.6, g);
-
-
-  return { group: g, accentA, accentB, screen: { canvas: sc, ctx: sctx, tex: screenTex, mesh: screen }, rollers, props, tiers, signM, monitor: mon };
+  const glow = cmat('podglow', () => basic({ color: '#7dd3fc', transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const flame = mesh(G('podflame', () => new THREE.ConeGeometry(0.55, 2.6, 20, 1, true)), glow, -2.9, 0, 0, g, { rz: Math.PI / 2, cast: false });
+  g.userData.flame = flame;
+  return g;
 }

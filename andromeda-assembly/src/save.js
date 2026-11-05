@@ -1,4 +1,4 @@
-const KEY = 'andromeda-assembly-save-v1';
+const KEY = 'andromeda-assembly-save-v2';
 
 export function defaultSave() {
   return {
@@ -13,8 +13,15 @@ export function defaultSave() {
     themes: { violet: true },
     theme: 'violet',
     careerDone: false,
-    stats: { orders: 0, perfect: 0, bestTime: null, earned: 0, stars: 0, qaFails: 0 },
-    settings: { master: 0.8, music: 0.45, sfx: 0.85, quality: 'high', hints: true },
+    finaleDone: false,
+    signal: 0,
+    seen: {},
+    collection: { decor: {}, codex: {} },
+    records: {},
+    contracts: [],
+    xpBoost: 0,
+    stats: { orders: 0, perfect: 0, perfects: 0, bestTime: null, earned: 0, stars: 0, qaFails: 0, crates: 0, sGrades: 0 },
+    settings: { master: 0.8, music: 0.5, sfx: 0.85, quality: 'ultra', hints: true, shake: true },
   };
 }
 
@@ -31,6 +38,9 @@ export function loadSave() {
       settings: { ...d.settings, ...(s.settings || {}) },
       upgrades: { ...(s.upgrades || {}) },
       themes: { ...d.themes, ...(s.themes || {}) },
+      seen: { ...(s.seen || {}) },
+      records: { ...(s.records || {}) },
+      collection: { decor: { ...((s.collection || {}).decor || {}) }, codex: { ...((s.collection || {}).codex || {}) } },
     };
   } catch (e) {
     return d;

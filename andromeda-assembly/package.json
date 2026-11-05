@@ -10,6 +10,8 @@
     "test:fast": "node build.mjs && FAST=1 node tests/smoke.mjs"
   },
   "devDependencies": {
+    "@fontsource/inter": "^5.2.5",
+    "@fontsource/rajdhani": "^5.2.5",
     "esbuild": "0.25.10",
     "three": "0.180.0"
   }

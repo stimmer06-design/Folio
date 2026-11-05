@@ -1,49 +1,76 @@
 # Andromeda Assembly
 
-A 3D PC-building and packing game for **Andromeda Insights** PCs. You take work orders, build each PC from a parts rack, run QA, pack it and ship it, then spend your pay on workshop upgrades.
+A 3D PC-building game for **Andromeda Insights** PCs. It is set in 2291 aboard **Forge-7**, Andromeda Insights' orbital foundry above Titan. You build machines by hand, test them, pack them and launch them to colonies across the Sol system. Every machine you ship helps decode a mysterious signal from the Andromeda Galaxy.
 
 ## What ships
 
-`release/AndromedaAssembly.html` is the whole game: **one file, about 700 KB, fully offline**. The 3D engine, models, textures, sound effects and music are all generated at runtime. There are no other files, installers, network calls or accounts.
+`release/AndromedaAssembly.html` is the whole game: **one file, about 1 MB, fully offline**. The 3D engine, models, textures, shaders, sound effects, music and fonts are all inside it. There are no installers, network calls or accounts.
 
 To bundle it with a PC:
 
-1. Copy `release/AndromedaAssembly.html` to the image, for example `C:\Program Files\Andromeda Insights\Andromeda Assembly\`.
-2. Put a desktop or Start-menu shortcut to that file. It opens in the default browser (Edge, Chrome or Firefox).
-3. Optional: point the shortcut at `release/Play Andromeda Assembly.cmd` instead. It opens the game in a clean app-style Microsoft Edge window and falls back to the default browser.
+1. Copy `release/AndromedaAssembly.html` and `release/Play Andromeda Assembly.cmd` to the image, for example to `C:\Program Files\Andromeda Insights\Andromeda Assembly\`.
+2. Put a desktop or Start-menu shortcut to `Play Andromeda Assembly.cmd`. It opens the game in a clean app-style Microsoft Edge window and falls back to the default browser. Double-clicking the HTML file also works.
 
-Progress is saved automatically in the browser's local storage, separately for each Windows user.
+Progress is saved automatically in the browser's local storage, separately for each Windows user. Graphics quality starts at **Ultra** (ambient occlusion, bloom, film grain, 4K shadows). It steps down automatically within a few seconds if the PC can't keep up, and players can change it in Settings.
 
-## The game loop
+## The loop
 
-1. **Work order**: a ticket lists the customer's exact parts. From Rank 2, the rack also holds look-alike parts, so players have to read it.
-2. **Build**: drag parts into their glowing outlines (or click to pick up and click to drop). Then click screws, the CPU socket lever and the power-cable ports. Close the glass panel.
-3. **QA**: press the power button. Fans spin up, the RGB lights come on, and a POST screen checks every part against the ticket. A wrong part means opening the case and swapping it. Some customers ask for a specific RGB colour.
-4. **Pack**: put the PC in the box, then the foam and the accessories (plus an optional thank-you card for a tip). Fold the flaps, drag tape along the seam, apply the label and hit **SHIP**.
-5. **Payout**: base pay plus bonuses for beating par time, Flow combos and passing QA first time, then stars and XP.
-6. **Progress**: a shift is 3 to 6 orders. There are 10 ranks; each one unlocks harder builds, rush orders, peripherals and RGB requests. Money buys 8 tool upgrades (a power screwdriver, a tape gun, magnetic gloves and so on) and 5 workshop lighting themes. Reaching **Galactic Master Builder** shows a certificate and credits. After that the game continues as an endless mode.
+**Build**
+- **Read the work order.** From Rank 2 the holo pads also hold look-alike parts.
+- **Precision placement.** Drag parts into the hologram outline. A shrinking reticle shows your alignment. Release inside the gold ring for **PERFECT**.
+- **Torque screws.** Hold a screw and release when the needle sweeps into the gold zone.
+- **Thermal paste.** Hold on the CPU until the blob fills the target ring. Too little backs off; too much oozes.
+- **Cables.** Drag each connector from its grommet to its port.
+- **QA and stress test.** Press power: the fans spin up, the RGB lights come on, POST checks the order, and the benchmark score counts up (with tier records). Some customers ask for a specific RGB colour.
 
-Controls: mouse only. `H` shows a hint, `Esc` pauses, `M` mutes, `F` toggles fullscreen, right-drag looks around, and the wheel zooms. The first order is a guided tutorial.
+**Pack and launch**
+- Drop in the PC, foam and accessories (plus an optional thank-you card for a tip).
+- **Speed-fold** the flaps.
+- Tape the seam in **one straight swipe**. The tape follows your hand, so wobbly runs look wobbly.
+- **Stamp** the label when the timing rings meet.
+- Hit **SHIP**. The box rolls through the airlock, and a launch pod blasts past Saturn.
 
-Graphics quality (High, Medium or Low) is detected automatically and can be changed in Settings.
+**The dopamine layer**
+- Every action is judged **PERFECT / GREAT / GOOD / SLOPPY**, with popups, rising-pitch chimes, particles and shockwaves.
+- Chaining actions builds **Flow**. At ×5, ×12 and ×20 you hit **Overdrive I, II and III**: the screen-edge glow intensifies, the adaptive music adds layers, and the payout multiplier grows.
+- Each build gets a letter grade (**S, A, B, C or D**) that slams onto the screen, plus a payout breakdown, XP, a customer review, and a **supply crate**. Crates come in Common, Rare, Epic and Legendary. They hold credits, XP chips, workshop decor, crate-only lighting themes and lost Codex lore.
+- **Three daily contracts** per shift pay credits and bonus crates.
+- **Twelve tool upgrades** and seven lighting themes. **Ten collectible decor pieces** appear around the bench.
+
+## Story: *The Lighthouse Protocol*
+
+There are five chapters across ten ranks: *First Shift*, *The Whisper*, *Static*, *Resonance* and *The Lighthouse*. The story plays out in comms transmissions with voiced-style typewriter text and procedurally drawn portraits. The cast:
+- **ORIN**, the station's dry-witted foreman AI
+- **Director Sela Okafor**
+- **Juno Reyes**, the launch tech
+- archived logs from founder **Dr. Ilya Marrow**
+
+The Lighthouse Network gives a **signal decode** meter that rises with every quality build. At the top rank you build the **Lighthouse Core** from legendary parts and hear what Andromeda has to say. After that the game continues as an endless mode. Every story beat unlocks entries in the in-game **Codex**.
+
+Controls: mouse only. `H` shows a hint, `Esc` pauses, `M` mutes, `F` toggles fullscreen, right-drag looks around, and the wheel zooms. The first order is a guided tutorial, and first-time tips introduce each skill mechanic.
 
 ## Development
 
 ```bash
 npm install
 npm run build      # → release/AndromedaAssembly.html
-npm test           # build + automated playtest (Playwright drives the mouse through real orders)
+npm test           # build + automated playtest (Playwright plays a full order with the mouse) + UI test
+npm run test:fast  # playtest that skips the build phase (packing/meta only)
 ```
 
 Source is in `src/`:
 
 | File | Contents |
 |---|---|
-| `main.js` | renderer, camera, game states, scoring, progression |
-| `assembly.js` | build bench: drag and snap, screws, cables, QA test |
-| `packing.js` | packing station: box, foam, flaps, tape, label, shipping |
-| `models.js` | procedural 3D models (case, parts, box, workshop) |
-| `textures.js` | canvas-drawn textures and the Andromeda logo |
-| `audio.js` | synthesized sound effects and the generative lo-fi soundtrack |
-| `ui.js`, `template.html` | HUD, ticket and menus |
-| `catalog.js`, `orders.js` | parts, tiers, ranks, upgrades and order generation |
+| `main.js` | game states, judgement, Flow and Overdrive, scoring, story beats, crates, contracts |
+| `assembly.js` | build bench: precision drops, torque, paste, cable dragging, QA, benchmark |
+| `packing.js` | dispatch bay: box, foam, speed folds, freehand tape, stamp timing, launch pod |
+| `env.js` | Forge-7 set: window onto Saturn and Andromeda, lamps and light shafts, holo pads, airlock |
+| `models.js`, `decor.js` | procedural models (parts, case, box, pod, collectible decor) |
+| `shaders.js`, `post.js` | sky, planet, hologram and light-shaft shaders; GTAO, bloom and grading pipeline |
+| `textures.js` | canvas textures, generated normal maps, logo |
+| `audio.js` | synthesized sound effects and the adaptive soundtrack |
+| `ui.js`, `template.html` | HUD, work order, comms, results, crates, workshop, codex |
+| `catalog.js`, `story.js`, `meta.js`, `orders.js` | data, lore and progression systems |
+
+Fonts: Rajdhani and Inter, used under the SIL Open Font License and embedded in the build.

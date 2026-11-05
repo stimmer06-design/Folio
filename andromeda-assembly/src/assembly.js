@@ -1,9 +1,11 @@
 import * as THREE from 'three';
-import { PARTS, CAT_LABEL, CAT_COLOR, RGB_COLORS } from './catalog.js';
+import { PARTS, CAT_LABEL, CAT_COLOR, RGB_COLORS, TIERS } from './catalog.js';
 import * as MD from './models.js';
 import { M } from './models.js';
 import * as T from './textures.js';
-import { tweens, tweenObj, wait, Ease, V3, QI, qEuler, damp, clamp } from './util.js';
+import { PADS } from './env.js';
+import { holoMaterial } from './shaders.js';
+import { tweens, tweenObj, wait, Ease, V3, QI, qEuler, damp, clamp, fmtTime } from './util.js';
 import { audio } from './audio.js';
 
 // Anchor points in case-local coordinates (case origin = bottom centre)
@@ -17,25 +19,29 @@ export const SLOTS = {
   psu: V3(1.3, 0.06, -0.22),
   panel: V3(0, 2.5, 1.12),
 };
-export const CASE_POS = V3(0, 0.08, 0);
-const PANEL_PARK = { pos: V3(-3.05, 2.55, -2.35), quat: qEuler(-0.08, 0.55, 0.02) };
-
-const RACK_TIERS = [{ y: 0.3, z: 1.75 }, { y: 1.05, z: 0.85 }, { y: 1.8, z: -0.05 }, { y: 2.55, z: -0.95 }];
-const RACK_X = [3.55, 5.0, 6.45];
-const TRAY_QUAT = qEuler(-0.1, -0.38, 0);
-const TRAY_QUAT_RAM = qEuler(-0.1, -1.95, 0);
+export const CASE_POS = V3(0, 0.16, 0);
+const PANEL_PARK = { pos: V3(-3.15, 3.35, -2.8), quat: qEuler(-0.1, 0.5, 0.0) };
+const PAD_LIFT = 0.12 + 0.2;
+const TRAY_QUAT = qEuler(-0.12, -0.38, 0);
+const TRAY_QUAT_RAM = qEuler(-0.12, -1.95, 0);
 const HITBOX_MAT = new THREE.MeshBasicMaterial({ visible: false });
 const ORDER = ['mb', 'cpu', 'cooler', 'ram', 'ssd', 'gpu', 'psu'];
+const MAGNET = 0.85;
+
+// Skill windows
+const TORQUE = { time: 0.85, green: [0.62, 0.92], perfect: [0.72, 0.82] };
+const TORQUE_PRO = { time: 0.85, green: [0.55, 0.95], perfect: [0.68, 0.86] };
+const PASTE = { time: 1.15, green: [0.62, 0.9], perfect: [0.71, 0.83], min: 0.45, max: 0.98 };
 
 function trayScaleFor(spec) {
   switch (spec.cat) {
     case 'mb': return 0.27;
-    case 'cpu': return 1.15;
+    case 'cpu': return 1.2;
     case 'cooler': return spec.kind === 'stock' ? 0.85 : spec.kind === 'tower' ? 0.55 : 0.3;
     case 'ram': return 0.62;
     case 'ssd': return 1.15;
-    case 'gpu': return 0.4;
-    case 'psu': return 0.52;
+    case 'gpu': return 0.36;
+    case 'psu': return 0.5;
   }
   return 0.5;
 }
@@ -43,8 +49,8 @@ function trayScaleFor(spec) {
 const CABLE_MATS = {};
 function cableMat(variant) {
   if (!CABLE_MATS[variant.id]) {
-    const col = variant.id === 'lumen' ? '#e8e9ee' : variant.id === 'eclipse' ? '#5b3fb8' : '#15161b';
-    CABLE_MATS[variant.id] = MD.std({ color: col, roughness: 0.8 });
+    const col = { lumen: '#e8e9ee', eclipse: '#6d4ad6', titan: '#22262e', lighthouse: '#d4a514' }[variant.id] || '#15161b';
+    CABLE_MATS[variant.id] = MD.std({ color: col, roughness: 0.6, metalness: 0.1, normalMap: M.sleeveN, normalScale: new THREE.Vector2(0.9, 0.9) });
   }
   return CABLE_MATS[variant.id];
 }
@@ -59,14 +65,35 @@ export class Assembly {
     this.caseObj = null;
     this.panel = null;
     this.held = null;
+    this.gauge = null;
     this.active = false;
     this.fanSpeed = 0;
     this.rotors = [];
+    this.stubs = {};
     this.tmpV = V3();
     this.hintArrow = MD.buildHintArrow();
     this.hintArrow.visible = false;
     this.scene.add(this.hintArrow);
     this.hover = null;
+    this.ghostMat = holoMaterial('#67e8f9', 0.55);
+    this.ghostHotMat = holoMaterial('#facc15', 0.9);
+    // precision reticle
+    const mk = (r, w, color, op) => {
+      const m = new THREE.Mesh(new THREE.RingGeometry(r - w, r, 64), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending }));
+      m.renderOrder = 998;
+      return m;
+    };
+    this.reticle = new THREE.Group();
+    this.retOuter = mk(MAGNET, 0.02, '#67e8f9', 0.5);
+    this.retInner = mk(1, 0.035, '#67e8f9', 0.9);
+    this.retPerfect = mk(0.2, 0.025, '#facc15', 0.8);
+    this.reticle.add(this.retOuter, this.retInner, this.retPerfect);
+    this.reticle.visible = false;
+    this.scene.add(this.reticle);
+    // paste target ring
+    this.pasteRing = mk(0.2, 0.012, '#facc15', 0.9);
+    this.pasteRing.visible = false;
+    this.scene.add(this.pasteRing);
   }
 
   // ------------------------------------------------------------------ setup
@@ -76,42 +103,48 @@ export class Assembly {
     this.testing = false;
     this.slot = { mb: null, cpu: null, cooler: null, ram: null, ssd: null, gpu: null, psu: null };
     this.cpuLocked = false;
+    this.paste = { amount: 0, done: false, blob: null };
     this.cables = { c24: null, c8: null, cgpu: null };
     this.panelOn = false;
     this.lastAction = performance.now();
     this.clickables = [];
-
-    // case drops in
+    this.stubs = {};
     const c = MD.buildCase(order.caseVariant);
-    c.position.set(CASE_POS.x, 9, CASE_POS.z);
+    c.position.set(CASE_POS.x, 10, CASE_POS.z);
     this.scene.add(c);
     this.caseObj = c;
-    // glass panel parked against the wall
     const p = MD.buildPanel();
     p.position.copy(PANEL_PARK.pos);
     p.quaternion.copy(PANEL_PARK.quat);
     this.scene.add(p);
     this.panel = p;
-
     this.buildTray(order);
     this.buildClickables();
-
-    tweenObj(c, { pos: CASE_POS.clone(), duration: 0.75, ease: Ease.outBounce }).then(() => {});
-    await wait(0.3);
+    // the chassis descends from the fabricator bay
+    audio.play('whoosh');
+    tweenObj(c, { pos: CASE_POS.clone(), duration: 0.7, ease: Ease.outBounce }).then(() => {});
+    await wait(0.28);
     audio.play('heavy');
-    this.g.fx.shake(0.12);
-    this.g.fx.burst(V3(0, 0.2, 0.6), { count: 30, color: '#94a3b8', color2: '#cbd5e1', speed: 3, size: 0.5, up: 0.3 });
-    // restock the rack with a satisfying pop cascade
+    this.g.fx.shake(0.14);
+    this.g.post.pulse('#a5f3fc', 0.12);
+    this.g.fx.ring(V3(0, 0.12, 0.15), { color: '#7dd3fc', radius: 3.2 });
+    this.g.fx.burst(V3(0, 0.2, 0.6), { count: 40, color: '#94a3b8', color2: '#cbd5e1', speed: 3.4, size: 0.5, up: 0.3 });
+    // parts materialise on their pads
     let i = 0;
     for (const part of this.parts) {
       const s = part.trayScale;
       part.obj.scale.setScalar(0.001);
       part.obj.visible = true;
       const k = i++;
-      tweenObj(part.obj, { scale: s, duration: 0.35, delay: 0.05 + k * 0.06, ease: Ease.outBack }).then(() => {});
-      tweens.add({ duration: 0.01, delay: 0.05 + k * 0.06, update: (e, kk) => kk >= 1 && audio.play('pop', { pitch: 1 + k * 0.06 }) });
+      const d = 0.05 + k * 0.07;
+      tweenObj(part.obj, { scale: s, duration: 0.4, delay: d, ease: Ease.outBack, key: part.obj.uuid + ':spawn' }).then(() => {});
+      tweens.add({ duration: 0.01, delay: d, update: (e, kk) => {
+        if (kk < 1) return;
+        audio.play('pop', { pitch: 1 + k * 0.07 });
+        this.g.fx.burst(part.base.pos.clone().add(V3(0, 0.3, 0)), { count: 10, color: '#a5f3fc', color2: '#c4b5fd', speed: 1.2, size: 0.35 });
+      } });
     }
-    await wait(0.5 + this.parts.length * 0.06);
+    await wait(0.5 + this.parts.length * 0.07);
     this.refreshTicket();
   }
 
@@ -121,7 +154,6 @@ export class Assembly {
       const id = order.parts[cat];
       if (!id) continue;
       const group = [id, ...order.decoys.filter((d) => PARTS[d].cat === cat)];
-      // shuffle so the right one is not always first
       group.sort(() => Math.random() - 0.5);
       for (const g of group) list.push(PARTS[g]);
     }
@@ -131,24 +163,21 @@ export class Assembly {
       const box = new THREE.Box3().setFromObject(obj);
       const center = box.getCenter(V3());
       const size = box.getSize(V3());
-      const tier = RACK_TIERS[Math.floor(i / 3)];
-      const col = i % 3;
+      const pad = PADS[i % PADS.length];
       const s = trayScaleFor(spec);
-      const cell = V3(RACK_X[col], tier.y, tier.z);
       const tq = spec.cat === 'ram' ? TRAY_QUAT_RAM : TRAY_QUAT;
       const off = center.clone().multiplyScalar(s).applyQuaternion(tq);
-      const pos = cell.clone().add(V3(0, (size.y * s) / 2 + 0.06, 0)).sub(off);
+      const pos = pad.clone().add(V3(0, PAD_LIFT + (size.y * s) / 2, 0)).sub(off);
       obj.position.copy(pos);
       obj.quaternion.copy(tq);
       obj.scale.setScalar(s);
       obj.visible = false;
-      // generous invisible pick-box so thin parts are easy to grab from the rack
-      const pad = 0.25 / s;
-      const hb = new THREE.Mesh(new THREE.BoxGeometry(size.x + pad, size.y + pad, size.z + pad), HITBOX_MAT);
+      const padSz = 0.25 / s;
+      const hb = new THREE.Mesh(new THREE.BoxGeometry(size.x + padSz, size.y + padSz, size.z + padSz), HITBOX_MAT);
       hb.position.copy(center);
       hb.userData.hitbox = true;
       obj.add(hb);
-      const part = { spec, cat: spec.cat, obj, center, size, trayScale: s, tray: { pos: pos.clone(), quat: tq.clone(), scale: s }, state: 'tray', hitbox: hb };
+      const part = { spec, cat: spec.cat, obj, center, size, trayScale: s, base: { pos: pos.clone(), quat: tq.clone() }, tray: { pos: pos.clone(), quat: tq.clone(), scale: s }, state: 'tray', hitbox: hb, phase: i * 1.7 };
       obj.userData.it = { type: 'part', part };
       const refs = obj.userData.refs || {};
       part.screws = refs.screws ? refs.screws.slice() : refs.screw ? [refs.screw] : [];
@@ -158,15 +187,27 @@ export class Assembly {
         sc.userData.tight = false;
         sc.visible = false;
       }
+      if (spec.legendary) this.addLegendaryAura(obj, center, size);
       this.scene.add(obj);
       this.parts.push(part);
-      // label on rack front
-      const tex = T.chipLabel(spec.short, CAT_LABEL[spec.cat], CAT_COLOR[spec.cat]);
-      const lbl = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.325), new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
-      lbl.position.set(cell.x, tier.y - 0.17, tier.z + 0.456);
+      // holographic label floating in front of the pad
+      const tex = T.toTex(T.holoLabelCanvas(spec.short, CAT_LABEL[spec.cat], spec.legendary ? '#facc15' : CAT_COLOR[spec.cat]));
+      const lbl = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.36), holoMaterial('#ffffff', 1, { map: tex }));
+      lbl.position.set(pad.x, pad.y + 0.06, pad.z + 0.62);
+      lbl.rotation.x = -0.95;
+      lbl.renderOrder = 30;
       this.scene.add(lbl);
       this.labels.push(lbl);
     });
+  }
+
+  addLegendaryAura(obj, center, size) {
+    const r = Math.max(size.x, size.y, size.z) * 0.62;
+    const aura = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), holoMaterial('#facc15', 0.35));
+    aura.position.copy(center);
+    aura.userData.noAO = true;
+    aura.userData.aura = true;
+    obj.add(aura);
   }
 
   teardown() {
@@ -175,18 +216,22 @@ export class Assembly {
       if (p.hitbox) p.hitbox.geometry.dispose();
     }
     for (const l of this.labels) {
-      l.material.map.dispose();
+      l.material.uniforms.uMap.value.dispose();
       l.material.dispose();
       l.geometry.dispose();
       l.removeFromParent();
     }
     for (const c of this.clickables) c.marker.removeFromParent();
+    for (const id of Object.keys(this.stubs)) this.removeStub(id);
     this.labels = [];
     this.clickables = [];
     this.parts = [];
     this.held = null;
+    this.endGauge(true);
     this.active = false;
     this.hintArrow.visible = false;
+    this.reticle.visible = false;
+    this.pasteRing.visible = false;
   }
 
   // ------------------------------------------------------------------ helpers
@@ -199,11 +244,13 @@ export class Assembly {
   prereq(cat) {
     const s = this.slot;
     switch (cat) {
-      case 'cpu': return s.mb ? null : 'Install the motherboard first';
-      case 'ram': return s.mb ? null : 'Install the motherboard first';
-      case 'ssd': return s.mb ? null : 'Install the motherboard first';
-      case 'gpu': return s.mb ? null : 'Install the motherboard first';
-      case 'cooler': return !s.cpu ? 'Install the CPU first' : !this.cpuLocked ? 'Lock the CPU socket lever first' : null;
+      case 'cpu':
+      case 'ram':
+      case 'ssd':
+      case 'gpu':
+        return s.mb ? null : 'Install the motherboard first';
+      case 'cooler':
+        return !s.cpu ? 'Install the CPU first' : !this.cpuLocked ? 'Lock the CPU socket lever first' : !this.paste.done ? 'Apply thermal paste to the CPU first' : null;
     }
     return null;
   }
@@ -214,8 +261,7 @@ export class Assembly {
       case 'cpu': return s.cooler ? 'Remove the cooler first' : null;
       case 'gpu': return this.cables.cgpu ? 'Unplug the GPU power cable first' : null;
       case 'psu': return this.cables.c24 || this.cables.c8 || this.cables.cgpu ? 'Unplug the power cables first' : null;
-      case 'mb':
-        return s.cpu || s.ram || s.ssd || s.gpu || this.cables.c24 || this.cables.c8 ? 'Remove the parts on the motherboard first' : null;
+      case 'mb': return s.cpu || s.ram || s.ssd || s.gpu || this.cables.c24 || this.cables.c8 ? 'Remove the parts on the motherboard first' : null;
     }
     return null;
   }
@@ -228,7 +274,7 @@ export class Assembly {
   }
   requiredDone() {
     const s = this.slot;
-    if (!s.mb || !this.screwsTight(s.mb) || !s.cpu || !this.cpuLocked || !s.cooler || !s.ram || !s.ssd || !this.screwsTight(s.ssd) || !s.psu) return false;
+    if (!s.mb || !this.screwsTight(s.mb) || !s.cpu || !this.cpuLocked || !this.paste.done || !s.cooler || !s.ram || !s.ssd || !this.screwsTight(s.ssd) || !s.psu) return false;
     if (!this.cables.c24 || !this.cables.c8) return false;
     if (this.needGpu && (!s.gpu || !this.screwsTight(s.gpu) || !this.cables.cgpu)) return false;
     return true;
@@ -243,6 +289,10 @@ export class Assembly {
   partWorldCenter(part) {
     return part.obj.localToWorld(part.center.clone());
   }
+  screenOf(world) {
+    const v = world.clone().project(this.g.camera);
+    return { x: ((v.x + 1) / 2) * innerWidth, y: ((1 - v.y) / 2) * innerHeight };
+  }
 
   // ------------------------------------------------------------------ steps / hints
   steps() {
@@ -251,7 +301,7 @@ export class Assembly {
     const partStep = (cat, verb) => {
       const want = PARTS[o[cat]];
       if (s[cat] && !this.isCorrect(cat)) {
-        add(cat, false, true, `Wrong ${CAT_LABEL[cat].toLowerCase()}! Drag the ${s[cat].spec.name} back to the rack and fit the ${want.name}`, () => this.partWorldCenter(s[cat]), true);
+        add(cat, false, true, `Wrong ${CAT_LABEL[cat].toLowerCase()}! Drag the ${s[cat].spec.name} back and fit the ${want.name}`, () => this.partWorldCenter(s[cat]), true);
       } else {
         add(cat, !!s[cat], !this.prereq(cat), `${verb} the ${want.name}`, () => {
           const p = this.trayPartFor(cat);
@@ -259,30 +309,32 @@ export class Assembly {
         });
       }
     };
-    const screwStep = (id, cat, text) => {
+    const screwStep = (id, cat) => {
       const p = s[cat];
-      add(id, this.screwsTight(p), !!p, text, () => {
+      add(id, this.screwsTight(p), !!p, 'HOLD a screw and release in the gold zone for perfect torque', () => {
         const sc = p && p.screws.find((x) => !x.userData.tight);
         return sc ? sc.getWorldPosition(V3()) : this.slotWorld(cat);
       });
     };
-    partStep('mb', 'Drag onto the brass standoffs:');
-    screwStep('mbScrews', 'mb', 'Click the screws to fasten the motherboard');
-    partStep('cpu', 'Drop into the socket:');
+    partStep('mb', 'Drag onto the standoffs:');
+    screwStep('mbScrews', 'mb');
+    partStep('cpu', 'Seat in the socket:');
     add('cpuLock', this.cpuLocked, !!s.cpu, 'Click the socket lever to lock the CPU in', () => this.leverWorld());
+    add('paste', this.paste.done, !!s.cpu && this.cpuLocked, this.g.hasUpgrade('pastegun') ? 'Click the CPU to apply thermal paste' : 'HOLD on the CPU to dispense thermal paste — release when it fills the gold ring', () => this.slotWorld('cpu').add(V3(0, 0, 0.1)));
     partStep('cooler', 'Mount on the CPU:');
     partStep('ram', 'Click into the memory slots:');
     partStep('ssd', 'Slot into the M.2 connector:');
-    screwStep('ssdScrew', 'ssd', 'Click the tiny screw to hold the SSD down');
+    screwStep('ssdScrew', 'ssd');
     if (this.needGpu) {
       partStep('gpu', 'Seat in the PCIe slot:');
-      screwStep('gpuScrew', 'gpu', 'Click the bracket screw to secure the graphics card');
+      screwStep('gpuScrew', 'gpu');
     }
-    partStep('psu', 'Slide into the bottom chamber:');
-    add('c24', !!this.cables.c24, !!(s.mb && s.psu), 'Click the glowing port to plug in the 24-pin power cable', () => this.portWorld('c24'));
-    add('c8', !!this.cables.c8, !!(s.mb && s.psu), 'Click the glowing port to plug in the CPU power cable', () => this.portWorld('c8'));
-    if (this.needGpu) add('cgpu', !!this.cables.cgpu, !!(s.gpu && s.psu), 'Click the glowing port to power the graphics card', () => this.portWorld('cgpu'));
-    add('panel', this.panelOn, this.requiredDone(), 'Click the glass side panel to close up the case', () => this.panel.getWorldPosition(V3()));
+    partStep('psu', 'Slide into the power bay:');
+    const cab = (id, label, ok) => add(id, !!this.cables[id], ok, `DRAG the ${label} cable to its glowing port`, () => (this.stubs[id] ? this.stubs[id].plug.getWorldPosition(V3()) : this.portWorld(id)));
+    cab('c24', '24-pin board', !!(s.mb && s.psu));
+    cab('c8', 'CPU power', !!(s.mb && s.psu));
+    if (this.needGpu) cab('cgpu', 'GPU power', !!(s.gpu && s.psu));
+    add('panel', this.panelOn, this.requiredDone(), 'Click the glass side panel to seal the case', () => this.panel.getWorldPosition(V3()));
     add('power', false, this.panelOn, 'Press the power button on top of the case to run QA', () => this.caseObj.userData.caseRefs.btn.getWorldPosition(V3()).add(V3(0, 0.1, 0)));
     return out;
   }
@@ -301,42 +353,44 @@ export class Assembly {
       this.clickables.push(c);
       return c;
     };
-    // screws (generic: every installed part with loose screws)
     for (const part of this.parts) {
       part.screws.forEach((sc, i) => {
         const c = add({
-          id: `screw-${part.cat}-${i}`, size: 0.36,
-          avail: () => part.state === 'installed' && !sc.userData.tight && !this.panelOn && !sc.userData.busy,
+          id: `screw-${part.cat}-${i}`, size: 0.36, hold: true,
+          avail: () => part.state === 'installed' && !sc.userData.tight && !this.panelOn && !sc.userData.busy && !this.gauge,
           pos: () => sc.getWorldPosition(this.tmpV).clone(),
-          onClick: () => this.clickScrew(part, sc),
+          onDown: () => this.startScrew(part, sc),
         });
         sc.userData.it = { type: 'click', c };
       });
     }
-    // CPU lever
     add({
       id: 'lever', avail: () => !!this.slot.cpu && !this.cpuLocked && this.slot.cpu.state === 'installed' && !!this.slot.mb, pos: () => this.leverWorld(),
-      onClick: () => this.lockCPU(),
+      onDown: () => this.lockCPU(),
     });
-    // cable ports
+    add({
+      id: 'paste', color: '#facc15', size: 0.5, hold: true,
+      avail: () => !!this.slot.cpu && this.cpuLocked && !this.paste.done && !this.slot.cooler && !this.gauge,
+      pos: () => this.slotWorld('cpu').add(V3(0, 0, 0.12)),
+      onDown: () => this.startPaste(),
+    });
     for (const id of ['c24', 'c8', 'cgpu']) {
       add({
-        id: 'port-' + id, color: '#fde047', size: 0.42,
-        avail: () => !this.cables[id] && !this.panelOn && this.portAvail(id), pos: () => this.portWorld(id),
-        onClick: () => this.clickPort(id),
+        id: 'cable-' + id, color: '#fde047', size: 0.42,
+        avail: () => !!this.stubs[id] && !this.cables[id] && !this.panelOn && !this.held,
+        pos: () => this.stubs[id].plug.getWorldPosition(this.tmpV).clone(),
+        onDown: (ev) => this.startCable(id, ev),
       });
     }
-    // panel
     const pc = add({
       id: 'panel', size: 0.9, avail: () => !this.panelOn && this.requiredDone() && !this.testing, pos: () => this.panel.getWorldPosition(this.tmpV).clone(),
-      onClick: () => this.closePanel(),
+      onDown: () => this.closePanel(),
     });
-    this.panel.userData.it = { type: 'click', c: pc, always: true };
-    // power button
+    this.panel.userData.it = { type: 'click', c: pc };
     const btn = this.caseObj.userData.caseRefs.btn;
     const bc = add({
       id: 'power', color: '#86efac', size: 0.5, avail: () => this.panelOn && !this.testing, pos: () => btn.getWorldPosition(this.tmpV).clone().add(V3(0, 0.12, 0)),
-      onClick: () => this.runTest(),
+      onDown: () => this.runTest(),
     });
     btn.userData.it = { type: 'click', c: bc };
   }
@@ -347,7 +401,7 @@ export class Assembly {
   }
   portAvail(id) {
     const s = this.slot;
-    if (id === 'cgpu') return !!(s.gpu && s.psu && s.gpu.state === 'installed');
+    if (id === 'cgpu') return !!(s.gpu && s.psu && s.gpu.state === 'installed' && s.psu.state === 'installed');
     return !!(s.mb && s.psu && s.mb.state === 'installed' && s.psu.state === 'installed');
   }
   portLocal(id) {
@@ -360,43 +414,215 @@ export class Assembly {
   portWorld(id) {
     return this.caseObj.localToWorld(this.portLocal(id));
   }
+  cableStart(id) {
+    return { c24: V3(-0.95, 3.25, -1.06), c8: V3(-0.8, 4.72, -1.06), cgpu: V3(0.4, 1.27, 0.55) }[id].clone();
+  }
+  cableSpec(id) {
+    return { c24: { strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0, 0.07, 0) }, c8: { strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0.07, 0, 0) }, cgpu: { strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0.07, 0, 0) } }[id];
+  }
   cablePath(id) {
     const p = this.portLocal(id);
-    if (id === 'c24') {
-      return { pts: [V3(-0.95, 3.25, -1.06), V3(-0.95, 3.25, -0.74), V3(-0.8, 3.25, -0.56), V3(-0.55, 3.25, -0.56), V3(p.x, p.y, p.z + 0.12), V3(p.x, p.y, p.z)], strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0, 0.07, 0) };
+    if (id === 'c24') return [V3(-0.95, 3.25, -1.06), V3(-0.95, 3.25, -0.74), V3(-0.8, 3.25, -0.56), V3(-0.55, 3.25, -0.56), V3(p.x, p.y, p.z + 0.12), V3(p.x, p.y, p.z)];
+    if (id === 'c8') return [V3(-0.8, 4.72, -1.06), V3(-0.8, 4.72, -0.76), V3(-0.5, 4.68, -0.6), V3(-0.08, 4.58, -0.6), V3(p.x, p.y + 0.02, p.z + 0.12), V3(p.x, p.y, p.z)];
+    return [V3(0.4, 1.27, 0.55), V3(0.43, 1.42, 0.78), V3(p.x - 0.1, p.y - 0.12, p.z + 0.42), V3(p.x, p.y, p.z + 0.18), V3(p.x, p.y, p.z)];
+  }
+  // live cable from its grommet to an arbitrary point (case-local), with a little sag
+  livePath(id, endLocal) {
+    const a = this.cableStart(id);
+    const out = id === 'cgpu' ? V3(0, 0.25, 0.15) : V3(0, 0, 0.3);
+    const a2 = a.clone().add(out);
+    const mid = a2.clone().lerp(endLocal, 0.5);
+    mid.y -= 0.18 + a2.distanceTo(endLocal) * 0.18;
+    mid.z += 0.15;
+    return [a, a2, mid, endLocal.clone().add(V3(0, 0, 0.12)), endLocal.clone()];
+  }
+
+  // ------------------------------------------------------------------ cable stubs & drag
+  ensureStub(id) {
+    if (this.stubs[id]) return;
+    const start = this.cableStart(id);
+    const end = start.clone().add(id === 'cgpu' ? V3(0.15, 0.35, 0.25) : V3(0.12, -0.32, 0.32));
+    const st = this.buildLive(id, this.livePath(id, end));
+    st.end = end;
+    this.stubs[id] = st;
+  }
+  buildLive(id, pts) {
+    const { strands, off } = this.cableSpec(id);
+    const cable = MD.buildCable(pts, strands, off, 0.034, cableMat(this.order.caseVariant));
+    this.caseObj.add(cable);
+    return { group: cable, plug: cable.userData.plug };
+  }
+  removeStub(id) {
+    const st = this.stubs[id];
+    if (!st) return;
+    st.group.removeFromParent();
+    st.group.traverse((o) => o.isMesh && o.geometry && !o.geometry.userData.shared && o.geometry.dispose());
+    delete this.stubs[id];
+  }
+  startCable(id, ev) {
+    if (this.g.hasUpgrade('cablecomb')) {
+      const ids = ['c24', 'c8', 'cgpu'].filter((k) => !this.cables[k] && this.portAvail(k));
+      ids.forEach((k, i) => this.connect(k, i * 0.1, false, 'perfect'));
+      return;
     }
-    if (id === 'c8') {
-      return { pts: [V3(-0.8, 4.72, -1.06), V3(-0.8, 4.72, -0.76), V3(-0.5, 4.68, -0.6), V3(-0.08, 4.58, -0.6), V3(p.x, p.y + 0.02, p.z + 0.12), V3(p.x, p.y, p.z)], strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0.07, 0, 0) };
+    const port = this.portWorld(id);
+    this.held = { type: 'cable', id, plane: new THREE.Plane(V3(0, 0, 1), -(port.z + 0.08)), t0: performance.now(), x0: ev.clientX, y0: ev.clientY, moved: false, sticky: false, snap: false, d: 9 };
+    audio.play('pick', { pitch: 1.2 });
+  }
+  updateCableDrag() {
+    const h = this.held;
+    const rc = this.g.raycaster;
+    rc.setFromCamera(this.g.pointer, this.g.camera);
+    const p = rc.ray.intersectPlane(h.plane, V3());
+    if (!p) return;
+    const portW = this.portWorld(h.id);
+    const d = Math.hypot(p.x - portW.x, p.y - portW.y);
+    h.d = d;
+    const wasSnap = h.snap;
+    h.snap = d < 0.55;
+    if (h.snap && !wasSnap) audio.play('zone');
+    const endW = h.snap ? portW : p;
+    const endL = this.caseObj.worldToLocal(endW.clone());
+    this.removeStub(h.id);
+    const st = this.buildLive(h.id, this.livePath(h.id, endL));
+    st.end = endL;
+    this.stubs[h.id] = st;
+    this.showReticle(portW, d, 0.15, h.snap);
+  }
+  releaseCable() {
+    const h = this.held;
+    this.held = null;
+    this.reticle.visible = false;
+    if (h.snap) {
+      const tier = h.d < 0.15 ? 'perfect' : h.d < 0.32 ? 'great' : 'good';
+      this.connect(h.id, 0, false, tier);
+    } else {
+      // spring back to the stub
+      this.removeStub(h.id);
+      audio.play('drop');
     }
-    return { pts: [V3(0.4, 1.27, 0.55), V3(0.43, 1.42, 0.78), V3(p.x - 0.1, p.y - 0.12, p.z + 0.42), V3(p.x, p.y, p.z + 0.18), V3(p.x, p.y, p.z)], strands: [-1.5, -0.5, 0.5, 1.5], off: V3(0.07, 0, 0) };
   }
 
   // ------------------------------------------------------------------ actions
-  async clickScrew(part, sc) {
+  startScrew(part, sc) {
     const all = this.g.hasUpgrade('driver');
     const list = all ? part.screws.filter((s) => !s.userData.tight && !s.userData.busy) : [sc];
-    audio.play(all ? 'drill' : 'screw');
-    const dur = all ? 0.45 : 0.36;
-    await Promise.all(list.map((s, i) => {
+    for (const s of list) {
       s.userData.busy = true;
-      const from = s.position.clone();
-      const to = s.userData.base.clone();
-      let last = 0;
-      return tweens.add({
-        duration: dur, ease: Ease.inOutSine,
-        update: (e) => {
-          s.position.lerpVectors(from, to, e);
-          s.rotateZ((e - last) * 14);
-          last = e;
-        },
-      }).then(() => {
+      s.userData.from = s.position.clone();
+    }
+    this.gauge = { kind: 'screw', part, list, anchor: sc, t0: this.g.time, v: 0, zones: all ? TORQUE_PRO : TORQUE, lastTick: 0 };
+    audio.play(all ? 'drill' : 'pick', { pitch: 0.8 });
+  }
+  startPaste() {
+    if (this.g.hasUpgrade('pastegun')) {
+      this.ensureBlob();
+      this.paste.done = true;
+      tweens.add({ duration: 0.45, ease: Ease.outCubic, update: (e) => this.setBlob(e * 0.77) }).then(() => {
+        audio.play('squish', { v: 0.8 });
+        this.g.judge('paste', 'perfect', this.slotWorld('cpu').add(V3(0, 0.3, 0.2)), 'Perfect pea!');
+        this.refreshTicket();
+      });
+      return;
+    }
+    this.ensureBlob();
+    this.gauge = { kind: 'paste', t0: this.g.time - (this.paste.amount * PASTE.time), v: this.paste.amount, zones: PASTE, lastTick: 0 };
+    audio.play('squish', { v: 0.2 });
+  }
+  ensureBlob() {
+    if (this.paste.blob) return;
+    const b = MD.buildPasteBlob();
+    b.position.set(0, 0, 0.065);
+    b.scale.setScalar(0.001);
+    this.slot.cpu.obj.add(b);
+    this.paste.blob = b;
+  }
+  setBlob(v) {
+    const b = this.paste.blob;
+    if (!b) return;
+    const s = 0.15 + v * 1.25;
+    b.scale.set(s, s, 0.5 * Math.min(1.2, 0.4 + v));
+  }
+  updateGauge(dt) {
+    const gq = this.gauge;
+    const el = (this.g.time - gq.t0) / gq.zones.time;
+    gq.v = el;
+    // tick sound as the needle sweeps
+    if (Math.floor(el * 12) !== gq.lastTick) {
+      gq.lastTick = Math.floor(el * 12);
+      audio.play(gq.kind === 'paste' ? 'squish' : 'gauge', { v: el });
+    }
+    if (gq.kind === 'screw') {
+      const k = Math.min(1, el);
+      for (const s of gq.list) {
+        s.position.lerpVectors(s.userData.from, s.userData.base, k);
+        s.rotateZ(dt * 22);
+      }
+      const p = this.screenOf(gq.anchor.getWorldPosition(V3()));
+      this.g.ui.gauge({ ...p, v: el, zones: gq.zones, label: 'TORQUE' });
+      if (el > 1.25) this.endGauge();
+    } else {
+      this.setBlob(el);
+      const cpuW = this.slotWorld('cpu');
+      const p = this.screenOf(cpuW);
+      this.g.ui.gauge({ ...p, v: el, zones: gq.zones, label: 'PASTE' });
+      this.pasteRing.visible = true;
+      this.pasteRing.position.copy(cpuW).add(V3(0, 0, 0.09));
+      const target = (0.15 + 0.77 * 1.25) * 0.1;
+      this.pasteRing.scale.setScalar(target / 0.2);
+      if (el > 1.2) this.endGauge();
+    }
+  }
+  endGauge(cancel = false) {
+    const gq = this.gauge;
+    if (!gq) return;
+    this.gauge = null;
+    this.g.ui.gauge(null);
+    this.pasteRing.visible = false;
+    if (cancel) {
+      if (gq.kind === 'screw') for (const s of gq.list) {
+        s.userData.busy = false;
+        if (!s.userData.tight) s.position.copy(s.userData.from);
+      }
+      return;
+    }
+    const v = gq.v, z = gq.zones;
+    if (gq.kind === 'screw') {
+      const pos = gq.anchor.getWorldPosition(V3());
+      if (v < 0.4) {
+        // too loose — screw backs out, try again
+        for (const s of gq.list) {
+          s.userData.busy = false;
+          tweenObj(s, { pos: s.userData.from.clone(), duration: 0.2 });
+        }
+        audio.play('error');
+        this.g.fx.float(pos, 'TOO LOOSE', 'bad');
+        return;
+      }
+      const tier = v >= z.perfect[0] && v <= z.perfect[1] ? 'perfect' : v >= z.green[0] && v <= z.green[1] ? 'great' : v < z.green[0] ? 'good' : 'sloppy';
+      for (const s of gq.list) {
+        s.position.copy(s.userData.base);
         s.userData.tight = true;
         s.userData.busy = false;
-        this.g.fx.burst(s.getWorldPosition(V3()), { count: 8, speed: 1.2, size: 0.3, color: '#e2e8f0', color2: '#fde68a' });
-      });
-    }));
-    this.g.onAction(sc.getWorldPosition(V3()), all && list.length > 1 ? `×${list.length} Tight!` : 'Tight!');
-    this.refreshTicket();
+        this.g.fx.burst(s.getWorldPosition(V3()), { count: tier === 'perfect' ? 18 : 8, speed: 1.4, size: 0.32, color: tier === 'perfect' ? '#fde68a' : '#e2e8f0', color2: '#fef3c7' });
+      }
+      audio.play(tier === 'sloppy' ? 'error' : 'screw');
+      const label = tier === 'sloppy' ? 'OVER-TORQUED' : gq.list.length > 1 ? `×${gq.list.length}` : '';
+      for (let i = 0; i < gq.list.length; i++) this.g.judge('screw', tier, pos, i === 0 ? label : null, i > 0);
+      this.refreshTicket();
+    } else {
+      this.paste.amount = Math.min(v, 1.2);
+      const pos = this.slotWorld('cpu').add(V3(0, 0.3, 0.2));
+      if (v < PASTE.min) {
+        this.g.fx.float(pos, 'MORE PASTE…', '');
+        return;
+      }
+      this.paste.done = true;
+      const tier = v >= z.perfect[0] && v <= z.perfect[1] ? 'perfect' : v >= z.green[0] && v <= z.green[1] ? 'great' : v < z.green[0] ? 'good' : 'sloppy';
+      audio.play('squish', { v: 1 });
+      this.g.judge('paste', tier, pos, tier === 'sloppy' ? 'TOO MUCH!' : tier === 'perfect' ? 'Perfect pea!' : null);
+      this.refreshTicket();
+    }
   }
 
   async lockCPU() {
@@ -404,35 +630,26 @@ export class Assembly {
     this.cpuLocked = true;
     const r = this.slot.mb.obj.userData.refs;
     const p0 = r.plate.rotation.y, l0 = r.lever.rotation.x;
-    await tweens.add({ duration: 0.22, ease: Ease.inCubic, update: (e) => (r.plate.rotation.y = p0 * (1 - e)) });
+    await tweens.add({ duration: 0.2, ease: Ease.inCubic, update: (e) => (r.plate.rotation.y = p0 * (1 - e)) });
     audio.play('clack', { pitch: 0.7 });
-    await tweens.add({ duration: 0.2, ease: Ease.inCubic, update: (e) => (r.lever.rotation.x = l0 * (1 - e)) });
+    await tweens.add({ duration: 0.18, ease: Ease.inCubic, update: (e) => (r.lever.rotation.x = l0 * (1 - e)) });
     audio.play('lever');
-    this.g.fx.shake(0.04);
-    this.g.onAction(this.leverWorld(), 'Locked!');
+    this.g.fx.shake(0.05);
+    this.g.action(this.leverWorld(), 'LOCKED');
     this.refreshTicket();
   }
-  unlockCPU(instant = false) {
+  unlockCPU() {
     if (!this.slot.mb) return;
     const r = this.slot.mb.obj.userData.refs;
     this.cpuLocked = false;
-    if (instant) {
-      r.plate.rotation.y = -1.75;
-      r.lever.rotation.x = 1.15;
-      return;
-    }
     tweens.add({ duration: 0.25, update: (e) => { r.lever.rotation.x = 1.15 * e; r.plate.rotation.y = -1.75 * e; } });
   }
 
-  async clickPort(id) {
-    const ids = this.g.hasUpgrade('cablecomb') ? ['c24', 'c8', 'cgpu'].filter((k) => !this.cables[k] && this.portAvail(k)) : [id];
-    await Promise.all(ids.map((k, i) => this.connect(k, i * 0.08)));
-    this.g.onAction(this.portWorld(id), ids.length > 1 ? `×${ids.length} Plugged in!` : 'Plugged in!');
-    this.refreshTicket();
-  }
-  async connect(id, delay = 0, instant = false) {
+  async connect(id, delay = 0, instant = false, tier = 'great') {
     if (this.cables[id]) return;
-    const { pts, strands, off } = this.cablePath(id);
+    this.removeStub(id);
+    const pts = this.cablePath(id);
+    const { strands, off } = this.cableSpec(id);
     const cable = MD.buildCable(pts, strands, off, 0.034, cableMat(this.order.caseVariant));
     cable.userData.it = { type: 'cable', id };
     this.caseObj.add(cable);
@@ -443,19 +660,20 @@ export class Assembly {
     }
     MD.setCableGrowth(cable, 0);
     if (delay) await wait(delay);
-    audio.play('whoosh');
-    await tweens.add({ duration: 0.42, ease: Ease.inOutCubic, update: (e) => MD.setCableGrowth(cable, e) });
+    await tweens.add({ duration: 0.18, ease: Ease.outCubic, update: (e) => MD.setCableGrowth(cable, e) });
     MD.setCableGrowth(cable, 1);
     audio.play('plug');
-    this.g.fx.burst(this.portWorld(id), { count: 14, color: '#fde047', color2: '#fb923c', speed: 1.6, size: 0.4 });
+    const pw = this.portWorld(id);
+    this.g.fx.burst(pw, { count: 16, color: '#fde047', color2: '#fb923c', speed: 1.8, size: 0.4 });
+    this.g.judge('cable', tier, pw, tier === 'perfect' ? 'Clean route!' : null);
+    this.refreshTicket();
   }
   async unplug(id) {
     const cable = this.cables[id];
-    if (!cable) return;
-    if (this.panelOn || this.testing) return;
+    if (!cable || this.panelOn || this.testing) return;
     this.cables[id] = null;
     audio.play('plug', { pitch: 0.8 });
-    await tweens.add({ duration: 0.25, ease: Ease.inCubic, update: (e) => MD.setCableGrowth(cable, 1 - e) });
+    await tweens.add({ duration: 0.22, ease: Ease.inCubic, update: (e) => MD.setCableGrowth(cable, 1 - e) });
     cable.removeFromParent();
     cable.traverse((o) => o.isMesh && o.geometry && !o.geometry.userData.shared && o.geometry.dispose());
     this.refreshTicket();
@@ -468,12 +686,13 @@ export class Assembly {
     this.caseObj.attach(p);
     audio.play('whoosh');
     const mid = SLOTS.panel.clone().add(V3(-0.5, 0.4, 1.4));
-    await tweenObj(p, { pos: mid, quat: qEuler(0, 0.2, 0), duration: 0.35, ease: Ease.inOutCubic });
-    await tweenObj(p, { pos: SLOTS.panel.clone(), quat: QI(), duration: 0.28, ease: Ease.outCubic });
+    await tweenObj(p, { pos: mid, quat: qEuler(0, 0.2, 0), duration: 0.32, ease: Ease.inOutCubic });
+    await tweenObj(p, { pos: SLOTS.panel.clone(), quat: QI(), duration: 0.24, ease: Ease.outCubic });
     audio.play('glass');
     audio.play('snap', { pitch: 0.8 });
-    this.g.fx.shake(0.05);
-    this.g.onAction(p.getWorldPosition(V3()).add(V3(0, 1, 0)), 'Sealed up!');
+    this.g.fx.shake(0.06);
+    this.g.post.pulse('#c7d2fe', 0.1);
+    this.g.action(p.getWorldPosition(V3()).add(V3(0, 1, 0)), 'SEALED');
     this.refreshTicket();
   }
   async openPanel() {
@@ -489,11 +708,12 @@ export class Assembly {
     return !this.prereq(part.cat) && !this.slot[part.cat] && !this.panelOn && !this.testing;
   }
 
-  async install(part, instant = false) {
+  async install(part, instant = false, tier = 'great') {
     const cat = part.cat;
     this.slot[cat] = part;
     part.state = 'anim';
     const obj = part.obj;
+    for (const c of obj.children) if (c.userData.aura) c.visible = false;
     this.caseObj.attach(obj);
     const slot = SLOTS[cat].clone();
     if (instant) {
@@ -502,8 +722,8 @@ export class Assembly {
       obj.scale.setScalar(1);
     } else {
       const above = slot.clone().add(V3(0, 0, cat === 'psu' ? 0.6 : 0.22));
-      await tweenObj(obj, { pos: above, quat: QI(), scale: 1, duration: 0.13, ease: Ease.outCubic });
-      await tweenObj(obj, { pos: slot, duration: 0.08, ease: Ease.inQuad });
+      await tweenObj(obj, { pos: above, quat: QI(), scale: 1, duration: 0.11, ease: Ease.outCubic });
+      await tweenObj(obj, { pos: slot, duration: 0.07, ease: Ease.inQuad });
     }
     part.state = 'installed';
     MD.swapMaterial(obj, M.rgbIdle, M.rgb);
@@ -516,26 +736,37 @@ export class Assembly {
     if (cat === 'ram' && this.slot.mb) {
       const latches = this.slot.mb.obj.userData.refs.latches;
       if (instant) latches.forEach((l) => (l.obj.rotation.x = 0));
-      else {
-        tweens.add({ duration: 0.12, delay: 0.02, ease: Ease.outBack, update: (e) => latches.forEach((l) => (l.obj.rotation.x = l.dir * 0.45 * (1 - e))) });
-      }
+      else tweens.add({ duration: 0.12, delay: 0.02, ease: Ease.outBack, update: (e) => latches.forEach((l) => (l.obj.rotation.x = l.dir * 0.45 * (1 - e))) });
+    }
+    if (cat === 'cooler' && this.paste.blob) {
+      // the cooler squashes the paste flat
+      const b = this.paste.blob;
+      b.scale.z = 0.12;
     }
     if (instant) return;
     const wp = this.partWorldCenter(part);
+    const ok = part.spec.id === this.order.parts[cat];
     audio.play(cat === 'ram' ? 'clack' : cat === 'psu' ? 'thump' : 'snap', { pitch: this.g.comboPitch() });
     if (cat === 'psu' || cat === 'mb') audio.play('snap', { pitch: this.g.comboPitch() * 0.8 });
-    this.g.fx.burst(wp, { count: 26, speed: 2.4 });
-    this.g.fx.shake(cat === 'psu' || cat === 'mb' || cat === 'gpu' ? 0.07 : 0.035);
-    const ok = part.spec.id === this.order.parts[cat];
-    this.g.onAction(wp, ok ? pickPraise() : 'Hmm… check the ticket', !ok);
-    if (!ok) audio.play('error');
+    this.g.fx.burst(wp, { count: tier === 'perfect' ? 40 : 24, speed: tier === 'perfect' ? 3.2 : 2.2, color: tier === 'perfect' ? '#fde68a' : '#a5f3fc', color2: tier === 'perfect' ? '#fbbf24' : '#c4b5fd' });
+    this.g.fx.ring(this.slotWorld(cat).add(V3(0, 0, 0.3)), { color: tier === 'perfect' ? '#facc15' : '#67e8f9', radius: 1.2, axis: 'z' });
+    this.g.fx.shake(cat === 'psu' || cat === 'mb' || cat === 'gpu' ? 0.08 : 0.04);
+    if (ok) this.g.judge('place', tier, wp);
+    else this.g.wrong(wp);
     this.refreshTicket();
   }
 
   uninstall(part) {
     const cat = part.cat;
     if (this.slot[cat] === part) this.slot[cat] = null;
-    if (cat === 'cpu' && this.cpuLocked) this.unlockCPU();
+    if (cat === 'cpu') {
+      if (this.cpuLocked) this.unlockCPU();
+      if (this.paste.blob) {
+        this.paste.blob.removeFromParent();
+        this.paste = { amount: 0, done: false, blob: null };
+      }
+    }
+    if (cat === 'cooler' && this.paste.blob) this.setBlob(this.paste.amount);
     if (cat === 'ram' && this.slot.mb) {
       const latches = this.slot.mb.obj.userData.refs.latches;
       tweens.add({ duration: 0.15, update: (e) => latches.forEach((l) => (l.obj.rotation.x = l.dir * 0.45 * e)) });
@@ -544,6 +775,7 @@ export class Assembly {
       sc.visible = false;
       sc.userData.tight = false;
     }
+    for (const c of part.obj.children) if (c.userData.aura) c.visible = true;
     MD.swapMaterial(part.obj, M.rgb, M.rgbIdle);
     this.scene.attach(part.obj);
     this.refreshTicket();
@@ -553,13 +785,13 @@ export class Assembly {
     part.state = 'anim';
     this.hideGhost(part);
     audio.play('drop');
-    await tweenObj(part.obj, { pos: part.tray.pos.clone(), quat: part.tray.quat.clone(), scale: part.trayScale, duration: 0.4, ease: Ease.outCubic });
+    await tweenObj(part.obj, { pos: part.base.pos.clone(), quat: part.base.quat.clone(), scale: part.trayScale, duration: 0.4, ease: Ease.outCubic });
     part.state = 'tray';
   }
 
   ghostFor(part) {
     if (!part.ghost) {
-      const gh = ghostClone(part.obj);
+      const gh = ghostClone(part.obj, this.ghostMat);
       gh.position.copy(SLOTS[part.cat]);
       gh.quaternion.identity();
       gh.scale.setScalar(1);
@@ -571,7 +803,7 @@ export class Assembly {
     const gh = this.ghostFor(part);
     if (!gh.parent) this.caseObj.add(gh);
     gh.visible = true;
-    const mat = hot ? M.ghostHot : M.ghost;
+    const mat = hot ? this.ghostHotMat : this.ghostMat;
     if (gh.userData.mat !== mat) {
       gh.traverse((o) => o.isMesh && (o.material = mat));
       gh.userData.mat = mat;
@@ -580,18 +812,29 @@ export class Assembly {
   hideGhost(part) {
     if (part.ghost) part.ghost.visible = false;
   }
+  showReticle(at, d, perfR, hot) {
+    this.reticle.visible = true;
+    this.reticle.position.copy(at).add(V3(0, 0, 0.45));
+    const r = Math.max(perfR, Math.min(MAGNET, d));
+    this.retInner.scale.setScalar(r);
+    this.retPerfect.scale.setScalar(perfR / 0.2);
+    const gold = d <= perfR;
+    this.retInner.material.color.set(gold ? '#facc15' : hot ? '#a5f3fc' : '#67e8f9');
+    this.retOuter.material.opacity = hot ? 0.7 : 0.35;
+  }
 
   // ------------------------------------------------------------------ input
   pickHit(ndc) {
     const rc = this.g.raycaster;
     rc.setFromCamera(ndc, this.g.camera);
     const markers = this.clickables.filter((c) => c.marker.visible).map((c) => c.marker);
-    let hit = markers.length ? rc.intersectObjects(markers, false)[0] : null;
+    const hit = markers.length ? rc.intersectObjects(markers, false)[0] : null;
     if (hit) return hit.object.userData.it;
     const roots = [...this.parts.map((p) => p.obj), this.panel, this.caseObj];
     const hits = rc.intersectObjects(roots, true);
     for (const h of hits) {
-      if (h.object.material === M.ghost || h.object.material === M.ghostHot) continue;
+      const mat = h.object.material;
+      if (mat === this.ghostMat || mat === this.ghostHotMat || h.object.userData.aura) continue;
       if (h.object.userData.hitbox) {
         const it = h.object.parent.userData.it;
         if (it && it.part.state === 'tray') return it;
@@ -603,7 +846,6 @@ export class Assembly {
         if (o.userData && o.userData.it) return o.userData.it;
         o = o.parent;
       }
-      // hit something solid without interaction (e.g. the case): stop here
       return null;
     }
     return null;
@@ -612,23 +854,24 @@ export class Assembly {
   onDown(ndc, ev) {
     if (!this.active || this.testing) return;
     if (this.held) {
-      if (this.held.sticky) this.release();
+      if (this.held.sticky) this.held.type === 'cable' ? this.releaseCable() : this.release();
       return;
     }
+    if (this.gauge) return;
     const it = this.pickHit(ndc);
     if (!it) return;
     if (it.type === 'click') {
       const c = it.c;
-      if (c.avail()) c.onClick();
+      if (c.avail()) c.onDown(ev);
       else if (c.id === 'panel' && !this.panelOn) {
-        this.g.toast(`Finish the build first — ${this.remainingCount()} step${this.remainingCount() === 1 ? '' : 's'} to go`, 'warn');
+        const n = this.remainingCount();
+        this.g.toast(`Finish the build first — ${n} step${n === 1 ? '' : 's'} to go`, 'warn');
         audio.play('error');
       }
       return;
     }
     if (it.type === 'cable') {
-      if (this.panelOn) return;
-      this.unplug(it.id);
+      if (!this.panelOn) this.unplug(it.id);
       return;
     }
     if (it.type === 'part') {
@@ -650,13 +893,14 @@ export class Assembly {
   startHold(part, ev) {
     const fromInstalled = part.state !== 'tray';
     tweens.cancel(part.obj.uuid + ':xf');
+    tweens.cancel(part.obj.uuid + ':spawn');
     if (this.hover === part) this.hover = null;
     part.state = 'held';
     const slotW = this.slotWorld(part.cat);
     const z0 = slotW.z + part.center.z + 0.32;
     this.held = {
-      part, plane: new THREE.Plane(V3(0, 0, 1), -z0), t0: performance.now(), x0: ev.clientX, y0: ev.clientY,
-      moved: false, sticky: false, magnet: false, fromInstalled,
+      type: 'part', part, plane: new THREE.Plane(V3(0, 0, 1), -z0), t0: performance.now(), x0: ev.clientX, y0: ev.clientY,
+      moved: false, sticky: false, magnet: false, fromInstalled, d: 9, inPerfect: false,
     };
     audio.play('pick');
     this.g.ui.tooltip(null);
@@ -668,20 +912,15 @@ export class Assembly {
       if (Math.hypot(ev.clientX - this.held.x0, ev.clientY - this.held.y0) > 7) this.held.moved = true;
       return;
     }
-    if (this.testing) return;
-    // hover feedback
+    if (this.testing || this.gauge) return;
     const it = this.pickHit(ndc);
     let hov = null;
     if (it && it.type === 'part' && it.part.state === 'tray') hov = it.part;
     if (hov !== this.hover) {
-      if (this.hover && this.hover.state === 'tray') tweenObj(this.hover.obj, { pos: this.hover.tray.pos.clone(), duration: 0.15 });
       this.hover = hov;
-      if (hov) {
-        audio.play('hover');
-        tweenObj(hov.obj, { pos: hov.tray.pos.clone().add(V3(0, 0.12, 0.05)), duration: 0.15 });
-      }
+      if (hov) audio.play('hover');
     }
-    if (hov) this.g.ui.tooltip({ title: hov.spec.name, sub: hov.spec.spec, cat: CAT_LABEL[hov.cat], color: CAT_COLOR[hov.cat] }, ev.clientX, ev.clientY);
+    if (hov) this.g.ui.tooltip({ title: hov.spec.name, sub: hov.spec.spec, cat: hov.spec.legendary ? 'LEGENDARY · ' + CAT_LABEL[hov.cat] : CAT_LABEL[hov.cat], color: hov.spec.legendary ? '#facc15' : CAT_COLOR[hov.cat] }, ev.clientX, ev.clientY);
     else if (it && it.type === 'part' && it.part.state === 'installed') this.g.ui.tooltip({ title: it.part.spec.name, sub: this.canRemove(it.part) || 'Drag to remove', cat: 'Installed', color: CAT_COLOR[it.part.cat] }, ev.clientX, ev.clientY);
     else this.g.ui.tooltip(null);
     let cursor = 'default';
@@ -694,17 +933,29 @@ export class Assembly {
   }
 
   onUp(ndc, ev) {
+    if (this.gauge) {
+      this.endGauge();
+      return;
+    }
     const h = this.held;
     if (!h || h.sticky) return;
     const quick = !h.moved && performance.now() - h.t0 < 260;
+    if (h.type === 'cable') {
+      if (quick) {
+        h.sticky = true;
+        return;
+      }
+      this.releaseCable();
+      return;
+    }
     if (quick) {
       if (this.g.hasUpgrade('gloves') && !h.fromInstalled && this.canInstallNow(h.part)) {
         this.held = null;
         this.hideGhost(h.part);
-        this.install(h.part);
+        this.install(h.part, false, 'great');
         return;
       }
-      h.sticky = true; // click-to-carry: click again to drop
+      h.sticky = true;
       return;
     }
     this.release();
@@ -714,13 +965,15 @@ export class Assembly {
     const h = this.held;
     if (!h) return;
     this.held = null;
+    this.reticle.visible = false;
     const part = h.part;
     this.hideGhost(part);
     if (h.magnet) {
-      this.install(part);
+      const perfR = this.g.hasUpgrade('optics') ? 0.32 : 0.2;
+      const tier = h.d <= perfR ? 'perfect' : h.d <= 0.45 ? 'great' : 'good';
+      this.install(part, false, tier);
       return;
     }
-    // explain why it didn't fit if the player was close
     const slotW = this.slotWorld(part.cat);
     const d = Math.hypot(part.obj.position.x - slotW.x, part.obj.position.y - slotW.y);
     if (d < 1.2) {
@@ -734,23 +987,44 @@ export class Assembly {
   }
 
   cancelHold() {
+    if (this.gauge) this.endGauge(true);
     if (this.held) {
-      const p = this.held.part;
+      const h = this.held;
       this.held = null;
-      this.returnToTray(p);
+      this.reticle.visible = false;
+      if (h.type === 'cable') this.removeStub(h.id);
+      else this.returnToTray(h.part);
     }
   }
 
   // ------------------------------------------------------------------ frame update
   update(dt, t) {
     if (!this.caseObj) return;
-    // fans
     if (this.fanSpeed > 0.001) for (const r of this.rotors) r.rotation.z += dt * 28 * this.fanSpeed;
+    // floating parts on their pads
+    for (const p of this.parts) {
+      if (p.state !== 'tray') continue;
+      const lift = this.hover === p ? 0.16 : 0;
+      p.hoverLift = damp(p.hoverLift || 0, lift, 10, dt);
+      p.obj.position.copy(p.base.pos).add(V3(0, Math.sin(t * 1.6 + p.phase) * 0.04 + p.hoverLift, 0));
+      const yaw = this.hover === p ? 0 : Math.sin(t * 0.55 + p.phase) * 0.28;
+      p.yaw = damp(p.yaw || 0, yaw, 6, dt);
+      p.obj.quaternion.copy(p.base.quat).premultiply(TMPQ.setFromAxisAngle(UP, p.yaw));
+    }
     if (!this.active) return;
 
-    // held part follows the pointer
+    if (this.gauge) this.updateGauge(dt);
+    // cable stubs appear once both ends are installed
+    for (const id of ['c24', 'c8', 'cgpu']) {
+      const want = this.portAvail(id) && !this.cables[id] && !this.panelOn;
+      const dragging = this.held && this.held.type === 'cable' && this.held.id === id;
+      if (want && !this.stubs[id]) this.ensureStub(id);
+      else if (!want && this.stubs[id] && !dragging) this.removeStub(id);
+    }
+
     const h = this.held;
-    if (h) {
+    if (h && h.type === 'cable') this.updateCableDrag();
+    else if (h) {
       const part = h.part, obj = part.obj;
       const rc = this.g.raycaster;
       rc.setFromCamera(this.g.pointer, this.g.camera);
@@ -764,17 +1038,26 @@ export class Assembly {
         const slotW = this.slotWorld(part.cat);
         const can = this.canInstallNow(part);
         const d = Math.hypot(target.x - slotW.x, target.y - slotW.y);
-        h.magnet = can && d < 0.8;
-        if (h.magnet) target.lerp(slotW.clone().add(V3(0, 0, 0.2)), 0.8);
+        h.d = d;
+        h.magnet = can && d < MAGNET;
+        const perfR = this.g.hasUpgrade('optics') ? 0.32 : 0.2;
+        const inP = h.magnet && d <= perfR;
+        if (inP && !h.inPerfect) audio.play('zone');
+        h.inPerfect = inP;
+        if (h.magnet) target.lerp(slotW.clone().add(V3(0, 0, 0.2)), 0.55);
         const prev = obj.position.clone();
         obj.position.x = damp(obj.position.x, target.x, 22, dt);
         obj.position.y = damp(obj.position.y, target.y, 22, dt);
         obj.position.z = damp(obj.position.z, target.z, 16, dt);
-        // juicy sway based on velocity
         const vx = (obj.position.x - prev.x) / Math.max(dt, 1e-3);
         obj.rotateZ(clamp(-vx * 0.004, -0.08, 0.08));
-        if (can) this.showGhost(part, h.magnet);
-        else this.hideGhost(part);
+        if (can) {
+          this.showGhost(part, inP);
+          this.showReticle(slotW, d, perfR, h.magnet);
+        } else {
+          this.hideGhost(part);
+          this.reticle.visible = false;
+        }
       }
     }
 
@@ -789,12 +1072,9 @@ export class Assembly {
         c.marker.scale.set(s, s, s);
       }
     }
-    // power button glow
-    const refs = this.caseObj.userData.caseRefs;
     if (!this.testing) M.ledGreen.emissiveIntensity = this.panelOn ? 0.6 + Math.sin(t * 5) * 0.5 : 0;
 
-    // hint arrow
-    const st = this.held ? null : this.currentStep();
+    const st = this.held || this.gauge ? null : this.currentStep();
     const idle = (performance.now() - this.lastAction) / 1000;
     const showHint = st && !this.testing && this.g.save.settings.hints && (this.order.tutorial || this.g.forceHint || idle > 7 || st.wrong);
     this.hintArrow.visible = !!showHint;
@@ -802,7 +1082,20 @@ export class Assembly {
       const p = st.target();
       this.hintArrow.position.set(p.x, p.y + 0.55 + Math.abs(Math.sin(t * 4)) * 0.25, p.z);
     }
-    this.g.ui.prompt(this.testing ? null : this.held ? (this.held.magnet ? 'Release to snap it in!' : this.canInstallNow(this.held.part) ? 'Move it over the glowing outline' : this.prereq(this.held.part.cat) || 'That slot is already taken') : st ? st.text : null, st && st.wrong);
+    if (st && st.id !== this.lastStepId) {
+      this.lastStepId = st.id;
+      this.g.onStep(st.id);
+    }
+    let prompt = null, warn = false;
+    if (this.testing) prompt = null;
+    else if (this.gauge) prompt = this.gauge.kind === 'screw' ? 'Release in the GOLD zone for perfect torque!' : 'Release when the paste fills the gold ring!';
+    else if (this.held && this.held.type === 'cable') prompt = this.held.snap ? 'Release to plug it in!' : 'Drag the connector to its glowing port';
+    else if (this.held) prompt = this.held.magnet ? (this.held.inPerfect ? 'PERFECT alignment — release!' : 'Line it up with the gold ring for a PERFECT') : this.canInstallNow(this.held.part) ? 'Move it over the glowing outline' : this.prereq(this.held.part.cat) || 'That slot is already taken';
+    else if (st) {
+      prompt = st.text;
+      warn = st.wrong;
+    }
+    this.g.ui.prompt(prompt, warn);
   }
 
   refreshTicket() {
@@ -816,12 +1109,11 @@ export class Assembly {
     this.lastAction = performance.now();
   }
 
-  // ------------------------------------------------------------------ QA test
+  // ------------------------------------------------------------------ QA & benchmark
   collectRotors() {
     this.rotors = [];
     this.caseObj.traverse((o) => o.userData.isRotor && this.rotors.push(o));
   }
-
   qaLines() {
     const o = this.order.parts;
     const out = [];
@@ -836,25 +1128,66 @@ export class Assembly {
   drawScreen(mode, lines = [], extra = {}) {
     const { ctx, tex } = this.g.env.screen;
     const W = 1024, H = 600;
-    ctx.fillStyle = '#05070d';
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#060a16');
+    bg.addColorStop(1, '#0a0618');
+    ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
+    // scanlines
+    ctx.fillStyle = 'rgba(255,255,255,0.025)';
+    for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 1);
     if (mode === 'off') {
+      ctx.fillStyle = 'rgba(103,232,249,0.35)';
+      ctx.font = T.font(700, 30);
+      ctx.textAlign = 'center';
+      ctx.fillText('QA TERMINAL · STANDBY', W / 2, H / 2 + 10);
+      ctx.textAlign = 'left';
       tex.needsUpdate = true;
       return;
     }
     if (mode === 'splash') {
-      const c = T.logoCanvas(900, 225);
-      ctx.drawImage(c, 62, 170);
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = T.font(600, 26);
+      ctx.drawImage(T.logoCanvas(900, 225), 62, 150);
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = T.font(700, 30);
       ctx.textAlign = 'center';
-      ctx.fillText('QUALITY ASSURANCE · POWER-ON SELF TEST', W / 2, 470);
+      ctx.fillText('FORGE-7 QUALITY ASSURANCE · POWER-ON SELF TEST', W / 2, 460);
+      ctx.textAlign = 'left';
+      tex.needsUpdate = true;
+      return;
+    }
+    if (mode === 'bench') {
+      const { score = 0, k = 0, record = false, best = 0 } = extra;
+      ctx.fillStyle = '#a78bfa';
+      ctx.font = T.font(700, 40);
+      ctx.fillText('STRESS TEST · ' + this.order.no, 40, 66);
+      // bars
+      for (let i = 0; i < 24; i++) {
+        const hh = (0.3 + 0.7 * Math.abs(Math.sin(i * 1.7 + k * 14))) * 180 * Math.min(1, k * 1.5);
+        const gr = ctx.createLinearGradient(0, 420 - hh, 0, 420);
+        gr.addColorStop(0, '#facc15');
+        gr.addColorStop(1, '#7c3aed');
+        ctx.fillStyle = gr;
+        ctx.fillRect(60 + i * 38, 420 - hh, 26, hh);
+      }
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = T.font(700, 120);
+      ctx.textAlign = 'right';
+      ctx.fillText(Math.round(score).toLocaleString('en-US'), W - 50, 200);
+      ctx.font = T.font(700, 30);
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('ANDROMARK SCORE' + (best ? ` · BEST ${best.toLocaleString('en-US')}` : ''), W - 50, 245);
+      if (record) {
+        ctx.fillStyle = '#facc15';
+        ctx.font = T.font(700, 52);
+        ctx.textAlign = 'center';
+        ctx.fillText('★ NEW TIER RECORD ★', W / 2, 520);
+      }
       ctx.textAlign = 'left';
       tex.needsUpdate = true;
       return;
     }
     ctx.fillStyle = '#a78bfa';
-    ctx.font = T.font(800, 34);
+    ctx.font = T.font(700, 40);
     ctx.fillText('ANDROMEDA QA  ·  ' + this.order.no, 40, 64);
     ctx.fillStyle = '#334155';
     ctx.fillRect(40, 84, W - 80, 3);
@@ -880,9 +1213,9 @@ export class Assembly {
       ctx.fillStyle = mode === 'fail' ? '#7f1d1d' : '#14532d';
       ctx.fillRect(40, H - 110, W - 80, 70);
       ctx.fillStyle = mode === 'fail' ? '#fecaca' : '#bbf7d0';
-      ctx.font = T.font(800, 38);
+      ctx.font = T.font(700, 42);
       ctx.textAlign = 'center';
-      ctx.fillText(mode === 'fail' ? 'QA FAILED — OPEN THE CASE AND FIX IT' : mode === 'rgb' ? 'SET RGB PROFILE: ' + (extra.rgb || '').toUpperCase() : 'ALL SYSTEMS NOMINAL ✓', W / 2, H - 62);
+      ctx.fillText(mode === 'fail' ? 'QA FAILED — OPEN THE CASE AND FIX IT' : mode === 'rgb' ? 'SET RGB PROFILE: ' + (extra.rgb || '').toUpperCase() : 'ALL SYSTEMS NOMINAL', W / 2, H - 62);
       ctx.textAlign = 'left';
     }
     tex.needsUpdate = true;
@@ -893,10 +1226,9 @@ export class Assembly {
     this.testing = true;
     const gen = this.g.gen;
     const dead = () => gen !== this.g.gen;
-    this.g.onAction(this.caseObj.userData.caseRefs.btn.getWorldPosition(V3()), 'Power on!');
+    this.g.action(this.caseObj.userData.caseRefs.btn.getWorldPosition(V3()), 'POWER ON');
     this.g.onTestStart();
     const refs = this.caseObj.userData.caseRefs;
-    // press the button
     await tweens.add({ duration: 0.08, update: (e) => (refs.cap.position.y = 0.03 - e * 0.025) });
     audio.play('power');
     await tweens.add({ duration: 0.12, update: (e) => (refs.cap.position.y = 0.005 + e * 0.025) });
@@ -904,24 +1236,26 @@ export class Assembly {
     this.collectRotors();
     audio.humStart();
     tweens.add({ duration: 1.4, ease: Ease.inOutSine, update: (e) => (this.fanSpeed = e) });
-    this.g.setRgbMode(this.g.themeColor(), 0);
-    tweens.add({ duration: 1.2, update: (e) => (M.rgb.emissiveIntensity = e * 2.4) });
+    this.g.setRgbMode(this.g.themeColor());
+    tweens.add({ duration: 1.2, update: (e) => (M.rgb.emissiveIntensity = e * 2.6) });
+    this.g.post.pulse('#c4b5fd', 0.18);
     this.drawScreen('splash');
-    await wait(1.1);
+    await wait(1.0);
     if (dead()) return;
     const lines = this.qaLines();
     for (let i = 1; i <= lines.length; i++) {
       this.drawScreen('list', lines.slice(0, i));
       audio.play(lines[i - 1].ok ? 'tick' : 'error', { pitch: 1 + i * 0.05 });
-      await wait(0.26);
+      await wait(0.22);
+      if (dead()) return;
     }
     const fails = lines.filter((l) => !l.ok);
     if (fails.length) {
       this.drawScreen('fail', lines);
       audio.play('fail');
-      M.rgb.emissive.set('#ef4444');
-      this.g.setRgbMode('#ef4444', 0);
-      await wait(1.6);
+      this.g.setRgbMode('#ef4444');
+      this.g.post.pulse('#ef4444', 0.25);
+      await wait(1.5);
       if (dead()) return;
       await this.powerOff();
       await this.openPanel();
@@ -934,19 +1268,52 @@ export class Assembly {
     this.drawScreen('pass', lines);
     audio.play('success');
     this.g.fx.burst(this.caseObj.localToWorld(V3(0, 3, 1.2)), { count: 60, speed: 3.5, size: 0.7 });
-    await wait(0.7);
+    await wait(0.5);
     if (dead()) return;
+    // stress test benchmark — number goes up
+    const tier = TIERS.find((x) => x.id === this.order.tier);
+    const q = this.g.currentQuality();
+    const score = Math.round(tier.bench * (0.74 + 0.26 * q) * (0.985 + Math.random() * 0.03));
+    const best = (this.g.save.records && this.g.save.records[tier.id]) || 0;
+    const record = score > best;
+    tweens.add({ duration: 0.4, update: (e) => (this.fanSpeed = 1 + e * 1.4) });
+    audio.play('drill');
+    let lastTick = 0;
+    await tweens.add({
+      duration: 1.7, ease: Ease.outCubic,
+      update: (e, k) => {
+        this.drawScreen('bench', [], { score: score * e, k, best });
+        if (k - lastTick > 0.06) {
+          lastTick = k;
+          audio.play('coin', { pitch: 0.7 + e * 0.8 });
+        }
+      },
+    });
+    this.drawScreen('bench', [], { score, k: 1, record, best });
+    this.g.onBenchmark(score, record);
+    if (record) {
+      audio.play('levelup');
+      this.g.fx.confetti(this.g.env.monitor.getWorldPosition(V3()).add(V3(0, -1, 2)), 90);
+    }
+    await wait(record ? 1.1 : 0.6);
+    if (dead()) return;
+    tweens.add({ duration: 0.5, update: (e) => (this.fanSpeed = 2.4 - e * 1.4) });
     if (this.order.rgb) {
       const want = RGB_COLORS.find((c) => c.id === this.order.rgb);
       this.drawScreen('rgb', lines, { rgb: want.name });
+      const t0 = performance.now();
+      let first = true;
       await this.g.ui.pickRgb(want, (c) => {
-        this.g.setRgbMode(c.hex || 'rainbow', 0);
-        audio.play(c.id === want.id ? 'success' : 'tick');
+        this.g.setRgbMode(c.hex || 'rainbow');
+        const right = c.id === want.id;
+        audio.play(right ? 'success' : 'tick');
+        if (right) this.g.judge('rgb', first && performance.now() - t0 < 3500 ? 'perfect' : first ? 'great' : 'good', this.caseObj.localToWorld(V3(0, 3.5, 1.2)), 'Perfect glow!');
+        first = false;
       });
-      this.g.onAction(this.caseObj.localToWorld(V3(0, 3.5, 1.2)), 'Perfect glow!');
       this.drawScreen('pass', lines);
-      await wait(0.9);
-    } else await wait(0.5);
+      await wait(0.8);
+    } else await wait(0.3);
+    if (dead()) return;
     await this.powerOff();
     if (dead()) return;
     this.testing = false;
@@ -955,14 +1322,14 @@ export class Assembly {
 
   async powerOff() {
     audio.humStop();
-    const i0 = M.rgb.emissiveIntensity;
-    await tweens.add({ duration: 0.9, ease: Ease.inOutSine, update: (e) => { this.fanSpeed = 1 - e; M.rgb.emissiveIntensity = i0 * (1 - e); } });
+    const i0 = M.rgb.emissiveIntensity, f0 = this.fanSpeed;
+    await tweens.add({ duration: 0.9, ease: Ease.inOutSine, update: (e) => { this.fanSpeed = f0 * (1 - e); M.rgb.emissiveIntensity = i0 * (1 - e); } });
     this.fanSpeed = 0;
     M.ledGreen.emissiveIntensity = 0;
     this.drawScreen('off');
   }
 
-  // Debug/QA helper: finish the current build instantly (used by the automated playtest)
+  // Debug/QA helper used by the automated playtest
   debugComplete() {
     for (const cat of ORDER) {
       const id = this.order.parts[cat];
@@ -974,6 +1341,7 @@ export class Assembly {
     r.plate.rotation.y = 0;
     r.lever.rotation.x = 0;
     this.cpuLocked = true;
+    this.paste.done = true;
     for (const cat of ORDER) {
       const p = this.slot[cat];
       if (p) for (const sc of p.screws) {
@@ -990,6 +1358,7 @@ export class Assembly {
     this.order = order;
     this.slot = { mb: null, cpu: null, cooler: null, ram: null, ssd: null, gpu: null, psu: null };
     this.cables = { c24: null, c8: null, cgpu: null };
+    this.paste = { amount: 0, done: true, blob: null };
     const c = MD.buildCase(order.caseVariant);
     c.position.copy(CASE_POS);
     this.scene.add(c);
@@ -1021,6 +1390,9 @@ export class Assembly {
   }
 }
 
+const UP = new THREE.Vector3(0, 1, 0);
+const TMPQ = new THREE.Quaternion();
+
 function visibleChain(o) {
   while (o) {
     if (!o.visible) return false;
@@ -1030,28 +1402,23 @@ function visibleChain(o) {
 }
 
 // Rebuild an object tree with ghost material (Object3D.clone would deep-copy userData)
-function ghostClone(src) {
+function ghostClone(src, mat) {
   let o;
+  if (src.userData.hitbox || src.userData.aura || src.isSprite) return null;
   if (src.isInstancedMesh) {
-    o = new THREE.InstancedMesh(src.geometry, M.ghost, src.count);
+    o = new THREE.InstancedMesh(src.geometry, mat, src.count);
     o.instanceMatrix.array.set(src.instanceMatrix.array);
-  } else if (src.isMesh) o = new THREE.Mesh(src.geometry, M.ghost);
-  else if (src.isSprite) return null;
-  if (src.userData.hitbox) return null;
+  } else if (src.isMesh) o = new THREE.Mesh(src.geometry, mat);
   else o = new THREE.Group();
   o.position.copy(src.position);
   o.quaternion.copy(src.quaternion);
   o.scale.copy(src.scale);
   o.visible = src.visible;
   o.renderOrder = 4;
+  o.castShadow = o.receiveShadow = false;
   for (const c of src.children) {
-    const k = ghostClone(c);
+    const k = ghostClone(c, mat);
     if (k) o.add(k);
   }
   return o;
-}
-
-const PRAISE = ['Perfect fit!', 'Click!', 'Smooth!', 'Nailed it!', 'Snug!', 'Clean!', 'Beautiful!', 'Textbook!'];
-function pickPraise() {
-  return PRAISE[Math.floor(Math.random() * PRAISE.length)];
 }

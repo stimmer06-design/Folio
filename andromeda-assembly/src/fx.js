@@ -54,6 +54,19 @@ export class FX {
 
     this.shakeAmt = 0;
     this.floatLayer = document.getElementById('floaters');
+    // shockwave rings
+    this.ringGeo = new THREE.RingGeometry(0.86, 1, 64);
+    this.rings = [];
+  }
+
+  ring(p, { color = '#67e8f9', radius = 1.5, axis = 'y', life = 0.55 } = {}) {
+    const m = new THREE.Mesh(this.ringGeo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+    m.position.copy(p);
+    if (axis === 'y') m.rotation.x = -Math.PI / 2;
+    m.renderOrder = 60;
+    m.scale.setScalar(0.05);
+    this.scene.add(m);
+    this.rings.push({ m, t: 0, life, radius });
   }
 
   burst(p, { count = 24, color = '#a5f3fc', color2 = '#c4b5fd', speed = 2.2, size = 0.6, life = 0.7, up = 1, spread = 1 } = {}) {
@@ -87,6 +100,19 @@ export class FX {
 
   shake(a = 0.08) {
     this.shakeAmt = Math.max(this.shakeAmt, a);
+  }
+
+  judge(worldPos, word, sub, cls) {
+    if (!this.floatLayer) return;
+    const v = worldPos.clone().project(this.camera);
+    if (v.z > 1) return;
+    const el = document.createElement('div');
+    el.className = 'judge ' + cls;
+    el.innerHTML = `<b>${word}</b>${sub ? `<i>${sub}</i>` : ''}`;
+    el.style.left = ((v.x + 1) / 2) * 100 + '%';
+    el.style.top = ((1 - v.y) / 2) * 100 + '%';
+    this.floatLayer.appendChild(el);
+    setTimeout(() => el.remove(), 1300);
   }
 
   float(worldPos, text, cls = '') {
@@ -165,6 +191,20 @@ export class FX {
     this.conf.instanceMatrix.needsUpdate = true;
     if (this.conf.instanceColor) this.conf.instanceColor.needsUpdate = true;
 
+    for (let i = this.rings.length - 1; i >= 0; i--) {
+      const r = this.rings[i];
+      r.t += dt;
+      const k = r.t / r.life;
+      if (k >= 1) {
+        r.m.removeFromParent();
+        r.m.material.dispose();
+        this.rings.splice(i, 1);
+        continue;
+      }
+      const e = 1 - Math.pow(1 - k, 3);
+      r.m.scale.setScalar(0.05 + e * r.radius);
+      r.m.material.opacity = 0.9 * (1 - k);
+    }
     this.shakeAmt = Math.max(0, this.shakeAmt - dt * 0.5);
   }
 
