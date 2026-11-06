@@ -25,6 +25,11 @@ CONTROLS
   F              Fullscreen
   Right-drag     Look around   (mouse wheel zooms)
 
+  Walking the station (after a shipment choose "Walk the station"):
+  W A S D        Move   (Shift to sprint, mouse to look)
+  E              Talk, shop, play, interact
+  Tab            Back to the bench
+
 
 SAVES & SETTINGS
   Progress is saved automatically to:

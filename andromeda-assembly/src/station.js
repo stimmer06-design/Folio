@@ -77,44 +77,111 @@ function holoLabel(title, sub, color, parent, pos, ry = 0, w = 2.2) {
 }
 
 // ---------------------------------------------------------------- characters
-export function buildCrew({ suit = '#6d4ad6', trim = '#22d3ee', skin = '#c99a77', hair = '#2b1d14', headset = false }) {
+export function buildCrew({ suit = '#6d4ad6', trim = '#22d3ee', skin = '#c99a77', hair = '#2b1d14', headset = false, style = 'short', badge = '' }) {
   const g = new THREE.Group();
-  const suitM = phys({ color: suit, roughness: 0.45, metalness: 0.2, clearcoat: 0.4 });
+  const suitM = phys({ color: suit, roughness: 0.5, metalness: 0.15, clearcoat: 0.35, clearcoatRoughness: 0.4 });
+  const panelM = phys({ color: new THREE.Color(suit).multiplyScalar(0.55), roughness: 0.6, metalness: 0.3 });
   const trimM = std({ color: '#111', emissive: new THREE.Color(trim), emissiveIntensity: 1.6 });
-  const skinM = std({ color: skin, roughness: 0.7 });
-  const hairM = std({ color: hair, roughness: 0.8 });
+  const skinM = phys({ color: skin, roughness: 0.6, sheen: 0.25, sheenColor: new THREE.Color(skin).lerp(new THREE.Color('#ffd0b0'), 0.3), sheenRoughness: 0.7 });
+  const hairM = phys({ color: hair, roughness: 0.7, sheen: 0.3, sheenColor: new THREE.Color(hair).lerp(new THREE.Color('#ffffff'), 0.1), sheenRoughness: 0.5 });
   const dark = std({ color: '#1a1c24', roughness: 0.6 });
-  // legs
-  for (const x of [-0.32, 0.32]) mesh(new THREE.CapsuleGeometry(0.26, 2.4, 6, 12), dark, x, 1.5, 0, g);
+  const bootM = phys({ color: '#14161d', roughness: 0.35, metalness: 0.4, clearcoat: 0.8 });
+  const eyeW = std({ color: '#f4f1ec', roughness: 0.25 });
+  const iris = phys({ color: '#20140c', roughness: 0.1, clearcoat: 1 });
+  // legs + boots
+  for (const x of [-0.32, 0.32]) {
+    mesh(new THREE.CapsuleGeometry(0.27, 2.2, 6, 12), panelM, x, 1.65, 0, g);
+    mesh(rbox(0.5, 0.42, 0.85, 0.14), bootM, x, 0.21, 0.1, g);
+    mesh(new THREE.TorusGeometry(0.27, 0.035, 6, 20), trimM, x, 0.5, 0, g, { rx: Math.PI / 2, cast: false });
+  }
   const body = new THREE.Group();
   body.position.y = 3.0;
   g.add(body);
-  mesh(new THREE.CapsuleGeometry(0.72, 1.6, 8, 16), suitM, 0, 1.15, 0, body);
-  mesh(box(0.08, 1.6, 0.05), trimM, 0, 1.2, 0.72, body, { cast: false });
-  mesh(new THREE.TorusGeometry(0.62, 0.05, 8, 32), trimM, 0, 1.9, 0, body, { rx: Math.PI / 2, cast: false });
+  // hips + belt
+  mesh(new THREE.CylinderGeometry(0.66, 0.62, 0.5, 24), panelM, 0, 0.05, 0, body).scale.z = 0.72;
+  mesh(new THREE.CylinderGeometry(0.69, 0.69, 0.14, 24), dark, 0, 0.3, 0, body).scale.z = 0.74;
+  mesh(rbox(0.26, 0.18, 0.08, 0.03), trimM, 0, 0.3, 0.52, body, { cast: false });
+  // tapered torso (lathe), flattened front-to-back
+  const prof = [[0.0, 0.25], [0.64, 0.25], [0.66, 0.6], [0.6, 1.0], [0.7, 1.45], [0.84, 1.85], [0.74, 2.08], [0.34, 2.22], [0.0, 2.24]].map(([r, y]) => new THREE.Vector2(r, y));
+  mesh(new THREE.LatheGeometry(prof, 32), suitM, 0, 0, 0, body).scale.z = 0.7;
+  // jacket seam, collar, shoulder plates, chest badge
+  mesh(box(0.05, 1.7, 0.04), trimM, 0.12, 1.15, 0.49, body, { rz: 0.05, cast: false });
+  mesh(new THREE.TorusGeometry(0.33, 0.09, 10, 28), panelM, 0, 2.16, 0, body, { rx: Math.PI / 2 }).scale.y = 0.8;
+  for (const s of [-1, 1]) mesh(new THREE.SphereGeometry(0.36, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), panelM, s * 0.8, 1.9, 0, body, { rz: -s * 0.5 }).scale.set(1, 0.7, 0.9);
+  if (badge) {
+    const tex = T.toTex(T.textCanvas(256, 128, (ctx) => {
+      ctx.fillStyle = '#0b0d14';
+      ctx.fillRect(0, 0, 256, 128);
+      ctx.fillStyle = trim;
+      ctx.fillRect(0, 0, 12, 128);
+      ctx.font = '700 46px Rajdhani, sans-serif';
+      ctx.fillStyle = '#fff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(badge.toUpperCase(), 30, 50);
+      ctx.font = '600 22px Rajdhani, sans-serif';
+      ctx.fillStyle = trim;
+      ctx.fillText('FORGE-7 CREW', 30, 96);
+    }));
+    mesh(new THREE.PlaneGeometry(0.46, 0.23), std({ map: tex, emissive: new THREE.Color('#ffffff'), emissiveMap: tex, emissiveIntensity: 0.5, roughness: 0.3 }), -0.32, 1.55, 0.52, body, { ry: -0.18, cast: false });
+  }
   for (const s of [-1, 1]) {
     const arm = new THREE.Group();
-    arm.position.set(s * 0.9, 1.9, 0);
+    arm.position.set(s * 0.9, 1.85, 0);
     body.add(arm);
-    mesh(new THREE.CapsuleGeometry(0.2, 1.4, 6, 10), suitM, 0, -0.85, 0, arm);
-    mesh(new THREE.SphereGeometry(0.2, 12, 10), skinM, 0, -1.75, 0, arm);
-    arm.rotation.z = s * 0.12;
+    mesh(new THREE.CapsuleGeometry(0.21, 0.6, 6, 10), suitM, 0, -0.42, 0, arm);
+    const fore = new THREE.Group();
+    fore.position.y = -0.9;
+    fore.rotation.x = -0.25;
+    arm.add(fore);
+    mesh(new THREE.CapsuleGeometry(0.19, 0.55, 6, 10), suitM, 0, -0.35, 0, fore);
+    mesh(new THREE.TorusGeometry(0.19, 0.035, 6, 18), trimM, 0, -0.68, 0, fore, { rx: Math.PI / 2, cast: false });
+    mesh(new THREE.SphereGeometry(0.19, 14, 10), skinM, 0, -0.86, 0.02, fore).scale.set(0.85, 1.15, 0.7);
+    arm.rotation.z = s * 0.1;
     body.userData['arm' + s] = arm;
   }
+  // head
   const head = new THREE.Group();
   head.position.y = 2.75;
   body.add(head);
-  mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.3, 12), skinM, 0, -0.25, 0, head);
-  mesh(new THREE.SphereGeometry(0.52, 24, 18), skinM, 0, 0.2, 0, head).scale.set(0.92, 1.05, 0.95);
-  const hairMesh = mesh(new THREE.SphereGeometry(0.55, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.55), hairM, 0, 0.26, -0.03, head);
-  hairMesh.scale.set(0.96, 1.05, 1.0);
-  for (const x of [-0.18, 0.18]) mesh(new THREE.SphereGeometry(0.06, 10, 8), dark, x, 0.25, 0.46, head, { cast: false });
-  if (headset) {
-    mesh(new THREE.TorusGeometry(0.55, 0.05, 8, 24, Math.PI), dark, 0, 0.3, 0, head, { rz: 0 }).rotation.set(0, Math.PI / 2, 0);
-    mesh(new THREE.SphereGeometry(0.14, 12, 10), trimM, 0.55, 0.2, 0, head);
-    mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.45, 6), dark, 0.42, 0.0, 0.25, head, { rx: 1.1, rz: 0.5 });
+  mesh(new THREE.CylinderGeometry(0.19, 0.23, 0.36, 14), skinM, 0, -0.27, 0, head);
+  mesh(new THREE.SphereGeometry(0.5, 32, 24), skinM, 0, 0.2, 0, head).scale.set(0.9, 1.08, 0.96);
+  for (const s of [-1, 1]) mesh(new THREE.SphereGeometry(0.1, 10, 8), skinM, s * 0.45, 0.18, 0, head).scale.set(0.5, 1, 0.8); // ears
+  mesh(new THREE.SphereGeometry(0.075, 12, 10), skinM, 0, 0.13, 0.48, head).scale.set(0.9, 1.1, 1); // nose
+  const eyes = [];
+  for (const s of [-1, 1]) {
+    const e = new THREE.Group();
+    e.position.set(s * 0.17, 0.27, 0.4);
+    head.add(e);
+    mesh(new THREE.SphereGeometry(0.085, 14, 10), eyeW, 0, 0, 0, e, { cast: false }).scale.set(1.15, 0.85, 0.6);
+    mesh(new THREE.SphereGeometry(0.052, 12, 10), iris, 0, -0.005, 0.04, e, { cast: false });
+    eyes.push(e);
+    mesh(rbox(0.19, 0.045, 0.05, 0.02), hairM, s * 0.17, 0.4, 0.43, head, { rz: -s * 0.12, cast: false }); // brows
   }
-  g.userData = { body, head };
+  mesh(new THREE.TorusGeometry(0.09, 0.016, 6, 16, Math.PI * 0.8), std({ color: '#5a2b24', roughness: 0.5 }), 0, 0.02, 0.47, head, { rz: Math.PI * 1.1, cast: false }); // smile
+  // hair
+  const cap = mesh(new THREE.SphereGeometry(0.54, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.52), hairM, 0, 0.24, -0.04, head);
+  cap.scale.set(0.95, 1.08, 1.0);
+  cap.rotation.x = -0.32;
+  if (style === 'bun') {
+    mesh(new THREE.SphereGeometry(0.26, 18, 14), hairM, 0, 0.5, -0.5, head);
+    mesh(new THREE.TorusGeometry(0.17, 0.035, 6, 18), trimM, 0, 0.44, -0.37, head, { rx: 0.9, cast: false });
+    mesh(new THREE.SphereGeometry(0.5, 24, 14, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.3), hairM, 0, 0.2, -0.08, head).scale.set(0.97, 1, 0.9);
+  } else {
+    // messy fringe + side tufts
+    for (let i = 0; i < 6; i++) {
+      const a = -0.95 + i * 0.38;
+      mesh(new THREE.SphereGeometry(0.17, 12, 10), hairM, Math.sin(a) * 0.36, 0.56 - Math.abs(a) * 0.07, Math.cos(a) * 0.3, head).scale.set(1, 0.65, 0.9);
+    }
+    for (const s of [-1, 1]) mesh(new THREE.SphereGeometry(0.2, 12, 10), hairM, s * 0.4, 0.3, -0.12, head).scale.set(0.6, 1.1, 1.1);
+  }
+  if (headset) {
+    mesh(new THREE.TorusGeometry(0.56, 0.045, 8, 24, Math.PI), dark, 0, 0.2, -0.02, head); // band over the top, ear to ear
+    for (const s of [-1, 1]) mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.1, 16), dark, s * 0.53, 0.18, 0, head, { rz: Math.PI / 2 });
+    mesh(new THREE.SphereGeometry(0.07, 10, 8), trimM, 0.6, 0.18, 0, head, { cast: false });
+    mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.5, 6), dark, 0.42, 0.0, 0.25, head, { rx: 1.1, rz: 0.5 });
+    mesh(new THREE.SphereGeometry(0.045, 8, 6), dark, 0.27, -0.06, 0.45, head);
+  }
+  g.userData = { body, head, eyes };
   g.scale.setScalar(1.25); // ~1.7 m tall at walk-mode scale
   return g;
 }
@@ -469,7 +536,7 @@ export function buildDeck(env, theme) {
   }
   const door = (cx, cz, axis, w, parent = g) => {
     const d = { cx, cz, axis, w, open: 0, target: 0, panels: [] };
-    const doorM = phys({ color: '#2b303c', roughness: 0.35, metalness: 0.8, clearcoat: 0.6 });
+    const doorM = phys({ color: '#2b303c', roughness: 0.5, metalness: 0.55, clearcoat: 0.15, envMapIntensity: 0.3 });
     for (const s of [-1, 1]) {
       const p = new THREE.Group();
       parent.add(p);
@@ -606,7 +673,7 @@ export function buildDeck(env, theme) {
   g.add(scope);
   coll(35.2, -9.5, 37.8, -6.9);
   interact.push({ id: 'telescope', action: 'telescope', label: 'Look through the telescope', pos: V3(36.5, 2, -8.2), r: 6 });
-  const sela = buildCrew({ suit: '#4c3a8a', trim: '#a78bfa', skin: '#7a4f36', hair: '#120c08' });
+  const sela = buildCrew({ suit: '#4c3a8a', trim: '#a78bfa', skin: '#5e3a26', hair: '#16100c', style: 'bun', badge: 'Dir. Okafor' });
   sela.position.set(31.5, FY, -5.5);
   sela.rotation.y = 0.8;
   g.add(sela);
@@ -777,7 +844,7 @@ export function buildDeck(env, theme) {
     pods.push(pod);
     interact.push({ id: 'pod' + i, action: 'pod', pod: i, label: ['Pod "Big Kevin"', 'Pod "Comet Lady"', 'Pod "Ol\' Reliable"'][i], pos: V3(59, 1, z), r: 6 });
   }
-  const juno = buildCrew({ suit: '#b45309', trim: '#fde68a', skin: '#d6a07a', hair: '#7c2d12', headset: true });
+  const juno = buildCrew({ suit: '#b45309', trim: '#fde68a', skin: '#d6a07a', hair: '#7c2d12', headset: true, badge: 'J. Reyes' });
   juno.position.set(50.5, FY, -1);
   juno.rotation.y = -0.6;
   g.add(juno);
@@ -838,6 +905,10 @@ export function buildDeck(env, theme) {
       const n = npcs[k];
       const { body, head } = n.userData;
       body.scale.y = 1 + Math.sin(t * 1.8 + k.length) * 0.012;
+      const blink = (t + k.length * 0.7) % 3.9 < 0.13;
+      for (const e of n.userData.eyes) e.scale.y = blink ? 0.12 : 1;
+      body.userData['arm-1'].rotation.x = Math.sin(t * 0.9 + k.length) * 0.05;
+      body.userData.arm1.rotation.x = Math.sin(t * 0.9 + k.length + 1.3) * 0.05;
       if (player && walking) {
         const local = n.worldToLocal(player.clone());
         const yaw = Math.atan2(local.x, local.z);

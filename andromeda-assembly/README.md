@@ -11,6 +11,14 @@ To bundle it with a PC:
 1. Copy `release/AndromedaAssembly.html` and `release/Play Andromeda Assembly.cmd` to the image, for example to `C:\Program Files\Andromeda Insights\Andromeda Assembly\`.
 2. Put a desktop or Start-menu shortcut to `Play Andromeda Assembly.cmd`. It opens the game in a clean app-style Microsoft Edge window and falls back to the default browser. Double-clicking the HTML file also works.
 
+**Windows app package.** `desktop/build.sh` wraps the game in a branded `Andromeda Assembly.exe` and zips it with a readme and licence notices. The exe has its own icon and version info, embeds the HTML, and opens it in a chrome-less Edge (or Chrome) window with a private profile. Saves go to `%LOCALAPPDATA%\Andromeda Insights\Andromeda Assembly`. Building it needs Go 1.24+ and `go install github.com/tc-hib/go-winres@latest`:
+
+```bash
+desktop/build.sh release/AndromedaAssembly.html 1.1.0   # → desktop/dist/AndromedaAssembly-1.1.0-win64.zip
+```
+
+The exe is unsigned, so sign it with your code-signing certificate before imaging, or Windows SmartScreen will warn on first launch.
+
 Progress is saved automatically in the browser's local storage, separately for each Windows user. Graphics quality starts at **Ultra** (ambient occlusion, bloom, film grain, 4K shadows). It steps down automatically within a few seconds if the PC can't keep up, and players can change it in Settings.
 
 ## The loop

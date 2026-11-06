@@ -4,8 +4,9 @@
 #   ./build.sh [path/to/game.html] [version]
 # Requires Go 1.24+ and go-winres (go install github.com/tc-hib/go-winres@latest).
 set -euo pipefail
-cd "$(dirname "$0")"
-HTML="${1:-../release/AndromedaAssembly.html}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+HTML="$(realpath "${1:-$HERE/../release/AndromedaAssembly.html}")"
+cd "$HERE"
 VER="${2:-1.0.0}"
 OUT=dist
 NAME="Andromeda Assembly"
