@@ -1,4 +1,5 @@
-import { PARTS, CAT_LABEL, RANKS, UPGRADES, THEMES, RGB_COLORS, PERIPHERALS, DECOR, RARITY, OVERDRIVE, rankFor } from './catalog.js';
+import { PARTS, CAT_LABEL, RANKS, UPGRADES, THEMES, RGB_COLORS, PERIPHERALS, DECOR, RARITY, OVERDRIVE, ACHIEVEMENTS, BODIES, rankFor } from './catalog.js';
+import { runPodRunner } from './arcade.js';
 import { CHARACTERS, CODEX, chapterFor } from './story.js';
 import { fmtTime } from './util.js';
 import { audio } from './audio.js';
@@ -135,6 +136,238 @@ export class UI {
     document.documentElement.style.setProperty('--b', theme.b);
   }
 
+
+  // ================================================================ station / walk mode
+  walkHud(on) {
+    document.body.classList.toggle('walking', on);
+    $('walkhud').classList.toggle('hidden', !on);
+    if (!on) this.walkPrompt(null);
+  }
+  walkPrompt(text) {
+    const p = $('walkprompt');
+    if (!text) {
+      p.classList.add('hidden');
+      return;
+    }
+    $('walkprompttxt').textContent = text;
+    p.classList.remove('hidden');
+  }
+  walkLockHint(on) {
+    $('lockhint').classList.toggle('hidden', !on);
+  }
+  roomBanner(name, sub) {
+    const b = $('roomban');
+    b.querySelector('.rn').textContent = name;
+    b.querySelector('.rs').textContent = sub || '';
+    b.classList.remove('on');
+    void b.offsetWidth;
+    b.classList.add('on');
+    clearTimeout(this.banT);
+    this.banT = setTimeout(() => b.classList.remove('on'), 2400);
+  }
+  fade(fn) {
+    const f = $('fade');
+    f.classList.add('on');
+    return new Promise((resolve) => setTimeout(async () => {
+      try {
+        await fn();
+      } finally {
+        setTimeout(() => f.classList.remove('on'), 80);
+        resolve();
+      }
+    }, 380));
+  }
+  achievementToast(a) {
+    const box = $('toasts');
+    const el = document.createElement('div');
+    el.className = 'toast panel ach2';
+    el.textContent = `🏆 ACHIEVEMENT UNLOCKED — ${a.name}`;
+    box.appendChild(el);
+    setTimeout(() => el.classList.add('out'), 3600);
+    setTimeout(() => el.remove(), 4000);
+  }
+  choice() {
+    return new Promise((resolve) => {
+      const root = this.open(`<div class="eyebrow">Order complete</div><h2>What's next, Builder?</h2>
+        <p class="sub">Grab the next work order, or stretch your legs: visit the shop, the arcade, the observatory or the hangar.</p>
+        <div class="row" style="justify-content:flex-end"><button class="btn" data-a="walk">Stretch your legs</button><button class="btn primary big" data-a="next">Next order ▸ <span class="kbd" style="margin-left:6px">Space</span></button></div>`, 'clear');
+      root.querySelectorAll('[data-a]').forEach((b) => (b.onclick = () => {
+        this.close();
+        resolve(b.dataset.a);
+      }));
+      this.onKey = (e) => {
+        if (e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault();
+          this.close();
+          resolve('next');
+        }
+      };
+    });
+  }
+  purchase(u, save) {
+    return new Promise((resolve) => {
+      const owned = !!save.upgrades[u.id];
+      const can = save.money >= u.price;
+      const root = this.open(`<div class="eyebrow" style="color:#34d399">Orbital Outfitters</div><div class="spread"><h2>${u.icon} ${esc(u.name)}</h2><div class="disp" style="color:var(--gold);font-size:30px">${cr(u.price)}</div></div>
+        <p class="sub" style="font-size:16px">${esc(u.desc)}</p>
+        <p class="sub">Wallet <b style="color:var(--gold)">${cr(save.money)}</b></p>
+        <div class="row" style="justify-content:flex-end"><button class="btn" data-a="no">${owned ? 'Close' : 'Not now'}</button>${owned ? '<button class="btn" disabled>Installed ✓</button>' : `<button class="btn primary" data-a="yes" ${can ? '' : 'disabled'}>${can ? 'Buy it' : 'Not enough credits'}</button>`}</div>`);
+      root.querySelectorAll('[data-a]').forEach((b) => (b.onclick = () => {
+        this.close();
+        resolve(b.dataset.a === 'yes');
+      }));
+      this.onKey = (e) => {
+        if (e.code === 'Escape') {
+          this.close();
+          resolve(false);
+        }
+      };
+    });
+  }
+  achievements(save) {
+    return new Promise((resolve) => {
+      const n = ACHIEVEMENTS.filter((a) => save.achievements[a.id]).length;
+      const root = this.open(`<div class="eyebrow">Hall of Achievement · ${n}/${ACHIEVEMENTS.length}</div><h2>Trophies</h2>
+        <div class="ach">${ACHIEVEMENTS.map((a) => `<div class="${save.achievements[a.id] ? 'on' : ''}"><b>${save.achievements[a.id] ? '🏆 ' : '🔒 '}${esc(a.name)}</b><span>${esc(a.desc)}</span></div>`).join('')}</div>
+        <div class="row" style="justify-content:flex-end"><button class="btn primary" data-close>Close</button></div>`, 'shop');
+      root.querySelector('[data-close]').onclick = () => {
+        this.close();
+        resolve();
+      };
+    });
+  }
+  collection(save) {
+    return new Promise((resolve) => {
+      const owned = DECOR.filter((d) => save.collection && save.collection.decor[d.id]).length;
+      const root = this.open(`<div class="eyebrow">Collection cabinet · ${owned}/${DECOR.length}</div><h2>Your finds</h2><p class="sub">Decor drops from supply crates. Collected pieces appear here in the cabinet and around your bench.</p>
+        <div class="shopgrid">${DECOR.map((d) => {
+          const own = save.collection && save.collection.decor[d.id];
+          const R = RARITY[d.rarity];
+          return `<div class="item ${own ? 'owned' : 'locked'}"><div class="rar" style="color:${R.color}">${R.name.toUpperCase()}</div><div class="nm">${own ? esc(d.name) : '???'}</div><div class="ds">${own ? esc(d.desc) : 'Find it in a supply crate.'}</div></div>`;
+        }).join('')}</div><div class="row" style="justify-content:flex-end"><button class="btn primary" data-close>Close</button></div>`, 'shop');
+      root.querySelector('[data-close]').onclick = () => {
+        this.close();
+        resolve();
+      };
+    });
+  }
+  solmap(save) {
+    return new Promise((resolve) => {
+      const ship = save.shipments || {};
+      const total = Object.values(ship).reduce((a, b) => a + b, 0);
+      const rows = BODIES.map((b) => `<div class="b"><span><i style="background:${b.color}"></i>${esc(b.name)}</span><b>${ship[b.id] || 0}</b></div>`).join('');
+      const hist = (save.history || []).slice(-10).reverse().map((h) => `<div class="h"><b style="color:var(--text)">${esc(h.no)}</b> · grade <b style="color:var(--gold)">${esc(h.grade)}</b> · ${esc(h.customer)} → ${esc(h.city)}</div>`).join('') || '<div class="h">No launches yet.</div>';
+      const root = this.open(`<div class="eyebrow" style="color:#f59e0b">Launch Hangar · Sol shipment map</div><h2>${total} machines in service</h2>
+        <p class="sub">Every hand-built Andromeda machine you've launched, by destination. Each one also listens for the Whisper.</p>
+        <div class="mapgrid"><div>${rows}</div><div><div class="eyebrow" style="margin-bottom:6px">Recent launches</div>${hist}</div></div>
+        <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn primary" data-close>Close</button></div>`, 'shop');
+      root.querySelector('[data-close]').onclick = () => {
+        this.close();
+        resolve();
+      };
+    });
+  }
+  arcade(best) {
+    return new Promise((resolve) => {
+      const o = $('overlay2');
+      o.innerHTML = `<div class="cabinet"><div class="mq">POD RUNNER</div><canvas width="880" height="520"></canvas><div class="ft">FORGE-7 ARCADE · HIGH SCORE ${best.toLocaleString('en-US')} · ESC TO STEP AWAY</div></div>`;
+      o.classList.remove('hidden');
+      this.overlayOpen = true;
+      runPodRunner(o.querySelector('canvas'), { best }).then((r) => {
+        o.classList.add('hidden');
+        o.innerHTML = '';
+        this.overlayOpen = false;
+        resolve(r);
+      });
+    });
+  }
+  // telescope: the 3D camera is aimed by the game; this draws the eyepiece and the tuner
+  telescope({ canTune, lockedToday, onLock }) {
+    return new Promise((resolve) => {
+      const o = $('overlay2');
+      o.style.background = 'transparent';
+      o.style.backdropFilter = 'none';
+      const target = { f: 1.5 + Math.random() * 3.5, p: Math.random() * 6.28 };
+      o.innerHTML = `<div id="scope"><div class="ret"></div></div>
+        <div id="tuner" class="panel"><div class="spread"><div class="eyebrow" style="color:#facc15">${canTune ? (lockedToday ? 'Signal locked for today' : 'Tune to the Whisper') : 'Andromeda Galaxy · M31'}</div><button class="btn small" data-close>Step back <span class="kbd">Esc</span></button></div>
+        ${canTune && !lockedToday ? `<canvas width="900" height="160"></canvas>
+        <div class="knobs"><span>FREQUENCY</span><input type="range" min="1" max="5.5" step="0.01" value="3" data-k="f"><span>PHASE</span><input type="range" min="0" max="6.28" step="0.01" value="0" data-k="p"></div>
+        <div class="lock"><i></i></div>` : `<p class="sub" style="margin:8px 0 0">${canTune ? 'You already locked onto the Whisper today. The array is crunching what you found — come back next shift.' : 'Two and a half million light-years away, a trillion stars turn slowly. ORIN: "The array has detected nothing unusual. Yet."'}</p>`}</div>`;
+      o.classList.remove('hidden');
+      this.overlayOpen = true;
+      let raf = 0, lockP = 0, done = false, last = performance.now();
+      const close = () => {
+        if (done) return;
+        done = true;
+        cancelAnimationFrame(raf);
+        removeEventListener('keydown', onKey, true);
+        o.classList.add('hidden');
+        o.innerHTML = '';
+        o.style.background = '';
+        o.style.backdropFilter = '';
+        this.overlayOpen = false;
+        resolve();
+      };
+      const onKey = (e) => {
+        if (e.code === 'Escape') {
+          e.preventDefault();
+          e.stopPropagation();
+          close();
+        }
+      };
+      addEventListener('keydown', onKey, true);
+      o.querySelector('[data-close]').onclick = close;
+      const cv = o.querySelector('#tuner canvas');
+      if (cv) {
+        const ctx = cv.getContext('2d');
+        const val = { f: 3, p: 0 };
+        o.querySelectorAll('input').forEach((el) => (el.oninput = () => {
+          val[el.dataset.k] = parseFloat(el.value);
+          audio.play('gauge', { v: val.f / 5.5 });
+        }));
+        const wave = (f, p, x) => Math.sin(x * f + p) * 0.8 + Math.sin(x * f * 2.0 + p * 1.5) * 0.2;
+        const loop = (now) => {
+          const dt = Math.min(0.05, (now - last) / 1000);
+          last = now;
+          ctx.fillStyle = '#05060f';
+          ctx.fillRect(0, 0, 900, 160);
+          let err = 0;
+          const draw = (fn, col, w) => {
+            ctx.strokeStyle = col;
+            ctx.lineWidth = w;
+            ctx.beginPath();
+            for (let i = 0; i <= 300; i++) {
+              const x = (i / 300) * 6.28;
+              ctx.lineTo(i * 3, 80 - fn(x) * 60);
+            }
+            ctx.stroke();
+          };
+          draw((x) => wave(target.f, target.p, x) + Math.sin(x * 37 + now * 0.01) * 0.04, '#facc15', 3);
+          draw((x) => wave(val.f, val.p, x), '#22d3ee', 2);
+          for (let i = 0; i <= 60; i++) {
+            const x = (i / 60) * 6.28;
+            err += Math.abs(wave(target.f, target.p, x) - wave(val.f, val.p, x));
+          }
+          err /= 61;
+          const ok = err < 0.16;
+          lockP = Math.max(0, Math.min(1, lockP + (ok ? dt / 1.4 : -dt)));
+          const bar = o.querySelector('.lock i');
+          if (bar) bar.style.width = lockP * 100 + '%';
+          ctx.fillStyle = ok ? '#4ade80' : '#94a3b8';
+          ctx.font = '700 22px Rajdhani, sans-serif';
+          ctx.fillText(ok ? 'SIGNAL MATCH — HOLD STEADY' : `DRIFT ${(err * 100).toFixed(0)}`, 14, 26);
+          if (lockP >= 1) {
+            onLock();
+            close();
+            return;
+          }
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+      }
+    });
+  }
+
   // ------------------------------------------------------------------ title
   showTitle(save) {
     const t = $('title');
@@ -149,7 +382,7 @@ export class UI {
         <p class="tag">Year 2291. Aboard <b>Forge-7</b>, high above Titan, every machine is still built by hand. Build it. Test it. Launch it. <b>Something out there is listening.</b></p>
         <div class="menu">
           ${has ? `<button class="btn primary big" data-a="continue"><span>Continue · Day ${save.day}</span><span>▸</span></button>` : `<button class="btn primary big" data-a="new"><span>Begin your first shift</span><span>▸</span></button>`}
-          <button class="btn" data-a="workshop"><span>Workshop</span><span>⚙</span></button>
+          <button class="btn" data-a="achievements"><span>Achievements</span><span>🏆</span></button>
           <button class="btn" data-a="codex"><span>Codex</span><span>❖</span></button>
           <button class="btn" data-a="howto"><span>How to play</span><span>?</span></button>
           <button class="btn" data-a="settings"><span>Settings</span><span>≡</span></button>
@@ -611,62 +844,16 @@ export class UI {
           <div><b>${s.best ? fmtTime(s.best) : '—'}</b><span>Best build</span></div>
         </div>
         ${cs ? `<div class="eyebrow" style="margin-top:4px">Contracts</div>${cs}` : ''}
-        <p class="sub">Wallet <b style="color:var(--gold)">${cr(s.money)}</b> — invest in tools at the workshop to build faster, chain longer and earn more.</p>
+        <p class="sub">Wallet <b style="color:var(--gold)">${cr(s.money)}</b> — PIP at Orbital Outfitters (down the spine corridor) sells tools that make you faster.</p>
         <div class="row" style="justify-content:flex-end">
           <button class="btn" data-a="menu">Main menu</button>
-          <button class="btn" data-a="workshop">Workshop</button>
+          <button class="btn" data-a="walk">Walk the station</button>
           <button class="btn primary big" data-a="next">Start Day ${s.day + 1} ▸</button>
         </div>`);
       root.querySelectorAll('[data-a]').forEach((b) => (b.onclick = () => {
         this.close();
         resolve(b.dataset.a);
       }));
-    });
-  }
-
-  workshop(save, onBuy, onTheme, tab = 'tools') {
-    return new Promise((resolve) => {
-      const render = (tab) => {
-        let body = '';
-        if (tab === 'tools') {
-          body = `<div class="shopgrid">${UPGRADES.map((u) => {
-            const own = !!save.upgrades[u.id];
-            return `<div class="item ${own ? 'owned' : ''}"><div class="ic">${u.icon}</div><div class="nm">${esc(u.name)}</div><div class="ds">${esc(u.desc)}</div>
-              ${own ? '<button class="btn small" disabled>Installed ✓</button>' : `<button class="btn small ${save.money >= u.price ? 'primary' : ''}" data-buy="${u.id}" ${save.money >= u.price ? '' : 'disabled'}>${cr(u.price)}</button>`}</div>`;
-          }).join('')}</div>`;
-        } else if (tab === 'lighting') {
-          body = `<p class="sub">Paint the whole workshop. Some themes can only be found in supply crates.</p><div class="themes">${THEMES.map((t) => {
-            const own = !!save.themes[t.id];
-            const lock = !own && t.crate;
-            return `<button class="theme ${save.theme === t.id ? 'sel' : ''} ${lock ? 'lock' : ''}" data-theme="${t.id}" ${lock ? 'disabled' : ''}><i style="background:linear-gradient(135deg,${t.a},${t.b})"></i>${esc(t.name)} ${own ? '' : t.crate ? '<small>CRATE ONLY</small>' : `<small>${cr(t.price)}</small>`}</button>`;
-          }).join('')}</div>`;
-        } else {
-          const owned = DECOR.filter((d) => save.collection && save.collection.decor[d.id]).length;
-          body = `<p class="sub">Decor found in supply crates appears around your bench. Collected <b>${owned}/${DECOR.length}</b>.</p><div class="shopgrid">${DECOR.map((d) => {
-            const own = save.collection && save.collection.decor[d.id];
-            const R = RARITY[d.rarity];
-            return `<div class="item ${own ? 'owned' : 'locked'}"><div class="rar" style="color:${R.color}">${R.name.toUpperCase()}</div><div class="nm">${own ? esc(d.name) : '???'}</div><div class="ds">${own ? esc(d.desc) : 'Find it in a supply crate.'}</div></div>`;
-          }).join('')}</div>`;
-        }
-        const root = this.open(`
-          <div class="spread"><div><div class="eyebrow">Forge-7 workshop</div><h2>Upgrades & style</h2></div><div style="text-align:right"><div class="eyebrow" style="color:var(--muted)">Credits</div><div class="disp" style="font-size:32px;color:var(--gold)">${cr(save.money)}</div></div></div>
-          <div class="tabs"><button class="btn ${tab === 'tools' ? 'on' : ''}" data-tab="tools">Tools</button><button class="btn ${tab === 'lighting' ? 'on' : ''}" data-tab="lighting">Lighting</button><button class="btn ${tab === 'decor' ? 'on' : ''}" data-tab="decor">Collection</button></div>
-          ${body}
-          <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary" data-close>Back to the bench ▸</button></div>`, 'shop');
-        root.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => render(b.dataset.tab)));
-        root.querySelectorAll('[data-buy]').forEach((b) => (b.onclick = () => {
-          if (onBuy(b.dataset.buy)) render(tab);
-        }));
-        root.querySelectorAll('[data-theme]').forEach((b) => (b.onclick = () => {
-          audio.play('ui');
-          if (onTheme(b.dataset.theme)) render(tab);
-        }));
-        root.querySelector('[data-close]').onclick = () => {
-          this.close();
-          resolve();
-        };
-      };
-      render(tab);
     });
   }
 
@@ -762,8 +949,9 @@ export class UI {
           <li><b>Cables:</b> drag each connector from its grommet to the glowing port. Close the glass panel and press <b>power</b> for QA and the stress test.</li>
           <li><b>Pack it:</b> drop in the PC, foam and accessories, then speed-fold the flaps. Tape the seam in <b>one straight line</b>, stamp the label when the rings meet, and hit <b>SHIP</b>.</li>
           <li><b>Chain actions</b> without long pauses to build <b>Flow</b> and reach <b>Overdrive</b> for payout multipliers. Every build earns a grade, a supply crate, XP and progress on decoding the signal.</li>
+          <li><b>Off the clock:</b> after a shipment, choose <b>Walk the station</b> to leave the bench and explore Forge-7 on foot. Buy upgrades from PIP at <b>Orbital Outfitters</b>, chat with the crew, tune the observatory telescope to boost the decode, play <b>Pod Runner</b> in the lounge, change the music at the jukebox, and watch your shipments land on the Sol map in the hangar.</li>
         </ol>
-        <div class="keys"><span class="kbd">H</span><span>Hint arrow for the next step</span><span class="kbd">Esc</span><span>Pause</span><span class="kbd">M</span><span>Mute</span><span class="kbd">F</span><span>Fullscreen</span><span class="kbd">Right-drag</span><span>Look around · wheel to zoom</span></div></div>
+        <div class="keys"><span class="kbd">H</span><span>Hint arrow for the next step</span><span class="kbd">Esc</span><span>Pause</span><span class="kbd">M</span><span>Mute</span><span class="kbd">F</span><span>Fullscreen</span><span class="kbd">Right-drag</span><span>Look around · wheel to zoom</span><span class="kbd">WASD</span><span>Walk (Shift to sprint) · mouse to look</span><span class="kbd">E</span><span>Interact · Tab returns to the bench</span></div></div>
         <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn primary" data-close>Got it</button></div>`);
       root.querySelector('[data-close]').onclick = () => {
         this.close();
@@ -778,6 +966,7 @@ export class UI {
         <div style="display:flex;flex-direction:column;gap:8px;min-width:300px">
           <button class="btn primary" data-a="resume">Resume <span class="kbd">Esc</span></button>
           <button class="btn" data-a="codex">Codex</button>
+          <button class="btn" data-a="achievements">Achievements</button>
           <button class="btn" data-a="howto">Field manual</button>
           <button class="btn" data-a="settings">Settings</button>
           <button class="btn" data-a="menu">Quit to menu <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">(this order restarts)</span></button>

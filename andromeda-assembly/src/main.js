@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-import { THEMES, UPGRADES, TIERS, RANKS, CASES, JUDGE, OVERDRIVE, REVIEWS, rankFor, gradeFor } from './catalog.js';
-import { TRANSMISSIONS, BARKS, CODEX, chapterFor } from './story.js';
+import { THEMES, UPGRADES, TIERS, RANKS, CASES, JUDGE, OVERDRIVE, REVIEWS, ACHIEVEMENTS, COLONY_BODY, MUSIC_STYLES, rankFor, gradeFor } from './catalog.js';
+import { TRANSMISSIONS, BARKS, CODEX, CREW_TALK, WALK_BARKS, chapterFor } from './story.js';
+import { buildDeck } from './station.js';
+import { Walk } from './walk.js';
 import { tweens, damp, clamp, V3, fmtTime, wait, pick } from './util.js';
 import { audio } from './audio.js';
 import * as MD from './models.js';
@@ -94,6 +96,12 @@ class Game {
     this.post = new Post(renderer, scene, this.camera);
     this.assembly = new Assembly(this);
     this.packing = new Packing(this);
+    this.deck = buildDeck(this.env, this.theme);
+    scene.add(this.deck.group);
+    this.deck.group.visible = false;
+    this.walk = new Walk(this, this.deck);
+    this.refreshDeck();
+    audio.setStyle(this.save.musicStyle || 'lofi');
     this.applyProps();
     this.applyDecor();
     this.applyQuality();
@@ -137,10 +145,19 @@ class Game {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   }
+  refreshDeck() {
+    const s = this.save;
+    this.deck.refreshShop(s);
+    this.deck.refreshTrophies(s.achievements);
+    this.deck.refreshCollection((s.collection && s.collection.decor) || {});
+    this.deck.drawLog(s.history);
+    this.deck.setMapMarkers(s.shipments);
+  }
   applyTheme(theme) {
     this.theme = theme;
     this.ui.setTheme(theme);
     this.env.setTheme(theme);
+    if (this.deck) this.deck.setTheme(theme);
   }
   themeColor() {
     return this.theme.a;
@@ -231,7 +248,7 @@ class Game {
         return;
       }
       if (e.code === 'Escape') {
-        if (PLAYING.has(this.state) && !this.paused) this.pause();
+        if ((PLAYING.has(this.state) || this.state === 'walk') && !this.paused && !this.ui.overlayOpen) this.pause();
       } else if (e.code === 'KeyH') this.hint();
       else if (e.code === 'KeyM') this.toggleMute();
       else if (e.code === 'KeyF') this.toggleFullscreen();
@@ -245,6 +262,7 @@ class Game {
     });
   }
   controller() {
+    if (this.state === 'walk' && !this.scopeView) return this.walk;
     if (this.state === 'assemble' || this.state === 'test') return this.assembly;
     if (this.state === 'pack') return this.packing;
     return null;
@@ -308,42 +326,15 @@ class Game {
 
   // ------------------------------------------------------------------ menus
   async menuAction(a) {
-    if (a === 'new' || a === 'continue') return this.startShift();
+    if (a === 'new') return this.startShift();
+    if (a === 'continue') return this.startShift(this.save.stats.orders > 0);
     this.ui.hideTitle();
-    if (a === 'workshop') await this.openWorkshop();
+    if (a === 'achievements') await this.ui.achievements(this.save);
     else if (a === 'codex') await this.ui.codex(this.save);
     else if (a === 'howto') await this.ui.howto();
     else if (a === 'settings') await this.openSettings();
     else if (a === 'credits') await this.ui.credits();
     if (this.state === 'title') this.ui.showTitle(this.save);
-  }
-  openWorkshop() {
-    return this.ui.workshop(this.save, (id) => {
-      const u = UPGRADES.find((x) => x.id === id);
-      if (!u || this.save.upgrades[id] || this.save.money < u.price) return false;
-      this.save.money -= u.price;
-      this.save.upgrades[id] = true;
-      audio.play('buy');
-      this.post.pulse(this.theme.b, 0.15);
-      this.applyProps();
-      writeSave(this.save);
-      return true;
-    }, (id) => {
-      const t = THEMES.find((x) => x.id === id);
-      if (!this.save.themes[id]) {
-        if (t.crate || this.save.money < t.price) {
-          audio.play('error');
-          return false;
-        }
-        this.save.money -= t.price;
-        this.save.themes[id] = true;
-        audio.play('buy');
-      }
-      this.save.theme = id;
-      this.applyTheme(t);
-      writeSave(this.save);
-      return true;
-    });
   }
   openSettings() {
     return this.ui.settings(this.save, (k, v) => {
@@ -372,6 +363,7 @@ class Game {
       if (a === 'resume') break;
       if (a === 'howto') await this.ui.howto();
       if (a === 'codex') await this.ui.codex(this.save);
+      if (a === 'achievements') await this.ui.achievements(this.save);
       if (a === 'settings') await this.openSettings();
       if (a === 'menu') {
         this.paused = false;
@@ -397,6 +389,12 @@ class Game {
     audio.tapeStop();
     audio.setMood('title');
     this.setOverdrive(0, true);
+    if (this.walk && this.walk.active) {
+      this.walk.exit();
+      this.ui.walkHud(false);
+    }
+    if (this.deck) this.deck.group.visible = false;
+    this.scopeView = false;
     if (!first) {
       if (this.assembly.active) this.assembly.teardown();
       if (this.assembly.caseObj) this.assembly.caseObj.removeFromParent();
@@ -423,7 +421,7 @@ class Game {
     if (first) this.ui.splash();
   }
 
-  async startShift() {
+  async startShift(walkFirst = false) {
     this.ui.hideTitle();
     this.assembly.teardown();
     if (this.showcase) {
@@ -451,6 +449,7 @@ class Game {
       this.ui.toast(`Day ${this.save.day} — ${dayLength(this.save.day)} orders on the board`, 'good');
       this.bark('day');
     }
+    if (walkFirst) return this.enterWalk('bench');
     await this.beginOrder();
   }
 
@@ -520,7 +519,10 @@ class Game {
       this.bark('od' + tier);
       if (this.orderStats) this.orderStats.peakTier = Math.max(this.orderStats.peakTier, tier);
       if (tier >= 2) this.stat('od2');
-      if (tier >= 3) this.stat('od3');
+      if (tier >= 3) {
+        this.stat('od3');
+        this.save.flags.od3 = true;
+      }
     } else if (tier === 0 && prev > 0) {
       audio.play('flowlost');
       this.ui.toast('Flow lost', 'warn');
@@ -595,6 +597,247 @@ class Game {
       this.rgbMode.rainbow = false;
       this.rgbMode.color.set(c);
     }
+  }
+
+  // ------------------------------------------------------------------ the walkable station
+  async enterWalk(spawn = 'bench') {
+    this.gen++;
+    await this.ui.fade(() => {
+      this.state = 'walk';
+      this.paused = false;
+      this.ui.prompt(null);
+      this.ui.gauge(null);
+      this.setOverdrive(0, true);
+      this.ui.showHud(true);
+      this.ui.walkHud(true);
+      this.deck.group.visible = true;
+      this.refreshDeck();
+      this.walk.enter(spawn);
+      audio.setMood('shift');
+      audio.setIntensity(0);
+    });
+    if (!this.save.seen.tip_walk) {
+      this.save.seen.tip_walk = true;
+      this.ui.bark('orin', 'Stretch your legs, Builder. WASD to walk, mouse to look, E to interact. Tab — or the bench — starts the next order.');
+    }
+  }
+  async leaveWalk() {
+    await this.ui.fade(() => {
+      this.walk.exit();
+      this.ui.walkHud(false);
+      this.deck.group.visible = false;
+      const v = VIEWS.assembly;
+      this.camPos.copy(v.pos);
+      this.camLook.copy(v.look);
+    });
+    await this.beginOrder();
+  }
+  onEnterRoom(room) {
+    this.ui.roomBanner(room.name, room.sub);
+    if (!this.save.visited[room.id]) {
+      this.save.visited[room.id] = true;
+      this.checkAchievements();
+    }
+    this.barked = this.barked || {};
+    const b = WALK_BARKS[room.id];
+    if (b && !this.barked[room.id]) {
+      this.barked[room.id] = true;
+      setTimeout(() => this.state === 'walk' && this.ui.bark(b[0], b[1]), 900);
+    }
+  }
+  checkAchievements() {
+    const s = this.save;
+    let any = false;
+    for (const a of ACHIEVEMENTS) {
+      if (s.achievements[a.id]) continue;
+      let ok = false;
+      try {
+        ok = a.check(s);
+      } catch (e) {}
+      if (ok) {
+        s.achievements[a.id] = true;
+        any = true;
+        this.ui.achievementToast(a);
+        audio.play('contract');
+      }
+    }
+    if (any) {
+      this.deck.refreshTrophies(s.achievements);
+      writeSave(s);
+    }
+  }
+  async walkInteract(it) {
+    if (this.state !== 'walk' || this.interacting || this.paused) return;
+    this.interacting = true;
+    this.walk.releaseLock();
+    this.walk.keys.clear();
+    const s = this.save;
+    try {
+      switch (it.action) {
+        case 'bench':
+          await this.leaveWalk();
+          break;
+        case 'talk':
+          await this.talkTo(it.who);
+          break;
+        case 'buy': {
+          const u = UPGRADES.find((x) => x.id === it.item);
+          if (await this.ui.purchase(u, s)) this.buyUpgrade(u.id);
+          break;
+        }
+        case 'theme':
+          await this.themeOrb(it.theme);
+          break;
+        case 'arcade':
+          await this.playArcade();
+          break;
+        case 'jukebox': {
+          const i = MUSIC_STYLES.findIndex((x) => x.id === (s.musicStyle || 'lofi'));
+          const next = MUSIC_STYLES[(i + 1) % MUSIC_STYLES.length];
+          s.musicStyle = next.id;
+          s.flags.dj = true;
+          audio.setStyle(next.id);
+          audio.play('ui');
+          this.ui.toast(`♪ Now playing: ${next.name}`, 'gold');
+          break;
+        }
+        case 'trophies':
+          await this.ui.achievements(s);
+          break;
+        case 'collection':
+          await this.ui.collection(s);
+          break;
+        case 'telescope':
+          await this.useTelescope();
+          break;
+        case 'signal':
+          this.ui.bark('orin', rankFor(s.xp) < 3 ? 'Array status: background radiation, cosmic microwave hum, one very confident space rock. Nothing unusual.' : `Decode at ${(s.signal || 0).toFixed(1)}%. Every machine you ship — and every lock you get on the telescope — pushes it further.`);
+          break;
+        case 'codex':
+          await this.ui.codex(s);
+          break;
+        case 'bunk':
+          this.ui.bark('orin', pick(['Your bunk. Regulation-made. I tucked the corners myself, using a maintenance drone.', 'You may rest after the colonies are supplied. Approximately never.', 'Sleep cycle reminder: you have not slept. Neither have I. I do not need to.']));
+          break;
+        case 'solmap':
+          await this.ui.solmap(s);
+          break;
+        case 'pod':
+          this.ui.bark('juno', ['That\'s Big Kevin. He\'s carried more machines than any pod on the station. Show some respect.', 'Comet Lady! Fastest pod on the rail. Don\'t tell the others.', 'Ol\' Reliable has never once been late. Never. Once.'][it.pod]);
+          break;
+        case 'window':
+          this.ui.bark('orin', pick(['Saturn, Titan and, 2.5 million light-years behind them, Andromeda. Nobody gets tired of this view.', 'Fun fact: the light hitting your eyes from Andromeda left before humans existed. Do not let that distract your torque.']));
+          break;
+      }
+    } finally {
+      this.interacting = false;
+      this.checkAchievements();
+      writeSave(s);
+    }
+  }
+  async talkTo(who) {
+    const s = this.save;
+    const rank = rankFor(s.xp);
+    const sets = s.finaleDone ? CREW_TALK.after[who] : CREW_TALK[who][chapterFor(rank).n - 1];
+    const i = (s.talkIdx[who] || 0) % sets.length;
+    s.talkIdx[who] = (s.talkIdx[who] || 0) + 1;
+    s.talked[who] = true;
+    await this.ui.transmission(sets[i]);
+  }
+  buyUpgrade(id) {
+    const u = UPGRADES.find((x) => x.id === id);
+    const s = this.save;
+    if (!u || s.upgrades[id] || s.money < u.price) return;
+    s.money -= u.price;
+    s.upgrades[id] = true;
+    audio.play('buy');
+    this.post.pulse('#34d399', 0.18);
+    this.applyProps();
+    this.deck.refreshShop(s);
+    this.ui.toast(`${u.name} installed!`, 'good');
+    this.ui.bark('pip', pick(['THANK YOU! Excellent choice! I would have chosen it too! I am a vendor bot!', 'Sold! Wear it with pride! Or hold it. Some of these are not wearable!', 'Transaction complete! You look 12% more efficient already!']));
+    writeSave(s);
+  }
+  async themeOrb(id) {
+    const t = THEMES.find((x) => x.id === id);
+    const s = this.save;
+    if (!s.themes[id]) {
+      if (t.crate) {
+        this.ui.toast(`${t.name} can only be found in supply crates`, 'warn');
+        return;
+      }
+      if (s.money < t.price) {
+        audio.play('error');
+        this.ui.toast(`${t.name} costs ${cr(t.price)} — not enough credits`, 'warn');
+        return;
+      }
+      if (!(await this.ui.confirm(`${t.name} lighting`, `Repaint every light on Forge-7 for ${cr(t.price)}?`))) return;
+      s.money -= t.price;
+      s.themes[id] = true;
+      audio.play('buy');
+    }
+    s.theme = id;
+    this.applyTheme(t);
+    this.deck.refreshShop(s);
+    this.post.pulse(t.a, 0.25);
+    this.ui.toast(`Lighting set: ${t.name}`, 'good');
+  }
+  async playArcade() {
+    const s = this.save;
+    audio.setDuck(0.35);
+    const r = await this.ui.arcade(s.arcadeHigh || 0);
+    audio.setDuck(1);
+    if (r.score > (s.arcadeHigh || 0)) {
+      s.arcadeHigh = r.score;
+      if (r.score > 0) this.ui.toast(`NEW POD RUNNER HIGH SCORE — ${r.score.toLocaleString('en-US')}`, 'gold');
+    }
+    if (s.arcadeDay !== s.day) {
+      s.arcadeDay = s.day;
+      s.arcadeToday = 0;
+    }
+    const reward = Math.min(200 - (s.arcadeToday || 0), Math.floor(r.score / 40));
+    if (reward > 0) {
+      s.arcadeToday = (s.arcadeToday || 0) + reward;
+      s.money += reward;
+      audio.play('cash');
+      this.ui.toast(`Arcade winnings: +${cr(reward)} (daily cap ${cr(200)})`, 'good');
+    }
+  }
+  async useTelescope() {
+    const s = this.save;
+    const rank = rankFor(s.xp);
+    this.scopeView = true;
+    const cam = this.camera;
+    const dir = this.env.sky.material.uniforms.uG.value.clone().normalize();
+    // the optics look past the hull: put the virtual eye outside the station so no
+    // interior geometry (the tube itself, walls, ceiling) can block the field
+    const eye = new THREE.Vector3(36.5, 3.3, -7.2).addScaledVector(dir, 34);
+    cam.position.copy(eye);
+    cam.lookAt(eye.clone().add(dir.multiplyScalar(100)));
+    cam.fov = 7;
+    cam.updateProjectionMatrix();
+    this.ui.walkHud(false);
+    document.body.classList.add('walking');
+    audio.play('whoosh');
+    await this.ui.telescope({
+      canTune: rank >= 3 && !s.finaleDone,
+      lockedToday: s.scopeDay === s.day,
+      onLock: () => {
+        s.scopeDay = s.day;
+        s.flags.scope = true;
+        audio.play('whisper');
+        this.post.pulse('#facc15', 0.3);
+        if (!s.finaleDone && (s.signal || 0) < 99) {
+          s.signal = Math.min(99, (s.signal || 0) + 1.5);
+          this.ui.toast('SIGNAL LOCKED — Whisper decode +1.5%', 'gold');
+        }
+        setTimeout(() => this.ui.bark('sela', 'You heard it too, didn\'t you? Every lock gives the array a cleaner sample. Thank you.'), 600);
+      },
+    });
+    this.scopeView = false;
+    cam.fov = 70;
+    cam.updateProjectionMatrix();
+    this.ui.walkHud(true);
   }
 
   // ------------------------------------------------------------------ stage callbacks
@@ -677,6 +920,12 @@ class Game {
     if (this.par && this.par - res.time >= 20) this.stat('parBy20');
     if (this.orderStats.card) this.stat('card');
     s.orderInDay++;
+    const body = COLONY_BODY[this.order.city] || 'saturn';
+    s.shipments[body] = (s.shipments[body] || 0) + 1;
+    s.history.push({ no: this.order.no, grade: res.grade.id, customer: this.order.customerFull, city: this.order.city });
+    if (s.history.length > 40) s.history.shift();
+    if (this.order.rush) s.stats.rush = (s.stats.rush || 0) + 1;
+    if (this.par && this.par - res.time >= 60) s.flags.speed = true;
     writeSave(s);
     const rankAfter = rankFor(s.xp);
     const cur = RANKS[rankAfter - 1].xp, next = RANKS[rankAfter] ? RANKS[rankAfter].xp : cur + 1;
@@ -700,8 +949,11 @@ class Game {
       writeSave(s);
       await this.ui.crate(rarity, reward);
       if (reward.kind === 'decor') this.applyDecor();
+      if (rarity === 'legendary') s.flags.legendary = true;
       if (gen !== this.gen) return;
     }
+    this.refreshDeck();
+    this.checkAchievements();
     if (s.stats.orders === 1) await this.tx('firstShip');
     if (rankAfter > rankBefore) {
       audio.play('levelup');
@@ -740,9 +992,18 @@ class Game {
       writeSave(s);
       this.ui.contracts(s.contracts);
       if (choice === 'menu') return this.toTitle();
-      if (choice === 'workshop') await this.openWorkshop();
       this.ui.toast(`Day ${s.day} — ${dayLength(s.day)} orders on the board · new contracts posted`, 'good');
+      this.checkAchievements();
+      if (choice === 'walk') return this.enterWalk('bench');
       this.bark('day');
+    } else if (!this.order.tutorial || s.stats.orders > 1) {
+      const c = await this.ui.choice();
+      if (gen !== this.gen) return;
+      if (c === 'walk') return this.enterWalk('bench');
+    } else {
+      // after the tutorial order, point the player at the rest of the station
+      const c = await this.ui.choice();
+      if (c === 'walk') return this.enterWalk('bench');
     }
     if (gen !== this.gen) return;
     await this.beginOrder();
@@ -821,6 +1082,7 @@ class Game {
 
   // ------------------------------------------------------------------ loop
   updateCamera(dt) {
+    if (this.state === 'walk') return; // the walk controller drives the camera
     const asp = this.camera.aspect;
     let pos, look;
     if (this.view === 'title') {
@@ -879,6 +1141,11 @@ class Game {
     }
     this.assembly.update(gdt, this.time);
     this.packing.update(gdt, this.time);
+    if (!this.scopeView) this.walk.update(gdt, this.time);
+    if (this.deck.group.visible) {
+      this.deck.state.signal = this.save.signal || 0;
+      this.deck.update(this.time, dt, this.walk.active ? this.walk.pos : null, this.walk.active);
+    }
     this.fx.update(gdt);
     if (this.rgbMode.rainbow) M.rgb.emissive.setHSL((this.time * 0.12) % 1, 1, 0.55);
     else M.rgb.emissive.copy(this.rgbMode.color);
@@ -888,7 +1155,7 @@ class Game {
       this.combo = 0;
       if (this.odTier) this.setOverdrive(0);
     }
-    if (PLAYING.has(this.state) || this.state === 'results' || this.state === 'story') {
+    if (PLAYING.has(this.state) || this.state === 'results' || this.state === 'story' || this.state === 'walk') {
       this.hudT = (this.hudT || 0) + dt;
       if (this.hudT > 0.1) {
         this.hudT = 0;

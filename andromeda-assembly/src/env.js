@@ -49,10 +49,10 @@ export function buildStation(theme) {
   // ---------------------------------------------------------------- floor
   const ft = T.floorTextures();
   const floorM = std({ map: ft.map, normalMap: ft.normal, roughnessMap: ft.rough, roughness: 0.55, metalness: 0.7, envMapIntensity: 1.2 });
-  mesh(new THREE.PlaneGeometry(90, 34.4), floorM, -4, -4.0, 13.8, g, { rx: -Math.PI / 2, cast: false });
+  mesh(new THREE.PlaneGeometry(36.1, 19.4), floorM, -4.55, -4.0, 6.3, g, { rx: -Math.PI / 2, cast: false });
   // glowing floor guide lines
-  mesh(box(60, 0.02, 0.06), accentA, -4, -3.99, 3.6, g, { cast: false });
-  mesh(box(60, 0.02, 0.06), accentB, -4, -3.99, -2.6, g, { cast: false });
+  mesh(box(36, 0.02, 0.06), accentA, -4.55, -3.99, 3.6, g, { cast: false });
+  mesh(box(36, 0.02, 0.06), accentB, -4.55, -3.99, -2.6, g, { cast: false });
 
   // ---------------------------------------------------------------- walls (hex panels)
   const hex = T.hexPanelTextures('#ffffff');
@@ -61,16 +61,27 @@ export function buildStation(theme) {
   const WZ = -3.42;
   const wall = (w, h, x, y) => mesh(planeUV(w, h, 3.2), wallM, x, y, WZ, g, { cast: false });
   wall(24, 18, -28.4, 5); // left of window
-  wall(36, 18, 15.0, 5); // right of window
+  wall(16.5, 18, 5.25, 5); // right of window (up to the bay's east wall)
   wall(13.4, 5.0, -9.7, -1.5); // under window
   wall(13.4, 5.6, -9.7, 11.2); // above window
   // side walls
-  const side = mesh(planeUV(16, 18, 3.2), wallM, -22.6, 5, 4.6, g, { ry: Math.PI / 2, cast: false });
-  mesh(planeUV(16, 18, 3.2), wallM, 13.5, 5, 4.6, g, { ry: -Math.PI / 2, cast: false });
+  mesh(planeUV(19.4, 18, 3.2), wallM, -22.6, 5, 6.3, g, { ry: Math.PI / 2, cast: false });
+  // east wall with the doorway to the spine corridor (z 4..12, up to y 6); faces both ways
+  for (const [ry, x] of [[-Math.PI / 2, 13.5], [Math.PI / 2, 13.52]]) {
+    mesh(planeUV(7.4, 18, 3.2), wallM, x, 5, 0.3, g, { ry, cast: false });
+    mesh(planeUV(4, 18, 3.2), wallM, x, 5, 14, g, { ry, cast: false });
+    mesh(planeUV(8, 8, 3.2), wallM, x, 10, 8, g, { ry, cast: false });
+  }
+  // front wall (single-sided: invisible to the work cameras sitting behind it)
+  mesh(planeUV(36.1, 18, 3.2), wallM, -4.55, 5, 16, g, { ry: Math.PI, cast: false });
+  // ceiling with light panels
+  const ceilM = std({ color: '#12141b', roughness: 0.6, metalness: 0.5 });
+  mesh(new THREE.PlaneGeometry(36.1, 19.4), ceilM, -4.55, 11.5, 6.3, g, { rx: Math.PI / 2, cast: false });
+  for (const z of [5, 10, 14.5]) mesh(box(30, 0.05, 0.5), white, -4.55, 11.45, z, g, { cast: false });
   // horizontal light strips along the wall
-  mesh(box(36, 0.05, 0.05), accentA, 15, 8.8, WZ + 0.05, g, { cast: false });
+  mesh(box(16.5, 0.05, 0.05), accentA, 5.25, 8.8, WZ + 0.05, g, { cast: false });
   mesh(box(24, 0.05, 0.05), accentA, -28.4, 8.8, WZ + 0.05, g, { cast: false });
-  mesh(box(36, 0.05, 0.05), accentB, 15, -3.7, WZ + 0.05, g, { cast: false });
+  mesh(box(16.5, 0.05, 0.05), accentB, 5.25, -3.7, WZ + 0.05, g, { cast: false });
 
   // ---------------------------------------------------------------- panoramic window
   const frameM = phys({ color: '#0d0e13', roughness: 0.3, metalness: 0.8, clearcoat: 1, clearcoatRoughness: 0.15 });
@@ -133,8 +144,8 @@ export function buildStation(theme) {
 
   // ---------------------------------------------------------------- ceiling truss & lamps
   const truss = std({ color: '#1b1e26', roughness: 0.4, metalness: 0.8 });
-  for (const z of [-1.6, 2.6]) mesh(box(46, 0.35, 0.35), truss, -4, 10.5, z, g, { cast: false });
-  for (let x = -24; x <= 14; x += 3) mesh(box(0.2, 0.2, 4.6), truss, x, 10.5, 0.5, g, { cast: false });
+  for (const z of [-1.6, 2.6]) mesh(box(36, 0.35, 0.35), truss, -4.55, 10.5, z, g, { cast: false });
+  for (let x = -22; x <= 13; x += 3) mesh(box(0.2, 0.2, 4.6), truss, x, 10.5, 0.5, g, { cast: false });
   const lamps = [];
   const lamp = (x, y, z, floorY, r, key) => {
     const L = new THREE.Group();
@@ -377,6 +388,7 @@ export function buildStation(theme) {
 
   return {
     setQuality,
+    mats: { wallM, floorM, steel, frameM, white, darkPanel, ceilM, hz, glowTex, planeUV },
     group: g, accentA, accentB, screen: { canvas: sc, ctx: sctx, tex: screenTex, mesh: screen }, rollers, props, monitor: mon,
     keyLight: key, lamps, airlock: airlockState, sky, saturn, update, setTheme, dust,
   };

@@ -354,6 +354,14 @@ export class AudioEngine {
         this.tone({ f: 1760, dur: 0.12, gain: 0.05, type: 'sine', t: 0.09, rev: 0.6 });
         this.noise({ dur: 0.3, type: 'bandpass', f: 2500, Q: 3, gain: 0.04, attack: 0.05 });
         break;
+      case 'step':
+        this.noise({ dur: 0.07, type: 'lowpass', f: 380 + Math.random() * 120, gain: 0.12 });
+        this.tone({ f: 70 + Math.random() * 15, f2: 45, dur: 0.07, gain: 0.08, type: 'sine' });
+        break;
+      case 'door':
+        this.noise({ dur: 0.45, type: 'bandpass', f: 500, f2: 1600, Q: 1, gain: 0.08, attack: 0.08 });
+        this.tone({ f: 880, dur: 0.12, gain: 0.03, type: 'sine', t: 0.05 });
+        break;
       case 'whisper':
         [48, 55, 60, 67].forEach((n, i) => this.tone({ f: NOTE(n), dur: 3, gain: 0.05, type: 'sine', attack: 0.8, t: i * 0.2, rev: 1 }));
         break;
@@ -436,18 +444,28 @@ export class AudioEngine {
     this.mood = m;
     if (m !== 'shift') this.setIntensity(0);
   }
+  setStyle(id) {
+    this.style = id;
+    const S = STYLES[id] || STYLES.lofi;
+    this.bpm = S.bpm;
+    this.prog = S.prog;
+    this.setIntensity(this.intensity || 0);
+  }
   setIntensity(i) {
     this.intensity = i;
     if (!this.ctx || !this.layers) return;
     const t = this.ctx.currentTime;
-    const shift = this.mood === 'shift';
+    const ambient = this.style === 'ambient';
+    const synth = this.style === 'synth';
+    const shift = this.mood === 'shift' && !ambient;
+    if (ambient) i = 0;
     const want = {
       pad: 1,
       keys: shift ? 0.9 : 0.6,
       bass: shift ? (i >= 1 ? 1 : 0.55) : 0,
       drums: shift ? (i >= 1 ? 1 : 0.6) : 0,
       hats: shift ? (i >= 2 ? 1 : i >= 1 ? 0.5 : 0) : 0,
-      arp: shift ? (i >= 2 ? 1 : 0) : this.mood === 'title' ? 0.35 : 0,
+      arp: synth && this.mood === 'shift' ? 1 : shift ? (i >= 2 ? 1 : 0) : this.mood === 'title' || ambient ? 0.45 : 0,
       lead: shift && i >= 3 ? 1 : this.mood === 'finale' ? 1 : 0,
     };
     for (const k in this.layers) this.layers[k].gain.setTargetAtTime(want[k] || 0, t, 0.6);
@@ -466,6 +484,7 @@ export class AudioEngine {
     this.setIntensity(0);
     this.bpm = 92;
     this.step = 0;
+    this.style = this.style || 'lofi';
     this.nextT = ctx.currentTime + 0.2;
     // F#m9 – Dmaj7 – A6/9 – E6sus ... spacey, hopeful
     this.prog = [
@@ -479,6 +498,8 @@ export class AudioEngine {
       { root: 40, notes: [56, 59, 64, 68, 71] },
     ];
     this.arpPat = [0, 2, 1, 3, 2, 4, 3, 1];
+    STYLES.lofi.prog = this.prog;
+    this.setStyle(this.style);
     this.musicTimer = setInterval(() => this.schedule(), 30);
   }
   schedule() {
@@ -487,7 +508,8 @@ export class AudioEngine {
     const spb = 60 / this.bpm / 4;
     while (this.nextT < ctx.currentTime + 0.15) {
       this.playStep(this.step, this.nextT, spb);
-      this.nextT += spb * (this.step % 2 === 0 ? 1.06 : 0.94);
+      const sw = this.style === 'lofi' ? 0.06 : 0;
+      this.nextT += spb * (this.step % 2 === 0 ? 1 + sw : 1 - sw);
       this.step++;
     }
   }
@@ -545,8 +567,18 @@ export class AudioEngine {
       voice(L.keys, NOTE(n), spb * 7, 0.03, 'sine', 0.005, 3000);
       voice(L.keys, NOTE(n) * 2, spb * 2, 0.007, 'triangle', 0.003, 4000);
     }
+    const style = this.style;
+    if (style === 'synth' && s % 2 === 0) {
+      const n = s >= 8 ? chord.root + 12 : chord.root;
+      voice(L.bass, NOTE(n), spb * 1.6, 0.06, 'sawtooth', 0.005, 500, 0, 1400);
+    }
+    if (style === 'ambient' && (s === 0 || s === 8) && Math.random() < 0.7) {
+      const n = chord.notes[(Math.random() * chord.notes.length) | 0] + 24;
+      voice(L.keys, NOTE(n), spb * 14, 0.018, 'sine', 0.01, 6000);
+      voice(L.keys, NOTE(n) * 2.01, spb * 8, 0.006, 'sine', 0.01, 8000);
+    }
     // bass
-    if (s === 0 || s === 6 || s === 10 || (s === 14 && bar % 2)) {
+    if (style !== 'synth' && (s === 0 || s === 6 || s === 10 || (s === 14 && bar % 2))) {
       const n = s === 10 ? chord.root + 7 : chord.root;
       voice(L.bass, NOTE(n), spb * (s === 0 ? 5 : 3), 0.11, 'sine', 0.01, 500);
       voice(L.bass, NOTE(n), spb * (s === 0 ? 5 : 3), 0.035, 'sawtooth', 0.01, 300, 0, 900);
@@ -565,7 +597,8 @@ export class AudioEngine {
       voice(L.lead, NOTE(n), spb * 3.5, 0.02, 'sawtooth', 0.02, 2000, -5);
     }
     // drums
-    if (s === 0 || s === 8 || (s === 10 && bar % 2 === 1)) {
+    if (style === 'ambient') return;
+    if (style === 'synth' ? s % 4 === 0 : s === 0 || s === 8 || (s === 10 && bar % 2 === 1)) {
       const o = ctx.createOscillator();
       o.frequency.setValueAtTime(120, at);
       o.frequency.exponentialRampToValueAtTime(40, at + 0.16);
@@ -585,5 +618,27 @@ export class AudioEngine {
     if (Math.random() < 0.2) noiseHit(L.keys, 0.01, 'highpass', 3000, 0.01 + Math.random() * 0.015);
   }
 }
+
+const STYLES = {
+  lofi: { bpm: 92, prog: null },
+  synth: {
+    bpm: 112,
+    prog: [
+      { root: 45, notes: [57, 60, 64, 69, 72] },
+      { root: 41, notes: [57, 60, 65, 69, 72] },
+      { root: 48, notes: [55, 60, 64, 67, 72] },
+      { root: 43, notes: [55, 59, 62, 67, 71] },
+    ],
+  },
+  ambient: {
+    bpm: 64,
+    prog: [
+      { root: 38, notes: [62, 66, 69, 73, 76] },
+      { root: 43, notes: [62, 67, 71, 74, 78] },
+      { root: 40, notes: [59, 64, 67, 71, 74] },
+      { root: 45, notes: [61, 64, 69, 71, 76] },
+    ],
+  },
+};
 
 export const audio = new AudioEngine();

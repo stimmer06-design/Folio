@@ -14,6 +14,7 @@ export const CHARACTERS = {
   juno: { name: 'Juno Reyes', role: 'Dispatch & Launch', color: '#f59e0b', glyph: 'face2' },
   marrow: { name: 'Dr. Ilya Marrow', role: 'Founder · archived log', color: '#f0abfc', glyph: 'archive' },
   whisper: { name: '— UNKNOWN —', role: 'Source: M31 · 2.5 Mly', color: '#facc15', glyph: 'signal' },
+  pip: { name: 'PIP', role: 'Orbital Outfitters vendor bot', color: '#34d399', glyph: 'eye' },
 };
 
 export const CHAPTERS = [
@@ -160,3 +161,51 @@ export const CODEX = [
   { id: 'pods', cat: 'Station', title: 'Launch Pods', unlock: 'crate',
     text: 'Reusable courier capsules fired from Forge-7\'s dispatch airlock on a magnetic rail, then boosted by small ion thrusters. Average delivery time to the Martian colonies: 19 days. Pods return empty, smelling faintly of the colonies they visited.' },
 ];
+
+// ---------------------------------------------------------------- crew conversations on the deck
+// CREW_TALK[who][chapterIndex] = list of conversations (each a list of lines). 'after' plays post-finale.
+const C = (who, ...lines) => lines.map((t) => (Array.isArray(t) ? T(t[0], t[1]) : T(who, t)));
+export const CREW_TALK = {
+  orin: [
+    [C('orin', 'Welcome to the deck, Builder. Walking improves accuracy by four percent. I made that number up. It is probably true.'), C('orin', 'The shop is run by PIP. PIP is very enthusiastic. Please do not encourage PIP.'), C('orin', 'Your bunk is in this room. You will not use it. Nobody on Forge-7 sleeps during a shift. That is a joke. Please sleep.')],
+    [C('orin', 'The Whisper repeats every forty-seven minutes. I have listened to it nine hundred times. I am not bored. I am attentive.'), C('orin', 'Every machine you ship joins the Lighthouse Network. You are, in a very real sense, building my ears.')],
+    [C('orin', 'Nullcore\'s failure rate is now thirty-four percent. I am not gloating. I am noting. Warmly.'), C('orin', 'Dr. Marrow designed me to be patient, precise and "secretly sentimental". I deny the third requirement.', 'Mostly.')],
+    [C('orin', 'The signal responds when the network grows. I have checked eleven thousand times. It is not a coincidence.'), C('orin', 'If they answer, what should we say? I have drafted options. Option one: "Hello." Option two: "Hello!"')],
+    [C('orin', 'Whatever happens with the Lighthouse, you should know your torque values have been exemplary.'), C('orin', 'Lighthouse components are in fabrication. I have polished the core housing. Twice. Do not tell Juno I copied her.')],
+  ],
+  sela: [
+    [C('sela', 'Take a breath, Builder. The station is bigger than one bench. Go see the hangar — Juno will talk your ear off.'), C('sela', 'I spent twelve years mining Ceres before Forge-7. Trust me, this view beats rock walls.')],
+    [C('sela', 'The array hasn\'t been this busy since it was built. Sometimes I just sit here and listen to the static.'), C('sela', 'If you have a spare moment, try the telescope. Tune it to the Whisper. It\'s… something to hear.')],
+    [C('sela', 'Marrow\'s logs keep surfacing in the archive. She knew this day would come. I wish she\'d lived to see it.'), C('sela', 'Nullcore offered to buy us out. I told them we\'re not for sale. Neither is the sky.')],
+    [C('sela', 'Observatories across the system are calling me every hour. Everyone wants to know what we\'re hearing.'), C('sela', 'Whatever this is, Builder, it started because people like you cared how a machine was put together.')],
+    [C('sela', 'When the Lighthouse order comes through, take your time. History can wait a few minutes for perfect torque.'), C('sela', 'I keep thinking about what we\'ll say. Then I remember — we already said it. Every machine was the message.')],
+  ],
+  juno: [
+    [C('juno', 'Welcome to Dock 3! Say hi to Big Kevin. Kevin, say hi. …He\'s shy.'), C('juno', 'Every pod you launch goes out that forcefield. Pretty, right? Don\'t touch it. Seriously. Don\'t.')],
+    [C('juno', 'Check the Sol map! Every glowing dot is somewhere your machines ended up. Someday it\'ll light up like a city.'), C('juno', 'A colonist on Europa sent us a photo of their PC under the ice. They named it after you. Probably. I\'m choosing to believe that.')],
+    [C('juno', 'Nullcore pods keep bouncing off the Titan traffic grid. Amateurs.'), C('juno', 'I timed your last box: tape to launch in under a minute. You\'re making my job too easy!')],
+    [C('juno', 'The launch queue is three days deep. Everyone wants a machine that can hear the stars.'), C('juno', 'Ol\' Reliable got a new paint job. It\'s the same paint. I just like saying it.')],
+    [C('juno', 'I\'m reserving Big Kevin for the Lighthouse Core. He\'s been training for this his whole life.'), C('juno', 'After this, I\'m asking Sela for a bigger hangar. And a snack machine. Priorities.')],
+  ],
+  pip: [
+    [C('pip', 'WELCOME to Orbital Outfitters! Everything is on sale! Nothing is on sale! Prices are fair and ORIN audits me!'), C('pip', 'Walk up to anything on a pedestal and press E to inspect it. I accept credits, compliments and exact change.')],
+    [C('pip', 'The Power Driver is our best seller! It is also our only driver! It is very good!'), C('pip', 'Lighting orbs are on the back wall. One purchase repaints the whole station! The walls do not mind!')],
+    [C('pip', 'A Nullcore rep tried to sell me a "smart tape". It was regular tape with a sticker on it. I bought ten.'), C('pip', 'Crate Scanner! Better crates! Statistically! I love statistics!')],
+    [C('pip', 'Business is BOOMING! The galaxy is listening and apparently it wants espresso machines!'), C('pip', 'Have you tried the Magnetic Gloves? Parts fly to you! Like friendship! But faster!')],
+    [C('pip', 'If the aliens visit, I am offering them the first-contact discount. It is 0%. It is the thought that counts!'), C('pip', 'You have been my favourite customer for ' + 'many cycles! You are also my only customer! Still my favourite!')],
+  ],
+  after: {
+    orin: [C('orin', 'They said hello. Two galaxies, and the first thing exchanged was a greeting. I find this… very reassuring.')],
+    sela: [C('sela', 'The array is quiet tonight. Not empty — quiet. Like a friend who knows you\'re listening.')],
+    juno: [C('juno', 'Big Kevin is FAMOUS now. He\'s been insufferable about it.')],
+    pip: [C('pip', 'Andromeda has not ordered anything yet! I remain hopeful! I have prepared a catalogue in 4,000 languages!')],
+  },
+};
+
+export const WALK_BARKS = {
+  shop: ['pip', 'Welcome back! Browse freely! Touch gently! Buy enthusiastically!'],
+  hangar: ['juno', 'Hey hey! Come to watch the pods? Grab a seat. Not on Kevin.'],
+  observatory: ['sela', 'Mind the telescope — it was a gift from Dr. Marrow.'],
+  core: ['orin', 'You are in my core room. Please do not unplug anything. That is me.'],
+  lounge: ['orin', 'The arcade high score belongs to Juno. She will tell you. Repeatedly.'],
+};

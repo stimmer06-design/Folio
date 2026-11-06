@@ -59,6 +59,50 @@ button{font-family:var(--font)}
 @keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(330%)}}
 #loading p{color:var(--muted);letter-spacing:.3em;font-size:12px;text-transform:uppercase;font-family:var(--disp)}
 
+/* ---------- walk mode ---------- */
+body.walking #timer,body.walking #daypill,body.walking #od,body.walking #ticket,body.walking #prompt,body.walking #hb-hint{display:none!important}
+#walkhud{position:fixed;inset:0;z-index:9;pointer-events:none}
+#crosshair{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 0 6px rgba(0,0,0,.8)}
+#walkprompt{position:fixed;left:50%;top:calc(50% + 34px);transform:translateX(-50%);padding:8px 16px;display:flex;gap:10px;align-items:center;font-family:var(--disp);font-weight:700;letter-spacing:.08em;font-size:18px;text-transform:uppercase;white-space:nowrap;animation:pop .2s}
+#walkprompt .kbd{font-size:14px;padding:2px 8px;color:#fff;border-color:var(--b);background:rgba(34,211,238,.15)}
+#walkhint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:8px 14px;font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap}
+#lockhint{position:fixed;left:50%;top:calc(50% - 60px);transform:translateX(-50%);font-family:var(--disp);font-weight:700;letter-spacing:.3em;color:#fff;text-shadow:0 0 12px #000;font-size:16px;animation:pulse 1.6s infinite}
+#roomban{position:fixed;left:50%;top:18%;transform:translateX(-50%);text-align:center;z-index:11;opacity:0;transition:opacity .6s,letter-spacing .9s;letter-spacing:.1em}
+#roomban.on{opacity:1;letter-spacing:.18em}
+#roomban .rn{font-family:var(--disp);font-weight:700;font-size:44px;text-transform:uppercase;color:#fff;text-shadow:0 0 30px var(--b)}
+#roomban .rs{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.35em;text-transform:uppercase;color:var(--b)}
+#fade{position:fixed;inset:0;background:#000;opacity:0;z-index:35;transition:opacity .35s}
+#fade.on{opacity:1}
+#overlay2{position:fixed;inset:0;z-index:31;display:flex;align-items:center;justify-content:center;background:rgba(2,3,8,.82);backdrop-filter:blur(4px)}
+.cabinet{background:linear-gradient(180deg,#2a1745,#120a22);padding:26px 26px 18px;border-radius:18px 18px 8px 8px;box-shadow:0 0 0 3px #ec4899 inset,0 30px 80px rgba(0,0,0,.8),0 0 60px rgba(236,72,153,.35);text-align:center}
+.cabinet .mq{font-family:var(--disp);font-weight:700;letter-spacing:.3em;font-size:28px;color:#22d3ee;text-shadow:0 0 16px #22d3ee;margin-bottom:12px}
+.cabinet canvas{display:block;border-radius:10px;box-shadow:0 0 0 2px #000,0 0 30px rgba(34,211,238,.25);max-width:88vw;max-height:70vh;background:#000;cursor:crosshair}
+.cabinet .ft{margin-top:12px;font-size:12px;color:var(--muted);letter-spacing:.1em}
+#scope{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 46%,transparent 0,transparent 33vh,rgba(0,0,0,.92) 34vh,#000 70vh)}
+#scope .ret{position:absolute;left:50%;top:46%;width:66vh;height:66vh;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(250,204,21,.35);box-shadow:inset 0 0 0 1px rgba(250,204,21,.12)}
+#scope .ret::before,#scope .ret::after{content:"";position:absolute;background:rgba(250,204,21,.35)}
+#scope .ret::before{left:50%;top:8%;bottom:8%;width:1px}
+#scope .ret::after{top:50%;left:8%;right:8%;height:1px}
+#tuner{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:14px 18px;width:min(640px,94vw);pointer-events:auto}
+#tuner canvas{width:100%;height:120px;display:block;background:#05060f;border:1px solid var(--line)}
+#tuner .knobs{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;align-items:center;margin-top:10px;font-family:var(--disp);font-weight:700;letter-spacing:.15em;font-size:13px;color:var(--muted)}
+#tuner input{width:100%;accent-color:#facc15}
+#tuner .lock{height:6px;background:rgba(255,255,255,.08);margin-top:10px}
+#tuner .lock i{display:block;height:100%;width:0;background:linear-gradient(90deg,#facc15,#f0abfc)}
+.ach{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.ach div{padding:12px;border:1px solid var(--line);background:rgba(120,150,255,.04);clip-path:var(--cut-s)}
+.ach div.on{border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.07)}
+.ach b{display:block;font-family:var(--disp);font-size:16px;letter-spacing:.04em}
+.ach span{font-size:12px;color:var(--muted)}
+.ach div.on b{color:#fde68a}
+.ach div:not(.on){opacity:.55}
+.toast.ach2{border:1px solid rgba(250,204,21,.6);color:#fde68a;font-family:var(--disp);letter-spacing:.08em;font-size:17px}
+.mapgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mapgrid .b{display:flex;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--line);font-size:14px}
+.mapgrid .b i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.mapgrid .h{font-size:12.5px;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--line)}
+@media (max-width:900px){.ach{grid-template-columns:repeat(2,1fr)}.mapgrid{grid-template-columns:1fr}}
+
 /* ---------- splash ---------- */
 #splash{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at center,rgba(3,4,12,.55),rgba(2,3,8,.95));cursor:pointer;transition:opacity .9s,backdrop-filter .9s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 #splash img{width:min(520px,76vw);filter:drop-shadow(0 0 40px rgba(139,92,246,.55))}
@@ -345,7 +389,7 @@ button{font-family:var(--font)}
   <div id="floaters" class="passthru"></div>
   <div id="hud" class="hidden passthru">
     <div class="row">
-      <div class="pill panel"><div><div class="lbl" id="chaplbl">Chapter 1</div><div class="val" id="chapval">First Shift</div></div><div><div class="lbl">Shift</div><div class="val" id="dayval">Day 1</div></div><div><div class="lbl">Order</div><div class="val" id="ordval">1/3</div></div></div>
+      <div class="pill panel" id="daypill"><div><div class="lbl" id="chaplbl">Chapter 1</div><div class="val" id="chapval">First Shift</div></div><div><div class="lbl">Shift</div><div class="val" id="dayval">Day 1</div></div><div><div class="lbl">Order</div><div class="val" id="ordval">1/3</div></div></div>
       <div id="hudbtns"><button class="btn small" id="hb-pause" title="Pause (Esc)">❚❚</button><button class="btn small" id="hb-hint" title="Hint (H)">?</button></div>
     </div>
     <div class="pill panel mid" id="timer"><div class="val" id="timeval">00:00</div><div class="pbar"><i id="parfill"></i></div><div class="par" id="parval">PAR 02:00</div></div>
@@ -365,6 +409,12 @@ button{font-family:var(--font)}
   <div id="rgbpick" class="hidden panel"></div>
   <div id="txdim" class="hidden"></div>
   <div id="tx" class="hidden panel"></div>
+  <div id="walkhud" class="hidden passthru"><div id="crosshair"></div><div id="walkprompt" class="hidden panel"><span class="kbd">E</span><span id="walkprompttxt"></span></div>
+    <div id="walkhint" class="panel"><span class="kbd">WASD</span> move <span class="kbd">Mouse</span> look <span class="kbd">Shift</span> sprint <span class="kbd">E</span> interact <span class="kbd">Tab</span> back to bench <span class="kbd">Esc</span> menu</div>
+    <div id="lockhint" class="hidden">CLICK TO LOOK AROUND</div></div>
+  <div id="roomban" class="passthru"><div class="rn"></div><div class="rs"></div></div>
+  <div id="overlay2" class="hidden"></div>
+  <div id="fade" class="passthru"></div>
   <div id="title" class="hidden"></div>
   <div id="modal"></div>
 </div>

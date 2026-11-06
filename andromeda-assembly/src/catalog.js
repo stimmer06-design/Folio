@@ -240,3 +240,55 @@ export const REVIEWS = {
   C: ['It works. Box looked like it fought a meteor.', 'Took a bit to get set up but it runs fine.'],
   D: ['It boots… eventually. I\'ve seen tidier hab modules.', 'Arrived. Functional. ORIN would not be proud.'],
 };
+
+// ---------------------------------------------------------------- station / exploration
+export const ROOM_IDS = ['bay', 'corridor', 'shop', 'observatory', 'lounge', 'core', 'hangar'];
+
+// which body on the hangar's Sol map each colony belongs to
+export const COLONY_BODY = {
+  'New Lisbon, Mars': 'mars', 'Olympus Dome, Mars': 'mars', 'Phobos Relay': 'mars',
+  'Ceres Station': 'belt', 'Vesta Yards': 'belt', 'Pallas Outpost': 'belt',
+  'Europa Deep Lab': 'jupiter', 'Ganymede Ring': 'jupiter', 'Callisto Port': 'jupiter', 'Io Foundry': 'jupiter',
+  'Titan Haven': 'saturn', 'Enceladus Vents': 'saturn', 'Forge-7 · Titan orbit': 'saturn',
+  'Luna Tycho': 'earth', 'Earth · Osaka Arcology': 'earth', 'Earth · Nairobi Spire': 'earth', 'Earth · Reykjavík': 'earth',
+  'Triton Watch': 'neptune', 'Halley Drift': 'neptune',
+};
+export const BODIES = [
+  { id: 'mercury', name: 'Mercury', color: '#a8a29e' }, { id: 'venus', name: 'Venus', color: '#fcd34d' },
+  { id: 'earth', name: 'Earth & Luna', color: '#60a5fa' }, { id: 'mars', name: 'Mars & Phobos', color: '#f87171' },
+  { id: 'belt', name: 'Asteroid Belt', color: '#94a3b8' }, { id: 'jupiter', name: 'Jovian moons', color: '#fdba74' },
+  { id: 'saturn', name: 'Saturn system', color: '#fde68a' }, { id: 'neptune', name: 'Outer system', color: '#818cf8' },
+];
+
+export const MUSIC_STYLES = [
+  { id: 'lofi', name: 'Orbit Lo-fi' },
+  { id: 'synth', name: 'Synthwave Drive' },
+  { id: 'ambient', name: 'Nebula Ambient' },
+];
+
+export const ACHIEVEMENTS = [
+  { id: 'first', name: 'First Light', desc: 'Ship your first machine.', check: (s) => s.stats.orders >= 1 },
+  { id: 'b10', name: 'Getting the Hang of It', desc: 'Ship 10 machines.', check: (s) => s.stats.orders >= 10 },
+  { id: 'b50', name: 'Assembly Line', desc: 'Ship 50 machines.', check: (s) => s.stats.orders >= 50 },
+  { id: 'b100', name: 'Centurion', desc: 'Ship 100 machines.', check: (s) => s.stats.orders >= 100 },
+  { id: 's1', name: 'Flawless', desc: 'Earn an S grade.', check: (s) => (s.stats.sGrades || 0) >= 1 },
+  { id: 's10', name: 'Perfectionist', desc: 'Earn 10 S grades.', check: (s) => (s.stats.sGrades || 0) >= 10 },
+  { id: 'p100', name: 'Steady Hands', desc: 'Land 100 PERFECT actions.', check: (s) => (s.stats.perfects || 0) >= 100 },
+  { id: 'p1000', name: 'Surgeon', desc: 'Land 1,000 PERFECT actions.', check: (s) => (s.stats.perfects || 0) >= 1000 },
+  { id: 'od3', name: 'Redline', desc: 'Reach OVERDRIVE III.', check: (s) => !!s.flags.od3 },
+  { id: 'legend', name: 'Jackpot', desc: 'Open a legendary supply crate.', check: (s) => !!s.flags.legendary },
+  { id: 'tools', name: 'Fully Kitted', desc: 'Own every tool upgrade.', check: (s) => UPGRADES.every((u) => s.upgrades[u.id]) },
+  { id: 'decor', name: 'Collector', desc: 'Collect every decor piece.', check: (s) => DECOR.every((d) => s.collection && s.collection.decor[d.id]) },
+  { id: 'themes', name: 'Interior Designer', desc: 'Own every lighting theme.', check: (s) => THEMES.every((t) => s.themes[t.id]) },
+  { id: 'speed', name: 'Speed Demon', desc: 'Beat par by 60 seconds.', check: (s) => !!s.flags.speed },
+  { id: 'bench', name: 'Benchmark Breaker', desc: 'Score 100,000 on a stress test.', check: (s) => Object.values(s.records || {}).some((v) => v >= 100000) },
+  { id: 'sig50', name: 'Halfway There', desc: 'Decode 50% of the Whisper.', check: (s) => (s.signal || 0) >= 50 },
+  { id: 'finale', name: 'Lighthouse Keeper', desc: 'Answer the Whisper.', check: (s) => !!s.finaleDone },
+  { id: 'arcade', name: 'High Score', desc: 'Score 5,000 in Pod Runner.', check: (s) => (s.arcadeHigh || 0) >= 5000 },
+  { id: 'scope', name: 'First Contact', desc: 'Lock the signal in the observatory telescope.', check: (s) => !!s.flags.scope },
+  { id: 'explorer', name: 'Stretch Your Legs', desc: 'Visit every room on the deck.', check: (s) => ROOM_IDS.every((r) => s.visited && s.visited[r]) },
+  { id: 'social', name: 'Crew Member', desc: 'Talk to everyone aboard.', check: (s) => ['orin', 'sela', 'juno', 'pip'].every((w) => s.talked && s.talked[w]) },
+  { id: 'rich', name: 'Credit Baron', desc: 'Earn 25,000 credits in total.', check: (s) => s.stats.earned >= 25000 },
+  { id: 'rush', name: 'Rush Hour', desc: 'Complete 5 rush orders.', check: (s) => (s.stats.rush || 0) >= 5 },
+  { id: 'dj', name: 'Station DJ', desc: 'Change the station music on the jukebox.', check: (s) => !!s.flags.dj },
+];

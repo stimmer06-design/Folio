@@ -1,4 +1,4 @@
-// Opens every menu/modal, exercises the workshop, codex, crates and transmissions, and checks for errors.
+// Opens every menu/modal, exercises achievements, codex, crates and transmissions, and checks for errors.
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -24,18 +24,8 @@ const shot = async (n) => { await page.waitForTimeout(700); await page.screensho
 const fail = (m) => errors.push(m);
 await shot('title');
 
-await page.click('[data-a="workshop"]');
-await shot('workshop');
-await page.click('[data-buy="driver"]');
-await page.waitForTimeout(300);
-if (!(await page.evaluate(() => window.__game.save.upgrades.driver === true && window.__game.save.money === 800))) fail('workshop purchase failed');
-await page.click('[data-tab="lighting"]');
-await page.click('[data-theme="amber"]');
-await page.waitForTimeout(300);
-if ((await page.evaluate(() => window.__game.save.theme)) !== 'amber') fail('theme purchase failed');
-await shot('workshop-lighting');
-await page.click('[data-tab="decor"]');
-await shot('workshop-collection');
+await page.click('[data-a="achievements"]');
+await shot('achievements');
 await page.click('[data-close]');
 await page.waitForSelector('#title:not(.hidden)');
 
