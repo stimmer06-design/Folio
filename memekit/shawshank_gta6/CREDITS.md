@@ -45,7 +45,25 @@ The docket names Pixabay. Pixabay answered the cloud session with a bot challeng
 
 Made in `mix_audio.py`, no outside material: the hollow pipe drone, the 0.3 s rising whoosh, and the pipe reverb.
 
-No film audio and no music is in either file.
+No film audio is in either file. Version B has no audio content at all.
+
+## Music (Version A) - CC BY 4.0, credit required
+
+| Item | Value |
+|---|---|
+| Track | "Fanfare for Space" by Kevin MacLeod (incompetech.com) |
+| File | `music/kevin_macleod_fanfare_for_space.mp3` |
+| Source | https://incompetech.com/music/royalty-free/mp3-royaltyfree/Fanfare%20for%20Space.mp3 |
+| Licence | Creative Commons Attribution 4.0 - https://creativecommons.org/licenses/by/4.0/ |
+| Used | 37.928-42.628 s of the track. Its biggest hit (39.928 s) sits on the cut at frame 60. |
+
+Paste this credit into the video description wherever Version A is posted:
+
+```
+"Fanfare for Space" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+```
 
 ## Font
 

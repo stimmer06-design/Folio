@@ -16,7 +16,7 @@
     "clip_h": 1360,
     "caption_font": "fonts/TikTokSans-Bold.ttf",
     "caption_color": "#000000",
-    "caption_center_y": 380,
+    "caption_center_y": 280,
     "caption_size": 76,
     "caption_min_size": 60,
     "caption_max_w": 960
@@ -60,8 +60,8 @@
     "limiter": "alimiter=limit=0.891:attack=5:release=50:level=false",
     "targets": {
       "breathing_peak_dbfs": -6.0,
-      "thunder_peak_dbfs": -2.0,
-      "rain_rms_dbfs": -14.0
+      "thunder_peak_dbfs": -5.0,
+      "rain_rms_dbfs": -21.0
     },
     "layers": {
       "breathing": {
@@ -90,7 +90,16 @@
       }
     },
     "rain_bus_trim_db": 0.0,
-    "post_trim_db": -2.5,
-    "breathing_drive_db": 6.0
+    "post_trim_db": -2.0,
+    "breathing_drive_db": 6.0,
+    "music": {
+      "enabled": true,
+      "file": "music/kevin_macleod_fanfare_for_space.mp3",
+      "hit_time": 39.928,
+      "gain_db": 0.5,
+      "title": "Fanfare for Space",
+      "artist": "Kevin MacLeod (incompetech.com)",
+      "license": "CC BY 4.0"
+    }
   }
 }

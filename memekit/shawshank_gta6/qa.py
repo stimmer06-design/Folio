@@ -145,21 +145,20 @@ def main():
     check("5a true peak <= -1.0 dBTP", tp_a <= -1.0 and tp_l <= -1.0,
           f"A {tp_a:.1f} dBTP, loopx3 {tp_l:.1f} dBTP")
     xa = audio(A).mean(axis=1)
-    # thunder onset: where low-band (<160 Hz) energy first jumps near the cut
-    from scipy.signal import butter, sosfiltfilt
-    lf = sosfiltfilt(butter(4, 160, "low", fs=SR, output="sos"), xa)
-    hop = SR // 1000
-    env = np.sqrt(np.convolve(lf ** 2, np.ones(hop * 4) / (hop * 4), "same"))
+    # hit onset (thunder + music hit): the sharpest level jump near the cut,
+    # 10 ms after vs 30 ms before, searched in 1 ms steps over cut -0.2 s .. +0.3 s
     c = int(cut / FPS * SR)
-    base = env[c - int(0.4 * SR):c - int(0.05 * SR)].max()
-    win = env[c - int(0.2 * SR):c + int(0.3 * SR)]
-    over = np.where(win > base * 2.0)[0]
-    onset = (c - int(0.2 * SR) + over[0]) / SR if len(over) else None
-    off_f = None if onset is None else (onset - cut / FPS) * FPS
-    check("5b thunder onset within +-1 frame of the cut",
-          off_f is not None and abs(off_f) <= 1.0,
-          f"onset {onset:.4f}s vs cut {cut/FPS:.4f}s = {off_f:+.2f} frames"
-          if onset is not None else "no onset found")
+    sq = np.concatenate([[0.0], np.cumsum(xa.astype(np.float64) ** 2)])
+    k10, k30 = int(0.010 * SR), int(0.030 * SR)
+    cand = np.arange(c - int(0.2 * SR), c + int(0.3 * SR), SR // 1000)
+    ratio = [((sq[t + k10] - sq[t]) / k10) / ((sq[t] - sq[t - k30]) / k30 + 1e-12)
+             for t in cand]
+    onset = cand[int(np.argmax(ratio))] / SR
+    jump_db = 10 * np.log10(max(ratio))
+    off_f = (onset - cut / FPS) * FPS
+    check("5b thunder onset within +-1 frame of the cut", abs(off_f) <= 1.0,
+          f"onset {onset:.4f}s vs cut {cut/FPS:.4f}s = {off_f:+.2f} frames "
+          f"(level jump {jump_db:.1f} dB)")
     check("5c integrated loudness (report; about -14 +-2 LUFS on loopx3)",
           -16.0 <= i_l <= -12.0, f"A {i_a:.1f} LUFS, loopx3 {i_l:.1f} LUFS")
     first = xa[:int(0.1 * SR)]

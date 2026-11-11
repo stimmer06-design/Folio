@@ -177,6 +177,19 @@ def rain_section():
     return th, rain
 
 
+def music_bed(n_total):
+    """Music with its biggest hit placed exactly on the cut. One fixed gain."""
+    M = A.get("music") or {}
+    if not M.get("enabled"):
+        return np.zeros((n_total, 2))
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(ROOT / M["file"]), "-f",
+                          "f32le", "-ac", "2", "-ar", str(SR), "-"],
+                         capture_output=True, check=True).stdout
+    x = np.frombuffer(raw, dtype=np.float32).astype(np.float64).reshape(-1, 2)
+    start = int(round((M["hit_time"] - CUT) * SR))
+    return x[start:start + n_total] * db(M["gain_db"])
+
+
 def main():
     crawl = crawl_section()
     th, rain = rain_section()
@@ -192,6 +205,7 @@ def main():
     # fixed gains only: thunder + rain, then an optional fixed bus trim (dB)
     rain_part = (th[:n_r] + rain[:n_r]) * db(A.get("rain_bus_trim_db", 0.0))
     mix[n_cut:] = rain_part
+    mix += music_bed(n_total)
 
     mix[:96] *= np.linspace(0, 1, 96)[:, None]              # 2 ms de-click at loop
     mix[-96:] *= np.linspace(1, 0, 96)[:, None]
