@@ -1,0 +1,4 @@
+# film-derived media stays out of the repo
+work/
+out/
+__pycache__/

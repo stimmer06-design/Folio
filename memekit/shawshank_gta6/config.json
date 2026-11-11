@@ -1,0 +1,96 @@
+{
+  "post": "Olfrim #3 - 13 Years Waiting (Shawshank x GTA 6)",
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "crf": 16,
+    "preset": "slow",
+    "audio_bitrate": "192k",
+    "audio_rate": 48000
+  },
+  "layout": {
+    "panel_color": "#FFFFFF",
+    "panel_h": 560,
+    "clip_w": 1080,
+    "clip_h": 1360,
+    "caption_font": "fonts/TikTokSans-Bold.ttf",
+    "caption_color": "#000000",
+    "caption_center_y": 380,
+    "caption_size": 76,
+    "caption_min_size": 60,
+    "caption_max_w": 960
+  },
+  "source": {
+    "file": "work/src/dm_x87jiso_video_only.mp4",
+    "url": "https://www.dailymotion.com/video/x87jiso",
+    "channel": "BeyazPerde (Dailymotion) - re-host of the Movieclips clip",
+    "resolution": "1280x720",
+    "fps": "24000/1001",
+    "status": "DRAFT SOURCE - 720p, docket asks for >=1080p",
+    "unsharp": "5:5:0.4"
+  },
+  "shots": [
+    {
+      "name": "CRAWL",
+      "caption": "13 years waiting for GTA 6:",
+      "src_start": 45.045,
+      "out_frames": 60,
+      "crop_dx": 0,
+      "speed": 1.0
+    },
+    {
+      "name": "RAIN_CLOSE",
+      "caption": "november 19:",
+      "src_start": 108.15,
+      "out_frames": 41,
+      "crop_dx": 0,
+      "speed": 1.0
+    },
+    {
+      "name": "RAIN_OVERHEAD",
+      "caption": "november 19:",
+      "src_start": 109.526,
+      "out_frames": 40,
+      "crop_dx": 0,
+      "speed": 1.0
+    }
+  ],
+  "audio_A": {
+    "limiter": "alimiter=limit=0.891:attack=5:release=50:level=false",
+    "targets": {
+      "breathing_peak_dbfs": -6.0,
+      "thunder_peak_dbfs": -2.0,
+      "rain_rms_dbfs": -14.0
+    },
+    "layers": {
+      "breathing": {
+        "file": "sfx/bsb_1103_breathless_man.mp3",
+        "offset": 5.34
+      },
+      "scrape": {
+        "file": "sfx/bsb_1104_synthetic_coat_rubbed.mp3",
+        "offset": 0.34
+      },
+      "pipe_drips": {
+        "file": "sfx/bsb_2136_cave_drops_reverb.mp3",
+        "offset": 10.0
+      },
+      "drips_close": {
+        "file": "sfx/bsb_1384_drops_of_water_1.mp3",
+        "offset": 1.45
+      },
+      "thunder": {
+        "file": "sfx/bsb_3180_thunder_7.mp3",
+        "offset": 0.0
+      },
+      "rain": {
+        "file": "sfx/bsb_0124_rain_and_thunder_1.mp3",
+        "offset": 6.0
+      }
+    },
+    "rain_bus_trim_db": 0.0,
+    "post_trim_db": -2.5,
+    "breathing_drive_db": 6.0
+  }
+}
